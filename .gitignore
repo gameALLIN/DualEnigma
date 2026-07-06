@@ -1,0 +1,32 @@
+# ===========================
+# Root .gitignore
+# ===========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ===========================
+# IDE
+# ===========================
+.vs/
+.vscode/
+.idea/
+
+# ===========================
+# Codely CLI / Tool Config
+# ===========================
+.codely-cli/
+.codelyignore
+.com-unity-codely.json
+
+# ===========================
+# Unity Build
+# ===========================
+*.apk
+*.aab
+*.ipa
+*.app

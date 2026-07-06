@@ -1,0 +1,46 @@
+# ===========================
+# OS Generated
+# ===========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ===========================
+# Temp / Backup Files
+# ===========================
+*~
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# ===========================
+# IDE / Editor
+# ===========================
+.vs/
+.vscode/
+.idea/
+
+# ===========================
+# Exported Files (large/binary)
+# ===========================
+*.pdf
+*.psd
+*.ai
+*.sketch
+*.xlsx
+*.docx
+*.pptx
+
+# ===========================
+# Keep Markdown & Text tracked
+# ===========================
+!*.md
+!*.txt
+!*.csv
+!*.json
