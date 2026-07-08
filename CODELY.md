@@ -22,19 +22,23 @@ DualEnigma/
 │
 ├── GameDesign/                       # 策划工作区
 │   ├── DesignDocuments/
-│   │   └── GDD_核心设计文档.md       # 核心设计文档 v3.0（游戏概述/角色/材料/灾害/建造/流程/地图）
-│   ├── LevelDesign/                  # 关卡设计（待基于 GDD 重写）
-│   ├── NumericalDesign/              # 数值设计（待基于 GDD 重写）
-│   ├── ArtRequirements/              # 美术需求（待基于 GDD 重写）
+│   │   └── GDD_核心设计文档.md       # 核心设计文档 v6.0
+│   ├── LevelDesign/                  # 关卡设计（待基于 GDD v6.0 重写）
+│   ├── NumericalDesign/              # 数值设计（待基于 GDD v6.0 重写）
+│   ├── ArtRequirements/              # 美术需求（待基于 GDD v6.0 重写）
 │   ├── AudioRequirements/            # 音频需求
 │   └── VersionHistory/               # 版本历史
 │
 └── .codely-cli/                     # Codely CLI 配置（gitignored）
-    ├── agents/                       # 子智能体配置
-    │   ├── 00.toml                   # 主智能体（任务分派调度器）
+    ├── agents/                       # 子智能体配置（8 个 agent toml）
+    │   ├── 00.toml                   # 主智能体（任务分派调度器，网状拓扑）
     │   ├── main_coder.toml           # 主程子智能体
     │   ├── main_art.toml             # 美术子智能体
-    │   └── main_designer.toml        # 主策划子智能体
+    │   ├── main_designer.toml        # 主策划子智能体
+    │   ├── main_network.toml         # 网络子智能体
+    │   ├── main_qa.toml             # 测试子智能体
+    │   ├── main_audio.toml          # 音频子智能体
+    │   └── main_level.toml          # 关卡子智能体
     ├── extensions/                   # Codely 扩展（unity-lsp, TJGenerators, superpowers 等）
     └── skills/                       # 自定义技能
         └── dualenigma-dispatcher/    # 任务分派 skill
@@ -42,25 +46,46 @@ DualEnigma/
 
 ## 智能体架构
 
-项目使用主智能体 + 三子智能体的层级分派模式：
+项目使用主智能体 + 七子智能体的**网状拓扑**协作模式：
 
 ```
 00 (主智能体) — 接收需求 → 识别类型 → 拆解任务 → 分派 → 汇报
+│
 ├── main_coder     — 程序：Unity C# 代码、架构、Bug修复
 ├── main_art       — 美术：精灵、Shader、预制体、特效、UI视觉
-└── main_designer  — 策划：GDD、数值、关卡、需求文档
+├── main_designer  — 策划：GDD、数值、关卡、需求文档
+├── main_network   — 网络：联机同步、房间管理、状态同步
+├── main_qa        — 测试：自动化测试、Bug复现、编译检查
+├── main_audio     — 音频：音效系统、BGM、程序化音效
+└── main_level     — 关卡：关卡布局、灾害波次、难度曲线
 ```
 
-子智能体均配置了 `task` 工具权限，可在需求较大时继续向下拆分给 `general-purpose` 子智能体并行执行。
+### 网状协作
 
-## 核心设计要点（GDD v3.0 摘要）
+子智能体之间可以**直接用 `task` 工具互相调用**，无需经过 00 中转：
+
+```
+main_coder ←→ main_network   (网络接口实现)
+main_coder ←→ main_qa        (代码测试验证)
+main_art   ←→ main_audio     (特效+音效配合)
+main_level ←→ main_designer  (关卡数值确认)
+main_level ←→ main_coder     (关卡脚本实现)
+...（任意两个智能体可直接协作）
+```
+
+00 负责**初始路由**和**跨领域复杂任务的拆解协调**，单一领域任务直接分派给对应智能体。
+
+## 核心设计要点（GDD v6.0 摘要）
 
 - **角色**: 水人(HP100, 移速4格/s) + 火人(HP100, 可二段跳)
-- **材料**: 5种（水砖/冰砖/火砖/岩浆砖/石砖），各有抗性/弱点/护盾加成
-- **灾害**: 5种（山火/洪水/地震/暴风雪/陨石雨），每种20秒
-- **建造**: 32×32px网格，12×10格区域，3块搬运上限
-- **流程**: 灾害预告(5s) → 建造(45s) → 灾害(20s) → 修整(10s) → 升级(15s) = 95s/轮 × 3轮
-- **结构**: 3章 × 12节 = 36关
+- **碎片**: 3种（冰晶★/熔岩★★/岩石★★★），天空掉落，3秒消失
+- **合成**: 根据灾难环境决定合成表，5种材料（水砖/冰砖/火砖/岩浆砖/石砖）
+- **灾害**: 35种，6大类，每轮1种，渐进式入侵（30%→60%→100%→80%）
+- **庇护**: 双生庇护能量系统，队友3格内+20/s，超3格-33/s，耗尽后扣血
+- **技能**: 卡牌选择（3E选1+3Q选1），被动固定，组合技温砖
+- **天赋**: 48个天赋，每轮3选1，全游戏36次，可叠加
+- **流程**: 7阶段90秒/轮（预告5s→碎片20s→灾预5s→建造15s→灾害20s→修整10s→升级15s）
+- **结构**: 3章 × 4节 × 3轮 = 36关
 
 ## 美术风格规范
 
@@ -90,7 +115,7 @@ DualEnigma/
 
 ## 当前状态
 
-- ✅ GDD v3.0 设计迭代中
-- ✅ 智能体架构配置完成（4个 agent toml）
+- ✅ GDD v6.0 设计迭代中（结构定稿，数值待定）
+- ✅ 智能体架构升级完成（8 个 agent toml，网状拓扑，全面 system prompt）
 - ✅ Unity 工程框架已清空，保留 Scenes，准备从零重建
-- 🎯 下一步：基于 GDD 重新设计工程化代码架构
+- 🎯 下一步：基于 GDD v6.0 重新设计工程化代码架构

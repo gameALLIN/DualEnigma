@@ -1,0 +1,4 @@
+interface:
+  display_name: "游戏策划文档工作流"
+  short_description: "规范游戏策划文档的迭代与更新，支持设计模式和敲定模式"
+  default_prompt: "帮我更新策划文档，同步版本记录"
