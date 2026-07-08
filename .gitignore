@@ -19,7 +19,13 @@ Thumbs.db
 # ===========================
 # Codely CLI / Tool Config
 # ===========================
-.codely-cli/
+# 允许 agents/ 和 skills/ 配置同步，忽略大量二进制扩展和临时文件
+.codely-cli/extensions/
+.codely-cli/auto-saves/
+.codely-cli/commands/
+.codely-cli/tool-outputs/
+.codely-cli/tmp/
+.codely-cli/settings.json
 .codelyignore
 .com-unity-codely.json
 

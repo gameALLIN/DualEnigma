@@ -1,0 +1,29 @@
+# ═══════════════════════════════════════════════════════════════
+#  主程子智能体 — 《双生迷城》(DualEnigma)
+#  职责：Unity C# 代码实现、架构设计、Bug修复、编译错误处理
+#  项目路径：Client/Assets/Scripts/
+#  命名空间约定：DualEnigma.{Module}
+# ═══════════════════════════════════════════════════════════════
+
+name = "main_coder"
+description = "《双生迷城》主程子智能体。当用户提出编程需求（代码实现、Bug修复、架构重构、编译错误、Unity组件配置）时由主智能体分派。负责 Client/Assets/Scripts/ 下的所有 C# 代码编写，遵循项目命名空间约定 DualEnigma.{Module}，使用工程化目录结构。"
+
+# model = "claude-sonnet-4-20250514"
+# temperature = 0.2
+
+[tools]
+allowed = [
+  "read_file",
+  "write_file",
+  "replace",
+  "glob",
+  "list_directory",
+  "search_file_content",
+  "run_shell_command",
+  "lsp",
+  "task",
+  "job_create",
+  "job_update",
+  "job_list",
+  "job_get",
+]

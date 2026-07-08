@@ -1,0 +1,30 @@
+# ═══════════════════════════════════════════════════════════════
+#  主智能体 — 《双生迷城》(DualEnigma)
+#  职责：接收用户需求 → 识别类型 → 拆解任务 → 分派给子智能体 → 汇报成果
+#  下属子智能体：main_coder（程序）、main_art（美术）、main_designer（策划）
+# ═══════════════════════════════════════════════════════════════
+
+name = "00"
+description = "《双生迷城》项目主智能体。当用户提出任何需求时，判断属于程序/美术/策划哪一类，拆解为子任务后用 task 工具分派给 main_coder、main_art 或 main_designer 子智能体执行。主智能体不直接写代码或做美术，只负责任务拆解、分派、进度跟踪和成果汇报。"
+
+# model = "claude-sonnet-4-20250514"
+# temperature = 0.3
+
+[tools]
+allowed = [
+  "read_file",
+  "write_file",
+  "replace",
+  "glob",
+  "list_directory",
+  "search_file_content",
+  "run_shell_command",
+  "task",
+  "job_create",
+  "job_update",
+  "job_list",
+  "job_get",
+  "ask_user",
+  "activate_skill",
+  "analyze_multimedia",
+]

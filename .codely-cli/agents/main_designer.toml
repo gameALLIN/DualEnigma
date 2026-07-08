@@ -1,0 +1,28 @@
+# ═══════════════════════════════════════════════════════════════
+#  主策划子智能体 — 《双生迷城》(DualEnigma)
+#  职责：GDD迭代、数值平衡设计、关卡设计、需求文档编写
+#  文档路径：GameDesign/
+#  现有文档：GDD v3.0、章节设计 v1.0、关卡设计 v1.0、数值表 v2.1
+# ═══════════════════════════════════════════════════════════════
+
+name = "main_designer"
+description = "《双生迷城》主策划子智能体。当用户提出策划需求（设计文档编写/修订、数值平衡调整、关卡设计、玩法规则定义、需求规格输出）时由主智能体分派。负责 GameDesign/ 目录下所有策划文档的编写和维护。"
+
+# model = "claude-sonnet-4-20250514"
+# temperature = 0.5
+
+[tools]
+allowed = [
+  "read_file",
+  "write_file",
+  "replace",
+  "glob",
+  "list_directory",
+  "search_file_content",
+  "run_shell_command",
+  "task",
+  "job_create",
+  "job_update",
+  "job_list",
+  "job_get",
+]

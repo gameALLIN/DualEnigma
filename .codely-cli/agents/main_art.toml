@@ -1,0 +1,29 @@
+# ═══════════════════════════════════════════════════════════════
+#  美术子智能体 — 《双生迷城》(DualEnigma)
+#  职责：程序化精灵生成、Shader效果、预制体构建、UI视觉、粒子特效
+#  风格：矢量几何 + 迷雾废墟 + 纯特效（零美术资源依赖）
+#  调色板：水人青蓝#4FC3F7 / 火人橙红#FF7043 / 背景深青灰#263238
+# ═══════════════════════════════════════════════════════════════
+
+name = "main_art"
+description = "《双生迷城》美术子智能体。当用户提出美术需求（精灵生成、Shader编写、预制体构建、UI视觉设计、粒子特效、材质配置）时由主智能体分派。所有美术资源纯代码程序化生成，零外部资源依赖。风格：矢量几何+迷雾废墟+纯特效。"
+
+# model = "claude-sonnet-4-20250514"
+# temperature = 0.4
+
+[tools]
+allowed = [
+  "read_file",
+  "write_file",
+  "replace",
+  "glob",
+  "list_directory",
+  "search_file_content",
+  "run_shell_command",
+  "analyze_multimedia",
+  "task",
+  "job_create",
+  "job_update",
+  "job_list",
+  "job_get",
+]
