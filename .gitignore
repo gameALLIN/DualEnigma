@@ -36,3 +36,22 @@ Thumbs.db
 *.aab
 *.ipa
 *.app
+
+# ===========================
+# Unity Temp / Library
+# ===========================
+Client/Library/
+Client/Temp/
+Client/Obj/
+Client/Build/
+Client/Builds/
+Client/UserSettings/
+Client/Logs/
+Client/.vs/
+Client/.idea/
+Client/*.csproj.user
+
+# ===========================
+# MimoCode
+# ===========================
+.mimocode/

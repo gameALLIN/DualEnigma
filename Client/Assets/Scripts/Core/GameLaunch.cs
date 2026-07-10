@@ -1,0 +1,99 @@
+/// ============================================================
+/// 文件名: GameLaunch.cs
+/// 创建时间: 2026-07-10
+/// 作者: DualEnigma
+/// 描述: 游戏启动入口，负责各系统初始化及首个 UI 面板的加载
+/// ============================================================
+
+using DualEnigma.UI;
+using UnityEngine;
+
+namespace DualEnigma.Core
+{
+    /// <summary>
+    /// 挂载在启动场景的空 GameObject 上，作为整个游戏的入口点。
+    /// 当前阶段仅负责 UI 系统初始化，后续模块按需在此扩展。
+    /// </summary>
+    public class GameLaunch : MonoBehaviour
+    {
+        [Header("启动配置")]
+        [Tooltip("游戏启动后自动打开的第一个面板名称（需以 UI 开头，对应 Prefabs/UI/{面板名}/{面板名}.prefab）")]
+        [SerializeField] private string m_EntryPanelName = "UITest";
+
+        private void Awake()
+        {
+            // 确保场景中只有一个 AudioListener
+            AudioListener[] listeners = FindObjectsOfType<AudioListener>();
+            if (listeners.Length > 1)
+            {
+                System.Array.Sort(listeners, (a, b) =>
+                {
+                    bool aOnCamera = a != null && a.GetComponent<Camera>() != null;
+                    bool bOnCamera = b != null && b.GetComponent<Camera>() != null;
+                    return bOnCamera.CompareTo(aOnCamera);
+                });
+
+                for (int i = 1; i < listeners.Length; i++)
+                {
+                    DestroyImmediate(listeners[i]);
+                }
+                Debug.Log($"[GameLaunch] 清理了 {listeners.Length - 1} 个多余的 AudioListener");
+            }
+            else if (listeners.Length == 0)
+            {
+                gameObject.AddComponent<AudioListener>();
+                Debug.Log("[GameLaunch] 自动添加了 AudioListener");
+            }
+
+            // 初始化资源管理器和 UI 系统
+            _ = ResMgr.Instance;
+            _ = UIManager.Instance;
+
+            Debug.Log("[GameLaunch] 资源管理器和 UI 系统初始化完成");
+        }
+
+        private void Start()
+        {
+            if (!string.IsNullOrEmpty(m_EntryPanelName))
+            {
+                OpenEntryPanel(m_EntryPanelName);
+            }
+        }
+
+        /// <summary>
+        /// 通过反射打开指定名称的面板，避免泛型 Push&lt;T&gt; 对类型参数的硬依赖。
+        /// 后续如有更复杂的启动流程，可在子类中重写此方法。
+        /// </summary>
+        protected virtual void OpenEntryPanel(string panelName)
+        {
+            // 遍历所有程序集查找面板 Controller 类型（{panelName}Ctrl）
+            System.Type type = null;
+            string typeName = $"{panelName}Ctrl";
+            foreach (var assembly in System.AppDomain.CurrentDomain.GetAssemblies())
+            {
+                type = assembly.GetType($"DualEnigma.UI.{typeName}");
+                if (type != null)
+                    break;
+            }
+
+            if (type == null)
+            {
+                Debug.LogWarning($"[GameLaunch] 未找到面板类型 {typeName}，跳过打开。请先使用「DualEnigma > UI > 生成面板」创建该面板。");
+                return;
+            }
+
+            // 反射调用 UIManager.Push<T>(UIMode) 泛型方法
+            var method = typeof(UIManager).GetMethod("Push", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            if (method == null)
+            {
+                Debug.LogError("[GameLaunch] UIManager.Push 泛型方法未找到");
+                return;
+            }
+
+            var genericMethod = method.MakeGenericMethod(type);
+            genericMethod.Invoke(UIManager.Instance, new object[] { UIMode.FullScreen });
+
+            Debug.Log($"[GameLaunch] 已打开入口面板: {panelName}");
+        }
+    }
+}
