@@ -1,0 +1,20 @@
+{
+    "name": "DualEnigma.Tests",
+    "rootNamespace": "DualEnigma.Core.Tests",
+    "references": [
+        "DualEnigma",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -45,8 +45,19 @@ namespace DualEnigma.Core
                 Debug.Log("[GameLaunch] 自动添加了 AudioListener");
             }
 
-            // 初始化资源管理器和 UI 系统
+            // 初始化资源管理器
             _ = ResMgr.Instance;
+            ResMgr.Instance.Init();
+
+            // Runtime 模式下标记常驻 AB
+#if !UNITY_EDITOR
+            ResMgr.Instance.SetPersistentBundle("ui");
+            ResMgr.Instance.SetPersistentBundle("audio");
+            ResMgr.Instance.SetPersistentBundle("atlas");
+            ResMgr.Instance.SetPersistentBundle("data");
+#endif
+
+            // 初始化 UI 系统
             _ = UIManager.Instance;
 
             Debug.Log("[GameLaunch] 资源管理器和 UI 系统初始化完成");

@@ -1,0 +1,136 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee4bc21567f434b598a3c96ba4946372, type: 3}
+  m_Name: AssetReferenceDB
+  m_EditorClassIdentifier: 
+  m_assets:
+  - m_assetDatabaseId: 935db735c871100438b9f3d45ea0bb4d
+    m_importFrom: Assets/Scripts/Core/GameLaunch.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: a770412e195a4dd4ca52c9fe290a9e0e
+    m_importFrom: Assets/Scripts/Core/ABRefItem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: f96823c6b6386694d9f04c61ebb3d870
+    m_importFrom: Assets/Scripts/UI/Core/IUIPanel.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: e00107432eb44af46840e97eaf726dd1
+    m_importFrom: Assets/Scripts/UI/Views/UIHome/UIHomeModel.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 3a3c7dbd17e766744ac991372a6c2f46
+    m_importFrom: Assets/Scripts/UI/Views/UITest/UITestCtrl.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: dc0ce725b9c25af4eb2e81ef07461ccd
+    m_importFrom: Assets/Scripts/UI/Views/UITest/UITestView.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 6084807892db7c948b32d27f5e763a8a
+    m_importFrom: Assets/Scripts/UI/Core/UIManager.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: b9592e461373bf14fb3114d3bbee74c3
+    m_importFrom: Assets/Scripts/Core/Tests/MockManifest.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 9cabc2d94aba8554895da759a3e5dce8
+    m_importFrom: Assets/Scripts/UI/MVC/UIModelBase.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: c6e758c9af1029d42954efabc2cb3d64
+    m_importFrom: Assets/Scripts/Core/Tests/ResMgrTests.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: e52679b617c49f24cba7539a0c2c6816
+    m_importFrom: Assets/Scripts/Core/Tests
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 40cac20628774d442a3877ec6a9d3c84
+    m_importFrom: Assets/Scripts/Core/Tests/MockBundleLoader.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 862213f780186ea449a47728ce45c17b
+    m_importFrom: Assets/Scripts/UI/MVC/UIViewBase.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 1a191bb27a59eef47a91b8514aeb9be3
+    m_importFrom: Assets/Scripts/Core/AssetBundleMgr.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 962fcfcd4d457564a97556dbcd207492
+    m_importFrom: Assets/Scripts/UI/Views/UIHome/UIHomeCtrl.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 987213e47219e8c4d821ce3d8e6fa6b7
+    m_importFrom: Assets/Scripts/Core/Tests/AssetBundleMgrTests.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 85b07f8974795004ea84235cc2def1fe
+    m_importFrom: Assets/Scripts/DualEnigma.asmdef
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 129142e70a7213b4b935e93aacb59f8a
+    m_importFrom: Assets/Scripts/UI/Views/UIHome/UIHomeView.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 89e49a641bb22f14fba1d6133158bbe9
+    m_importFrom: Assets/Scripts/Core/ResMgr.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: ab1aa23e88d5c5f43868b090e79610a2
+    m_importFrom: Assets/Scripts/UI/MVC/UICtrlBase.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 317979dcae831f54696cf75fbc68c462
+    m_importFrom: Assets/Scripts/UI/Core/UIAutoBinder.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: fcd86c668e59f124eb65b9f66f1fcc46
+    m_importFrom: Assets/Scripts/Core/Tests/DualEnigma.Tests.asmdef
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 3f97ca3728cb0554889e930b0cb83f83
+    m_importFrom: Assets/Scripts/UI/Views/UITest/UITestModel.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: f55a932aa00ae8d4db54d166be1847d3
+    m_importFrom: Assets/AssetGraph/AssetBundles/Cache
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 82d5cc7ef2d2597408382128100753a1
+    m_importFrom: Assets/AssetGraph/AssetBundles/Cache/TemporalSettingFiles
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 71ce596a6b804874c8f6807c0aeb5412
+    m_importFrom: Assets/AssetGraph/AssetBundles
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: aea0fa9d00c708f4aaf20b8cfa7c27dc
+    m_importFrom: Assets/AssetGraph
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 03e5328fb0d83984698cef032abf573f
+    m_importFrom: Assets/AssetGraph/AssetBundles/Cache/TemporalSettingFiles/AssetReferenceDB.asset
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: cafb324b9086d9441a741ac0808b05d0
+    m_importFrom: Assets/3rd/AssetGraph-1.7-release/AssetBundles/Cache/TemporalSettingFiles/AssetReferenceDB.asset
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 2cda990e2423bbf4892e6590ba056729
+    m_importFrom: Assets/Scenes/Main.unity
+    m_exportTo: 
+    m_variantName: 
+  m_version: 2
