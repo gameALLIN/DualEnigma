@@ -6,6 +6,16 @@
 /// ============================================================
 
 using DualEnigma.UI;
+using DualEnigma.Data;
+using DualEnigma.Character;
+using DualEnigma.Fragment;
+using DualEnigma.Synthesis;
+using DualEnigma.Building;
+using DualEnigma.Shelter;
+using DualEnigma.Disaster;
+using DualEnigma.Skill;
+using DualEnigma.Talent;
+using DualEnigma.Network;
 using UnityEngine;
 
 namespace DualEnigma.Core
@@ -57,10 +67,33 @@ namespace DualEnigma.Core
             ResMgr.Instance.SetPersistentBundle("data");
 #endif
 
+            // 初始化事件总线
+            _ = EventBus.Instance;
+
+            // 初始化数据管理器
+            DataManager.Instance.Initialize();
+
+            // 初始化游戏状态机
+            _ = GameStateMachine.Instance;
+
+            // 初始化游戏管理器
+            _ = GameManager.Instance;
+
             // 初始化 UI 系统
             _ = UIManager.Instance;
 
-            Debug.Log("[GameLaunch] 资源管理器和 UI 系统初始化完成");
+            // 初始化业务系统（触发 Singleton 创建 + ServiceLocator 注册）
+            _ = CharacterSystem.Instance;
+            _ = FragmentSystem.Instance;
+            _ = SynthesisSystem.Instance;
+            _ = BuildingSystem.Instance;
+            _ = ShelterSystem.Instance;
+            _ = DisasterSystem.Instance;
+            _ = SkillSystem.Instance;
+            _ = TalentSystem.Instance;
+            _ = NetworkSystem.Instance;
+
+            Debug.Log("[GameLaunch] 全系统初始化完成（Core + 9个业务系统 + UI）");
         }
 
         private void Start()
