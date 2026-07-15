@@ -96,6 +96,16 @@ namespace DualEnigma.Talent
             ApplyEpicPity(pool, result, chapter);
             ApplyFirstAidPity(pool, result);
 
+            // 稀有提升保底计数器：每轮3选1中无稀有以上天赋则 +1
+            if (result.Exists(t => t.Rarity >= Rarity.Rare))
+                _noRarityCounter = 0;
+            else
+                _noRarityCounter++;
+
+            // 急救保底计数器：统计急救天赋出现次数（而非选中次数）
+            if (result.Exists(t => t.EffectId == TalentEffectId.FirstAid))
+                _firstAidCount++;
+
             return result;
         }
 
@@ -114,10 +124,9 @@ namespace DualEnigma.Talent
             if (_chapterEpicHistory.TryGetValue(chapter, out bool epicObtained) && epicObtained)
                 return;
 
-            // 当前选项中已包含史诗天赋，视为本章已获得
+            // 当前选项中已包含史诗天赋，无需保底
             if (result.Exists(t => t.Rarity == Rarity.Epic))
             {
-                _chapterEpicHistory[chapter] = true;
                 return;
             }
 
@@ -141,7 +150,6 @@ namespace DualEnigma.Talent
             else
                 result[0] = epicTalent;
 
-            _chapterEpicHistory[chapter] = true;
             Debug.Log($"[TalentSystem] 史诗保底触发（第{chapter}章，全局第{globalRound}轮）");
         }
 
@@ -217,18 +225,9 @@ namespace DualEnigma.Talent
 
             targetList.Add(talent);
 
-            if (talent.Rarity >= Rarity.Rare)
-                _noRarityCounter = 0;
-            else
-                _noRarityCounter++;
-
             // 记录本章是否已获得史诗天赋（保底机制用）
             if (talent.Rarity == Rarity.Epic)
                 _chapterEpicHistory[_currentChapter] = true;
-
-            // 急救天赋被选中时计数（保底机制用）
-            if (talent.EffectId == TalentEffectId.FirstAid)
-                _firstAidCount++;
 
             ApplyTalentEffects(owner, talent);
 
@@ -287,33 +286,83 @@ namespace DualEnigma.Talent
                 // 使护盾类技能持续时间 +50%）
                 if (talent.EffectId == TalentEffectId.DamageReduction)
                     skillSystem.SetShieldActive(true);
+
+                // 被动技能触发概率加成（对两个角色都应用）
+                skillSystem.SetPassiveChanceBonus(0, summary.PassiveChanceBonus);
+                skillSystem.SetPassiveChanceBonus(1, summary.PassiveChanceBonus);
             }
 
+            // 角色属性修改：HP、搬运上限、移动速度（对两个角色都应用）
+            var characterSystem = ServiceLocator.Get<ICharacterSystem>();
+            if (characterSystem != null)
+            {
+                ApplyCharacterStats(characterSystem, CharacterType.Aqua, summary);
+                ApplyCharacterStats(characterSystem, CharacterType.Ignis, summary);
+            }
+
+            // 庇护参数修改（使用 summary 汇总值）
             var shelterSystem = ServiceLocator.Get<IShelterSystem>();
             if (shelterSystem != null)
             {
-                ShelterParams shelterParams = new ShelterParams();
+                ShelterParams shelterParams = new ShelterParams
+                {
+                    MaxEnergy = 0f,
+                    RecoveryRate = 0f,
+                    ShelterDistance = 0f,
+                    DamageMultiplier = 1f
+                };
                 bool needsShelterUpdate = false;
 
-                switch (talent.EffectId)
+                if (summary.EnergyMaxBonus != 0f)
                 {
-                    case TalentEffectId.EnergyMaxBonus:
-                        shelterParams.MaxEnergy = talent.EffectValue;
-                        needsShelterUpdate = true;
-                        break;
-                    case TalentEffectId.ShelterDistance:
-                        shelterParams.ShelterDistance = talent.EffectValue;
-                        needsShelterUpdate = true;
-                        break;
-                    case TalentEffectId.DamageReduction:
-                        shelterParams.DamageMultiplier = 0.5f;
-                        needsShelterUpdate = true;
-                        break;
+                    shelterParams.MaxEnergy = summary.EnergyMaxBonus;
+                    needsShelterUpdate = true;
+                }
+                if (summary.ShelterDistanceBonus != 0f)
+                {
+                    shelterParams.ShelterDistance = summary.ShelterDistanceBonus;
+                    needsShelterUpdate = true;
+                }
+                if (summary.DamageMultiplier != 1f)
+                {
+                    shelterParams.DamageMultiplier = summary.DamageMultiplier;
+                    needsShelterUpdate = true;
+                }
+                if (summary.EnergyRecoveryMultiplier != 1f)
+                {
+                    shelterParams.RecoveryRate = summary.EnergyRecoveryMultiplier;
+                    needsShelterUpdate = true;
                 }
 
                 if (needsShelterUpdate)
                     shelterSystem.ModifyParams(shelterParams);
             }
+        }
+
+        /// <summary>
+        /// 将天赋汇总效果应用到角色属性（HP、搬运上限、移动速度）。
+        /// 引用：天赋系统.md §4.2 天赋效果应用
+        /// </summary>
+        private void ApplyCharacterStats(ICharacterSystem characterSystem, CharacterType type, TalentEffectSummary summary)
+        {
+            CharacterController character = characterSystem.GetCharacter(type);
+            if (character == null || character.Stats == null)
+                return;
+
+            // HP 加成：同时增加最大生命值和当前生命值
+            if (summary.HPBonus != 0)
+            {
+                character.Stats.MaxHP += summary.HPBonus;
+                character.Stats.CurrentHP += summary.HPBonus;
+            }
+
+            // 搬运上限
+            if (summary.CarryLimitBonus != 0)
+                character.Stats.CarryLimit += summary.CarryLimitBonus;
+
+            // 移动速度
+            if (summary.MoveSpeedMultiplier != 1f)
+                character.Stats.MoveSpeed *= summary.MoveSpeedMultiplier;
         }
 
         private List<TalentData> GetTargetPool(CharacterType owner)
@@ -414,6 +463,9 @@ namespace DualEnigma.Talent
                     break;
                 case TalentEffectId.PassiveChance:
                     summary.PassiveChanceBonus += talent.EffectValue;
+                    break;
+                case TalentEffectId.DamageReduction:
+                    summary.DamageMultiplier *= talent.EffectValue;
                     break;
             }
         }

@@ -84,6 +84,7 @@ namespace DualEnigma.Core
 
             // 初始化业务系统（触发 Singleton 创建 + ServiceLocator 注册）
             _ = CharacterSystem.Instance;
+            CharacterSystem.Instance.Initialize();
             _ = FragmentSystem.Instance;
             _ = SynthesisSystem.Instance;
             _ = BuildingSystem.Instance;

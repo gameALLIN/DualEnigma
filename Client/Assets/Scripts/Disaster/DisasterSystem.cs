@@ -5,6 +5,7 @@
 /// 描述: 灾难系统管理器，管理灾难生成、渐进强度和伤害。
 /// ============================================================
 
+using System.Collections.Generic;
 using UnityEngine;
 using DualEnigma.Core;
 using DualEnigma.Data;
@@ -32,6 +33,7 @@ namespace DualEnigma.Disaster
         protected override void OnSingletonInitialized()
         {
             ServiceLocator.Register<IDisasterSystem>(this);
+            _config = DataManager.Instance.LoadConfig<DisasterConfig>("DisasterConfig");
             Debug.Log("[DisasterSystem] 灾难系统初始化完成");
         }
 
@@ -40,9 +42,6 @@ namespace DualEnigma.Disaster
         /// </summary>
         public void StartDisaster(DisasterId disasterId, float difficultyMultiplier, uint seed)
         {
-            if (_config == null)
-                _config = DataManager.Instance.LoadConfig<DisasterConfig>("DisasterConfig");
-
             DisasterParams parameters;
             if (disasterId == DisasterId.E3Enhanced && _config != null && _config.E3Enhanced != null)
             {
@@ -64,13 +63,30 @@ namespace DualEnigma.Disaster
                 };
             }
 
-            parameters.RandomSeed = seed;
-            parameters.DifficultyMultiplier = difficultyMultiplier;
+            if (parameters == null)
+            {
+                Debug.LogError($"[DisasterSystem] 灾难配置未找到: {disasterId}");
+                return;
+            }
+
+            DisasterParams paramsClone = new DisasterParams
+            {
+                Id = parameters.Id,
+                Name = parameters.Name,
+                Category = parameters.Category,
+                Environment = parameters.Environment,
+                BaseDPS = parameters.BaseDPS,
+                Range = parameters.Range,
+                Duration = parameters.Duration,
+                RandomSeed = seed,
+                DifficultyMultiplier = difficultyMultiplier,
+                Position = parameters.Position
+            };
 
             CurrentDisaster = CreateDisaster(disasterId);
             if (CurrentDisaster != null)
             {
-                CurrentDisaster.Initialize(parameters);
+                CurrentDisaster.Initialize(paramsClone);
                 CurrentDisaster.OnStart();
                 _elapsedTime = 0f;
 
@@ -79,7 +95,7 @@ namespace DualEnigma.Disaster
                     disasterId = (int)disasterId
                 });
 
-                Debug.Log($"[DisasterSystem] 灾难启动: {disasterId}, DPS={parameters.BaseDPS}, 难度×{difficultyMultiplier}");
+                Debug.Log($"[DisasterSystem] 灾难启动: {disasterId}, DPS={paramsClone.BaseDPS}, 难度×{difficultyMultiplier}");
             }
         }
 
@@ -115,6 +131,17 @@ namespace DualEnigma.Disaster
             }
 
             CurrentDisaster.OnUpdate(deltaTime, _elapsedTime);
+        }
+
+        /// <summary>
+        /// 获取当前灾难的实际位置（世界坐标）。
+        /// 若无运行中的灾难，返回 Vector2.zero。
+        /// </summary>
+        public Vector2 GetDisasterPosition()
+        {
+            if (CurrentDisaster != null && CurrentDisaster.Params != null)
+                return CurrentDisaster.Params.Position;
+            return Vector2.zero;
         }
 
         private DisasterBase CreateDisaster(DisasterId id)

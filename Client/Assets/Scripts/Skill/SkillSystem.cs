@@ -43,6 +43,9 @@ namespace DualEnigma.Skill
         /// <summary>技能配置</summary>
         private SkillConfig _config;
 
+        /// <summary>确定性随机数生成器（用于卡牌抽取和概率判定）</summary>
+        private System.Random _random = new System.Random();
+
         // ──────────────────────────────────────────────
         //  天赋修饰器
         // ──────────────────────────────────────────────
@@ -59,6 +62,9 @@ namespace DualEnigma.Skill
         /// <summary>双重释放概率（玩家ID → 概率 0-1）</summary>
         private readonly Dictionary<byte, float> _doubleCastChance = new Dictionary<byte, float>();
 
+        /// <summary>被动技能触发概率加成（玩家ID → 加成 0-1）</summary>
+        private readonly Dictionary<byte, float> _passiveChanceBonuses = new Dictionary<byte, float>();
+
         // ──────────────────────────────────────────────
         //  被动技能
         // ──────────────────────────────────────────────
@@ -71,19 +77,13 @@ namespace DualEnigma.Skill
         //  运行时效果状态
         // ──────────────────────────────────────────────
 
-        /// <summary>护盾效果剩余时间（秒）</summary>
-        private float _shieldRemainingTime;
-        /// <summary>护盾持有者玩家ID</summary>
-        private byte _shieldOwner = 0xFF;
-        /// <summary>护盾减伤比例（0-1，如 0.5 = 减少50%伤害）</summary>
-        private float _shieldReduction;
+        /// <summary>护盾效果状态（按玩家ID存储，支持双角色）</summary>
+        private struct ShieldState { public float reduction; public float remainingTime; }
+        private readonly Dictionary<byte, ShieldState> _shieldStates = new Dictionary<byte, ShieldState>();
 
-        /// <summary>加速效果剩余时间（秒）</summary>
-        private float _speedBoostRemainingTime;
-        /// <summary>加速持有者玩家ID</summary>
-        private byte _speedBoostOwner = 0xFF;
-        /// <summary>加速前的原始移速（用于恢复）</summary>
-        private float _originalMoveSpeed;
+        /// <summary>加速效果状态（按玩家ID存储，支持双角色）</summary>
+        private struct SpeedBoostState { public float originalSpeed; public float remainingTime; }
+        private readonly Dictionary<byte, SpeedBoostState> _speedBoostStates = new Dictionary<byte, SpeedBoostState>();
 
         // ──────────────────────────────────────────────
         //  阶段追踪（跨轮冷却）
@@ -159,6 +159,24 @@ namespace DualEnigma.Skill
         }
 
         /// <summary>
+        /// 设置确定性随机种子（供同步/回放使用）。
+        /// </summary>
+        public void SetSeed(uint seed)
+        {
+            _random = new System.Random((int)seed);
+        }
+
+        /// <summary>
+        /// 设置被动技能触发概率加成（天赋系统调用）。
+        /// </summary>
+        /// <param name="playerId">玩家ID（0=Aqua, 1=Ignis）</param>
+        /// <param name="bonus">概率加成（0-1）</param>
+        public void SetPassiveChanceBonus(byte playerId, float bonus)
+        {
+            _passiveChanceBonuses[playerId] = Mathf.Clamp01(bonus);
+        }
+
+        /// <summary>
         /// 查询护盾减伤比例（供 ShelterSystem 调用以减少伤害）。
         /// 引用：技能系统.md §4.5 寒霜护盾/火焰护盾
         /// </summary>
@@ -166,8 +184,8 @@ namespace DualEnigma.Skill
         /// <returns>减伤比例（0=无护盾，0.5=减少50%伤害）</returns>
         public float GetShieldReduction(byte playerId)
         {
-            if (_shieldOwner == playerId && _shieldRemainingTime > 0f)
-                return _shieldReduction;
+            if (_shieldStates.TryGetValue(playerId, out ShieldState state) && state.remainingTime > 0f)
+                return state.reduction;
             return 0f;
         }
 
@@ -320,7 +338,7 @@ namespace DualEnigma.Skill
             if (type == SkillType.E
                 && _doubleCastChance.TryGetValue(playerId, out float chance)
                 && chance > 0f
-                && Random.Range(0f, 1f) <= chance)
+                && (float)_random.NextDouble() <= chance)
             {
                 // 第二次释放，效果×0.5
                 SkillData halfSkill = CreateHalfEffectSkill(skill.Data);
@@ -402,7 +420,8 @@ namespace DualEnigma.Skill
             {
                 // 灾难存在范围，检查目标是否在灾难影响范围内
                 float disasterRange = disasterSys.CurrentDisaster.Params.Range;
-                float distanceToDisaster = Vector2.Distance(targetPosition, Vector2.zero);
+                Vector2 disasterPos = disasterSys.GetDisasterPosition();
+                float distanceToDisaster = Vector2.Distance(targetPosition, disasterPos);
 
                 if (distanceToDisaster <= disasterRange + range)
                 {
@@ -449,7 +468,14 @@ namespace DualEnigma.Skill
         private void ExecuteFreezeEffect(SkillData skill,
             Vector2 targetPosition, float range, float multiplier)
         {
-            FragmentController[] fragments = FindObjectsOfType<FragmentController>();
+            var fragmentSys = ServiceLocator.Get<IFragmentSystem>();
+            if (fragmentSys == null)
+            {
+                Debug.LogWarning("[SkillSystem] FragmentSystem 未注册，无法执行冻结效果");
+                return;
+            }
+
+            List<FragmentController> fragments = fragmentSys.GetActiveFragments();
             int frozenCount = 0;
 
             foreach (var fragment in fragments)
@@ -478,12 +504,14 @@ namespace DualEnigma.Skill
         {
             byte playerId = (byte)(owner == CharacterType.Aqua ? 0 : 1);
 
-            _shieldOwner = playerId;
-            _shieldRemainingTime = duration;
-            // 减伤比例：基础50%，效果系数影响
-            _shieldReduction = Mathf.Clamp01(0.5f * multiplier);
+            float reduction = Mathf.Clamp01(0.5f * multiplier);
+            _shieldStates[playerId] = new ShieldState
+            {
+                reduction = reduction,
+                remainingTime = duration
+            };
 
-            Debug.Log($"[SkillSystem] {owner} 获得护盾，持续{duration}s，减伤{_shieldReduction * 100}%" +
+            Debug.Log($"[SkillSystem] {owner} 获得护盾，持续{duration}s，减伤{reduction * 100}%" +
                       (_shieldActive ? " (护盾强化天赋激活)" : ""));
         }
 
@@ -500,18 +528,22 @@ namespace DualEnigma.Skill
             CharacterController character = charSys.GetCharacter(owner);
             if (character == null || character.Stats == null) return;
 
-            // 如果已有加速效果，先恢复原始移速
-            if (_speedBoostOwner != 0xFF && _speedBoostRemainingTime > 0f)
-                RestoreMoveSpeed();
-
             byte playerId = (byte)(owner == CharacterType.Aqua ? 0 : 1);
-            _speedBoostOwner = playerId;
-            _speedBoostRemainingTime = duration;
-            _originalMoveSpeed = character.Stats.MoveSpeed;
+
+            // 如果已有加速效果，先恢复原始移速
+            if (_speedBoostStates.TryGetValue(playerId, out SpeedBoostState existing) && existing.remainingTime > 0f)
+                RestoreMoveSpeed(playerId);
+
+            float originalSpeed = character.Stats.MoveSpeed;
+            _speedBoostStates[playerId] = new SpeedBoostState
+            {
+                originalSpeed = originalSpeed,
+                remainingTime = duration
+            };
 
             // 移速提升：基础+50%，效果系数影响
             float boost = 0.5f * multiplier;
-            character.Stats.MoveSpeed = _originalMoveSpeed * (1f + boost);
+            character.Stats.MoveSpeed = originalSpeed * (1f + boost);
 
             Debug.Log($"[SkillSystem] {owner} 获得加速，移速 +{boost * 100}%，持续{duration}s");
         }
@@ -552,26 +584,45 @@ namespace DualEnigma.Skill
             UpdateCooldown(IgnisESkill, deltaTime);
             UpdateCooldown(IgnisQSkill, deltaTime);
 
-            // 护盾效果计时
-            if (_shieldRemainingTime > 0f)
+            // 护盾效果计时（遍历所有角色的护盾）
+            if (_shieldStates.Count > 0)
             {
-                _shieldRemainingTime -= deltaTime;
-                if (_shieldRemainingTime <= 0f)
+                var shieldKeys = new List<byte>(_shieldStates.Keys);
+                for (int i = 0; i < shieldKeys.Count; i++)
                 {
-                    _shieldRemainingTime = 0f;
-                    _shieldOwner = 0xFF;
-                    Debug.Log("[SkillSystem] 护盾效果结束");
+                    byte id = shieldKeys[i];
+                    var state = _shieldStates[id];
+                    state.remainingTime -= deltaTime;
+                    if (state.remainingTime <= 0f)
+                    {
+                        _shieldStates.Remove(id);
+                        Debug.Log($"[SkillSystem] 玩家{id} 护盾效果结束");
+                    }
+                    else
+                    {
+                        _shieldStates[id] = state;
+                    }
                 }
             }
 
-            // 加速效果计时
-            if (_speedBoostRemainingTime > 0f)
+            // 加速效果计时（遍历所有角色的加速）
+            if (_speedBoostStates.Count > 0)
             {
-                _speedBoostRemainingTime -= deltaTime;
-                if (_speedBoostRemainingTime <= 0f)
+                var boostKeys = new List<byte>(_speedBoostStates.Keys);
+                for (int i = 0; i < boostKeys.Count; i++)
                 {
-                    RestoreMoveSpeed();
-                    Debug.Log("[SkillSystem] 加速效果结束");
+                    byte id = boostKeys[i];
+                    var state = _speedBoostStates[id];
+                    state.remainingTime -= deltaTime;
+                    if (state.remainingTime <= 0f)
+                    {
+                        RestoreMoveSpeed(id);
+                        Debug.Log($"[SkillSystem] 玩家{id} 加速效果结束");
+                    }
+                    else
+                    {
+                        _speedBoostStates[id] = state;
+                    }
                 }
             }
         }
@@ -634,22 +685,22 @@ namespace DualEnigma.Skill
         /// <summary>
         /// 恢复角色原始移速（加速效果结束时调用）。
         /// </summary>
-        private void RestoreMoveSpeed()
+        /// <param name="playerId">玩家ID（0=Aqua, 1=Ignis）</param>
+        private void RestoreMoveSpeed(byte playerId)
         {
-            if (_speedBoostOwner == 0xFF)
+            if (!_speedBoostStates.TryGetValue(playerId, out SpeedBoostState state))
                 return;
 
             var charSys = ServiceLocator.Get<ICharacterSystem>();
             if (charSys != null)
             {
-                CharacterType owner = _speedBoostOwner == 0 ? CharacterType.Aqua : CharacterType.Ignis;
+                CharacterType owner = playerId == 0 ? CharacterType.Aqua : CharacterType.Ignis;
                 CharacterController character = charSys.GetCharacter(owner);
                 if (character != null && character.Stats != null)
-                    character.Stats.MoveSpeed = _originalMoveSpeed;
+                    character.Stats.MoveSpeed = state.originalSpeed;
             }
 
-            _speedBoostOwner = 0xFF;
-            _speedBoostRemainingTime = 0f;
+            _speedBoostStates.Remove(playerId);
         }
 
         /// <summary>
@@ -732,7 +783,7 @@ namespace DualEnigma.Skill
                     rarityPool = available;
                 }
 
-                int idx = Random.Range(0, rarityPool.Count);
+                int idx = _random.Next(rarityPool.Count);
                 SkillData drawn = rarityPool[idx];
                 result.Add(drawn);
                 available.Remove(drawn);
@@ -746,7 +797,7 @@ namespace DualEnigma.Skill
             float total = 0f;
             foreach (float w in weights) total += w;
 
-            float roll = Random.Range(0f, total);
+            float roll = (float)_random.NextDouble() * total;
             float cumulative = 0f;
 
             for (int i = 0; i < weights.Length; i++)

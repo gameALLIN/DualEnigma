@@ -5,6 +5,8 @@
 /// 描述: 灾难系统服务接口。
 /// ============================================================
 
+using UnityEngine;
+
 namespace DualEnigma.Disaster
 {
     /// <summary>
@@ -24,5 +26,11 @@ namespace DualEnigma.Disaster
 
         /// <summary>每帧更新</summary>
         void OnUpdate(float deltaTime);
+
+        /// <summary>
+        /// 获取当前灾难的实际位置（世界坐标）。
+        /// 若无运行中的灾难，返回 Vector2.zero。
+        /// </summary>
+        Vector2 GetDisasterPosition();
     }
 }

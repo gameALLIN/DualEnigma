@@ -56,6 +56,13 @@ namespace DualEnigma.Skill
         void SetDoubleCastChance(byte playerId, float chance);
 
         /// <summary>
+        /// 设置被动技能触发概率加成（天赋系统调用）。
+        /// </summary>
+        /// <param name="playerId">玩家ID（0=Aqua, 1=Ignis）</param>
+        /// <param name="bonus">概率加成（0-1）</param>
+        void SetPassiveChanceBonus(byte playerId, float bonus);
+
+        /// <summary>
         /// 注册被动技能。
         /// 引用：技能系统.md §4.2 被动技能
         /// </summary>
@@ -71,5 +78,19 @@ namespace DualEnigma.Skill
         /// <param name="passive">被动技能类型</param>
         /// <returns>是否已注册该被动技能</returns>
         bool IsPassiveActive(byte playerId, PassiveSkillType passive);
+
+        /// <summary>
+        /// 查询护盾减伤比例（供 ShelterSystem 调用以减少伤害）。
+        /// 引用：技能系统.md §4.5 寒霜护盾/火焰护盾
+        /// </summary>
+        /// <param name="playerId">玩家ID（0=Aqua, 1=Ignis）</param>
+        /// <returns>减伤比例（0=无护盾，0.5=减少50%伤害）</returns>
+        float GetShieldReduction(byte playerId);
+
+        /// <summary>
+        /// 设置确定性随机种子（供同步/回放使用）。
+        /// </summary>
+        /// <param name="seed">随机种子</param>
+        void SetSeed(uint seed);
     }
 }

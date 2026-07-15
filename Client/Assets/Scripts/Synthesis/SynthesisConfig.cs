@@ -49,30 +49,33 @@ namespace DualEnigma.Synthesis
             {
                 new SynthesisRecipe { InputType = FragmentType.IceCrystal, OutputType = MaterialType.WaterBrick, RequiredCount = 2, SynthesisTime = 1f },
                 new SynthesisRecipe { InputType = FragmentType.IceCrystal, OutputType = MaterialType.IceBrick, RequiredCount = 3, SynthesisTime = 1.5f },
-                new SynthesisRecipe { InputType = FragmentType.Rock, OutputType = MaterialType.StoneBrick, RequiredCount = 2, SynthesisTime = 1f },
+                new SynthesisRecipe { InputType = FragmentType.Rock, OutputType = MaterialType.StoneBrick, RequiredCount = 2, SynthesisTime = 2f },
+                new SynthesisRecipe { InputType = FragmentType.Lava, OutputType = MaterialType.IceBrick, RequiredCount = 3, SynthesisTime = 1.5f },
             };
             _floodRecipes = new List<SynthesisRecipe>
             {
-                new SynthesisRecipe { InputType = FragmentType.IceCrystal, OutputType = MaterialType.StoneBrick, RequiredCount = 2, SynthesisTime = 1f },
+                new SynthesisRecipe { InputType = FragmentType.IceCrystal, OutputType = MaterialType.StoneBrick, RequiredCount = 2, SynthesisTime = 2f },
                 new SynthesisRecipe { InputType = FragmentType.Lava, OutputType = MaterialType.FireBrick, RequiredCount = 2, SynthesisTime = 1f },
                 new SynthesisRecipe { InputType = FragmentType.Lava, OutputType = MaterialType.LavaBrick, RequiredCount = 3, SynthesisTime = 1.5f },
+                new SynthesisRecipe { InputType = FragmentType.Rock, OutputType = MaterialType.LavaBrick, RequiredCount = 3, SynthesisTime = 1.5f },
             };
             _blizzardRecipes = new List<SynthesisRecipe>
             {
                 new SynthesisRecipe { InputType = FragmentType.IceCrystal, OutputType = MaterialType.IceBrick, RequiredCount = 3, SynthesisTime = 1.5f },
                 new SynthesisRecipe { InputType = FragmentType.Lava, OutputType = MaterialType.FireBrick, RequiredCount = 2, SynthesisTime = 1f },
+                new SynthesisRecipe { InputType = FragmentType.Rock, OutputType = MaterialType.LavaBrick, RequiredCount = 3, SynthesisTime = 1.5f },
             };
             _earthquakeRecipes = new List<SynthesisRecipe>
             {
-                new SynthesisRecipe { InputType = FragmentType.IceCrystal, OutputType = MaterialType.StoneBrick, RequiredCount = 2, SynthesisTime = 1f },
-                new SynthesisRecipe { InputType = FragmentType.Lava, OutputType = MaterialType.StoneBrick, RequiredCount = 2, SynthesisTime = 1f },
-                new SynthesisRecipe { InputType = FragmentType.Rock, OutputType = MaterialType.StoneBrick, RequiredCount = 2, SynthesisTime = 1f },
+                new SynthesisRecipe { InputType = FragmentType.IceCrystal, OutputType = MaterialType.StoneBrick, RequiredCount = 2, SynthesisTime = 2f },
+                new SynthesisRecipe { InputType = FragmentType.Lava, OutputType = MaterialType.StoneBrick, RequiredCount = 2, SynthesisTime = 2f },
+                new SynthesisRecipe { InputType = FragmentType.Rock, OutputType = MaterialType.StoneBrick, RequiredCount = 2, SynthesisTime = 2f },
             };
             _meteoriteRecipes = new List<SynthesisRecipe>
             {
-                new SynthesisRecipe { InputType = FragmentType.IceCrystal, OutputType = MaterialType.StoneBrick, RequiredCount = 2, SynthesisTime = 1f },
-                new SynthesisRecipe { InputType = FragmentType.Lava, OutputType = MaterialType.StoneBrick, RequiredCount = 2, SynthesisTime = 1f },
-                new SynthesisRecipe { InputType = FragmentType.Rock, OutputType = MaterialType.StoneBrick, RequiredCount = 2, SynthesisTime = 1f },
+                new SynthesisRecipe { InputType = FragmentType.IceCrystal, OutputType = MaterialType.StoneBrick, RequiredCount = 2, SynthesisTime = 2f },
+                new SynthesisRecipe { InputType = FragmentType.Lava, OutputType = MaterialType.StoneBrick, RequiredCount = 2, SynthesisTime = 2f },
+                new SynthesisRecipe { InputType = FragmentType.Rock, OutputType = MaterialType.StoneBrick, RequiredCount = 2, SynthesisTime = 2f },
             };
         }
     }

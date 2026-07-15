@@ -5,6 +5,7 @@
 /// 描述: 灾难基础参数数据结构。
 /// ============================================================
 
+using UnityEngine;
 using DualEnigma.Shelter;
 
 namespace DualEnigma.Disaster
@@ -34,5 +35,7 @@ namespace DualEnigma.Disaster
         public uint RandomSeed;
         /// <summary>难度倍率</summary>
         public float DifficultyMultiplier;
+        /// <summary>灾难实际位置（世界坐标）</summary>
+        public Vector2 Position = Vector2.zero;
     }
 }

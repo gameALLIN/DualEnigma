@@ -57,10 +57,12 @@ namespace DualEnigma.Synthesis
         public void SetEnvironment(ShelterEnvironment environment)
         {
             var config = DataManager.Instance.LoadConfig<SynthesisConfig>("SynthesisConfig");
-            if (config != null)
+            if (config == null)
             {
-                CurrentRecipes = config.GetRecipes(environment);
+                Debug.LogError("[SynthesisSystem] SynthesisConfig 未找到");
+                return;
             }
+            CurrentRecipes = config.GetRecipes(environment);
             Debug.Log($"[SynthesisSystem] 合成表切换 → {environment}, {CurrentRecipes.Count}条配方");
         }
 

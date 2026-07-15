@@ -68,8 +68,36 @@ namespace DualEnigma.Fragment
             public float timestamp;
         }
 
+        /// <summary>待确认收集记录（第一个玩家接住后暂存，等待同时接住判定窗口）</summary>
+        private readonly Dictionary<int, PendingCollect> _pendingCollects = new Dictionary<int, PendingCollect>();
+
+        private struct PendingCollect
+        {
+            public byte playerId;
+            public float timestamp;
+            public bool isJumping;
+            public FragmentController fragment;
+            public FragmentType type;
+        }
+
         /// <summary>当前场上存活的碎片数量</summary>
         public int ActiveCount => _activeFragments.Count;
+
+        /// <summary>
+        /// 获取当前场上所有活跃碎片的列表。
+        /// 供技能系统（冻结效果等）遍历碎片使用，避免 FindObjectsOfType 调用。
+        /// </summary>
+        /// <returns>活跃碎片列表的副本</returns>
+        public List<FragmentController> GetActiveFragments()
+        {
+            List<FragmentController> result = new List<FragmentController>(_activeFragments.Count);
+            foreach (var kvp in _activeFragments)
+            {
+                if (kvp.Value != null)
+                    result.Add(kvp.Value);
+            }
+            return result;
+        }
 
         protected override void OnSingletonInitialized()
 
@@ -197,27 +225,134 @@ namespace DualEnigma.Fragment
 
         /// <summary>
         /// 碎片被接住（由角色碰撞触发）。
+        /// 第一个玩家接住时暂存为待确认状态，不立即释放碎片；
+        /// 100ms 窗口内第二玩家接住则触发×3倍率，否则超时后正常完成收集。
         /// </summary>
         public void OnFragmentCollected(int fragmentId, byte playerId, bool isJumping)
         {
             if (!_activeFragments.TryGetValue(fragmentId, out FragmentController fragment))
                 return;
 
-            int multiplier = DetermineMultiplier(fragmentId, playerId, isJumping);
+            // 检查是否有待确认的收集记录（同时接住判定）
+            if (_pendingCollects.TryGetValue(fragmentId, out PendingCollect pending))
+            {
+                // 同一玩家重复触发，忽略
+                if (pending.playerId == playerId)
+                    return;
+
+                // 不同玩家在窗口内接住 → 同时接住 ×3
+                _pendingCollects.Remove(fragmentId);
+
+                int multiplier = DetermineMultiplier(fragmentId, playerId, isJumping);
+
+                // 为第一个玩家发布事件（倍率升级为×3）
+                EventBus.Instance.Publish(new FragmentCollectedEvent
+                {
+                    fragmentId = fragmentId,
+                    playerId = pending.playerId,
+                    isJumping = pending.isJumping,
+                    multiplier = multiplier
+                });
+
+                // 为第二个玩家发布事件
+                EventBus.Instance.Publish(new FragmentCollectedEvent
+                {
+                    fragmentId = fragmentId,
+                    playerId = playerId,
+                    isJumping = isJumping,
+                    multiplier = multiplier
+                });
+
+                // 被动技能检查（双方均触发，同时接住概率100%）
+                CheckPassiveSkills(pending.playerId, pending.type, pending.fragment.transform.position, pending.isJumping, true);
+                CheckPassiveSkills(playerId, fragment.Type, fragment.transform.position, isJumping, true);
+
+                fragment.SetState(FragmentState.Collected);
+                _collectedFragmentTypes[fragmentId] = fragment.Type;
+                ReleaseFragment(fragmentId);
+                return;
+            }
+
+            // 第一个玩家接住 → 存入待确认记录，不立即释放碎片
+            // 设置为 Collected 状态防止 FragmentController.Update 继续倒计时导致消失
+            fragment.SetState(FragmentState.Collected);
+
+            // 存入收集记录供 DetermineMultiplier 判定
+            _collectRecords[fragmentId] = new CollectRecord
+            {
+                playerId = playerId,
+                timestamp = Time.time
+            };
+
+            _pendingCollects[fragmentId] = new PendingCollect
+            {
+                playerId = playerId,
+                timestamp = Time.time,
+                isJumping = isJumping,
+                fragment = fragment,
+                type = fragment.Type
+            };
+        }
+
+        /// <summary>
+        /// 每帧更新，处理待确认收集记录的超时。
+        /// 超过 SIMULTANEOUS_WINDOW 窗口的记录按正常收集（×1或×2）完成并释放碎片。
+        /// </summary>
+        private void Update()
+        {
+            OnUpdate(Time.deltaTime);
+        }
+
+        private void OnUpdate(float deltaTime)
+        {
+            if (_pendingCollects.Count == 0)
+                return;
+
+            // 收集超时的 fragmentId，避免在遍历中修改字典
+            List<int> timedOut = new List<int>();
+            foreach (var kvp in _pendingCollects)
+            {
+                if (Time.time - kvp.Value.timestamp >= SIMULTANEOUS_WINDOW)
+                {
+                    timedOut.Add(kvp.Key);
+                }
+            }
+
+            foreach (int fragmentId in timedOut)
+            {
+                CompletePendingCollect(fragmentId);
+            }
+        }
+
+        /// <summary>
+        /// 完成超时的待确认收集（窗口内无第二玩家接住，按正常倍率完成）。
+        /// </summary>
+        private void CompletePendingCollect(int fragmentId)
+        {
+            if (!_pendingCollects.TryGetValue(fragmentId, out PendingCollect pending))
+                return;
+
+            _pendingCollects.Remove(fragmentId);
+
+            // 窗口超时，无同时接住 → 根据是否跳跃决定倍率
+            int multiplier = pending.isJumping ? 2 : 1;
 
             EventBus.Instance.Publish(new FragmentCollectedEvent
             {
                 fragmentId = fragmentId,
-                playerId = playerId,
-                isJumping = isJumping,
+                playerId = pending.playerId,
+                isJumping = pending.isJumping,
                 multiplier = multiplier
             });
 
-            // 被动技能检查（在释放碎片前获取位置和类型）
-            CheckPassiveSkills(playerId, fragment.Type, fragment.transform.position);
+            // 被动技能检查（地面接住概率30%，跳跃接住概率50%）
+            CheckPassiveSkills(pending.playerId, pending.type, pending.fragment.transform.position, pending.isJumping, false);
 
-            fragment.SetState(FragmentState.Collected);
-            _collectedFragmentTypes[fragmentId] = fragment.Type;
+            if (pending.fragment != null)
+            {
+                pending.fragment.SetState(FragmentState.Collected);
+            }
+            _collectedFragmentTypes[fragmentId] = pending.type;
             ReleaseFragment(fragmentId);
         }
 
@@ -266,16 +401,25 @@ namespace DualEnigma.Fragment
         /// - FlameAura（烈焰体质）：收集熔岩碎片时有概率点燃周围碎片
         /// 引用：技能系统.md §4.2 被动技能触发时机
         /// </summary>
-        private void CheckPassiveSkills(byte playerId, FragmentType collectedType, Vector2 position)
+        private void CheckPassiveSkills(byte playerId, FragmentType collectedType, Vector2 position, bool isJumping, bool isSimultaneous)
         {
             ISkillSystem skillSys = ServiceLocator.Get<ISkillSystem>();
             if (skillSys == null)
                 return;
 
+            // 根据接住方式动态设置触发概率：地面30% / 跳跃50% / 同时接住100%
+            float triggerChance;
+            if (isSimultaneous)
+                triggerChance = 1.0f;
+            else if (isJumping)
+                triggerChance = 0.5f;
+            else
+                triggerChance = _passiveTriggerChance;
+
             // 寒霜体质：收集冰晶碎片时有概率冻结周围碎片
             if (collectedType == FragmentType.IceCrystal
                 && skillSys.IsPassiveActive(playerId, PassiveSkillType.FrostAura)
-                && Random.Range(0f, 1f) <= _passiveTriggerChance)
+                && Random.Range(0f, 1f) <= triggerChance)
             {
                 FreezeNearbyFragments(position, PASSIVE_TRIGGER_RADIUS);
                 Debug.Log($"[FragmentSystem] 玩家{playerId} 寒霜体质触发，冻结周围碎片");
@@ -284,7 +428,7 @@ namespace DualEnigma.Fragment
             // 烈焰体质：收集熔岩碎片时有概率点燃周围碎片
             if (collectedType == FragmentType.Lava
                 && skillSys.IsPassiveActive(playerId, PassiveSkillType.FlameAura)
-                && Random.Range(0f, 1f) <= _passiveTriggerChance)
+                && Random.Range(0f, 1f) <= triggerChance)
             {
                 IgniteNearbyFragments(position, PASSIVE_TRIGGER_RADIUS);
                 Debug.Log($"[FragmentSystem] 玩家{playerId} 烈焰体质触发，点燃周围碎片");
@@ -442,6 +586,7 @@ namespace DualEnigma.Fragment
             _activeFragments.Remove(fragmentId);
             _collectRecords.Remove(fragmentId);
             _ignitedTimestamps.Remove(fragmentId);
+            _pendingCollects.Remove(fragmentId);
 
             if (_fragmentPool != null)
             {

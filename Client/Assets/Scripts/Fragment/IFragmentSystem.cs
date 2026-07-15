@@ -5,6 +5,8 @@
 /// 描述: 碎片系统服务接口。
 /// ============================================================
 
+using System.Collections.Generic;
+
 namespace DualEnigma.Fragment
 {
     /// <summary>
@@ -27,5 +29,12 @@ namespace DualEnigma.Fragment
         /// <param name="type">输出的碎片类型</param>
         /// <returns>是否查找到对应碎片</returns>
         bool TryGetFragmentType(int fragmentId, out FragmentType type);
+
+        /// <summary>
+        /// 获取当前场上所有活跃碎片的列表。
+        /// 供技能系统（冻结效果等）遍历碎片使用，避免 FindObjectsOfType 调用。
+        /// </summary>
+        /// <returns>活跃碎片列表的副本</returns>
+        List<FragmentController> GetActiveFragments();
     }
 }

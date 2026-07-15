@@ -8,6 +8,10 @@
 
 using UnityEngine;
 using DualEnigma.Shelter;
+using DualEnigma.Synthesis;
+using DualEnigma.Skill;
+using DualEnigma.Disaster;
+using DualEnigma.Fragment;
 
 namespace DualEnigma.Core
 {
@@ -89,6 +93,38 @@ namespace DualEnigma.Core
         protected override void OnSingletonInitialized()
         {
             Debug.Log("[GameManager] 游戏管理器初始化完成");
+        }
+
+        /// <summary>
+        /// 每帧驱动各业务系统的 OnUpdate，传递 Time.deltaTime。
+        /// 使用 HasInstance 保护，避免单例未初始化时报错。
+        /// </summary>
+        private void Update()
+        {
+            if (State.IsPaused || State.IsGameOver)
+                return;
+
+            float dt = Time.deltaTime;
+
+            // 能量循环 / 扣血
+            if (ShelterSystem.HasInstance)
+                ShelterSystem.Instance.OnUpdate(dt);
+
+            // 合成计时
+            if (SynthesisSystem.HasInstance)
+                SynthesisSystem.Instance.OnUpdate(dt);
+
+            // 技能冷却
+            if (SkillSystem.HasInstance)
+                SkillSystem.Instance.OnUpdate(dt);
+
+            // 灾难更新
+            if (DisasterSystem.HasInstance)
+                DisasterSystem.Instance.OnUpdate(dt);
+
+            // TODO: FragmentSystem.OnUpdate 尚未实现，待后续补充
+            // if (FragmentSystem.HasInstance)
+            //     FragmentSystem.Instance.OnUpdate(dt);
         }
 
         /// <summary>

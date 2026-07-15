@@ -5,6 +5,7 @@
 /// 描述: 建造系统管理器，管理蓝图、网格、建筑放置和抗性。
 /// ============================================================
 
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DualEnigma.Core;
@@ -42,6 +43,12 @@ namespace DualEnigma.Building
         /// <summary>安全区半径（格数）</summary>
         private float _safeZoneRadius = 5f;
 
+        /// <summary>当前庇护环境</summary>
+        private ShelterEnvironment _currentEnvironment;
+
+        /// <summary>灾难来源方向（网格方向向量），用于朝向抗性判断</summary>
+        private Vector2Int _disasterDirection = Vector2Int.up;
+
         protected override void OnSingletonInitialized()
         {
             ServiceLocator.Register<IBuildSystem>(this);
@@ -66,6 +73,7 @@ namespace DualEnigma.Building
 
             // 将灾难类别映射到庇护环境，用于确定建筑形状
             ShelterEnvironment env = MapCategoryToEnvironment(disasterType);
+            _currentEnvironment = env;
 
             // 根据灾难类型推荐建筑类型和材料
             BuildingType recommendedType = GetRecommendedBuildingType(env);
@@ -98,7 +106,8 @@ namespace DualEnigma.Building
         }
 
         /// <summary>
-        /// 放置建筑。检查材料消耗和安全区归属。
+        /// 放置建筑。检查两人同时在安全区、材料消耗和安全区归属。
+        /// 启动协程，等待0.5秒后实际创建建筑。
         /// </summary>
         public bool PlaceBuilding(byte playerId, BuildingType type, MaterialType material, Vector2Int gridPos, int facing)
         {
@@ -108,7 +117,22 @@ namespace DualEnigma.Building
                 return false;
             }
 
-            // 查找该位置的蓝图块，获取所需材料
+            // 通过 ICharacterSystem 获取角色系统
+            ICharacterSystem charSystem = ServiceLocator.Get<ICharacterSystem>();
+
+            // 1. 检查两个角色是否都在安全区范围内
+            if (charSystem != null)
+            {
+                CharacterController aqua = charSystem.GetCharacter(CharacterType.Aqua);
+                CharacterController ignis = charSystem.GetCharacter(CharacterType.Ignis);
+                if (!IsCharacterInSafeZone(aqua) || !IsCharacterInSafeZone(ignis))
+                {
+                    Debug.Log("[BuildingSystem] 两个角色未同时处于安全区内，无法放置建筑");
+                    return false;
+                }
+            }
+
+            // 2. 查找该位置的蓝图块，获取所需材料
             MaterialType requiredMaterial = material;
             BlueprintBlock? matchingBlock = null;
             foreach (var block in CurrentBlueprint)
@@ -121,8 +145,7 @@ namespace DualEnigma.Building
                 }
             }
 
-            // 通过 ICharacterSystem 获取放置者 CharacterController，检查并消耗材料
-            ICharacterSystem charSystem = ServiceLocator.Get<ICharacterSystem>();
+            // 3. 获取放置者 CharacterController，检查并消耗材料
             if (charSystem != null)
             {
                 CharacterController character = charSystem.GetCharacter((CharacterType)playerId);
@@ -136,14 +159,36 @@ namespace DualEnigma.Building
                 }
             }
 
+            // 4. 计算建筑HP（冰砖仅在暴风雪环境下+50%）
             float baseHP = GetBuildingHP(type);
-            if (material == MaterialType.IceBrick)
+            if (material == MaterialType.IceBrick && _currentEnvironment == ShelterEnvironment.Blizzard)
                 baseHP *= 1.5f;
 
-            // 计算建筑位置到安全区中心的距离
+            // 5. 计算建筑位置到安全区中心的距离
             Vector2Int diff = gridPos - _safeZoneCenter;
             float distance = Mathf.Sqrt(diff.x * diff.x + diff.y * diff.y);
             bool isInSafeZone = distance <= _safeZoneRadius;
+
+            // 6. 启动放置协程，等待0.5秒后实际创建建筑
+            StartCoroutine(PlaceBuildingCoroutine(type, material, gridPos, facing, baseHP, isInSafeZone, matchingBlock));
+
+            Debug.Log($"[BuildingSystem] 建筑放置中: {type}, {material}, {gridPos}, 预计0.5秒后完成");
+            return true;
+        }
+
+        /// <summary>
+        /// 放置建筑协程。等待0.5秒后实际创建建筑实例。
+        /// </summary>
+        private IEnumerator PlaceBuildingCoroutine(BuildingType type, MaterialType material, Vector2Int gridPos, int facing, float baseHP, bool isInSafeZone, BlueprintBlock? matchingBlock)
+        {
+            yield return new WaitForSeconds(0.5f);
+
+            // 再次检查位置是否被占用（等待期间可能被其他操作占用）
+            if (_grid.IsOccupied(gridPos))
+            {
+                Debug.Log($"[BuildingSystem] 放置取消：位置已被占用 {gridPos}");
+                yield break;
+            }
 
             BuildingData building = new BuildingData
             {
@@ -179,17 +224,31 @@ namespace DualEnigma.Building
                 gridPos = gridPos
             });
 
-            Debug.Log($"[BuildingSystem] 建筑放置: ID={building.BuildingId}, {type}, {material}, {gridPos}, 安全区={isInSafeZone}");
-            return true;
+            Debug.Log($"[BuildingSystem] 建筑放置完成: ID={building.BuildingId}, {type}, {material}, {gridPos}, 安全区={isInSafeZone}");
         }
 
         /// <summary>
-        /// 修补建筑。
+        /// 修补建筑。消耗1个对应材料，恢复50%基础HP。
         /// </summary>
         public bool RepairBuilding(byte playerId, int buildingId)
         {
             BuildingData building = Buildings.Find(b => b.BuildingId == buildingId);
             if (building == null) return false;
+
+            // 通过 ICharacterSystem 获取角色，检查并消耗材料
+            ICharacterSystem charSystem = ServiceLocator.Get<ICharacterSystem>();
+            if (charSystem != null)
+            {
+                CharacterController character = charSystem.GetCharacter((CharacterType)playerId);
+                if (character != null)
+                {
+                    if (!character.TryConsumeMaterial(building.Material, 1))
+                    {
+                        Debug.Log($"[BuildingSystem] 修补材料不足: 需要 {building.Material} x1");
+                        return false;
+                    }
+                }
+            }
 
             building.CurrentHP = Mathf.Min(building.CurrentHP + building.BaseHP * 0.5f, building.BaseHP);
             Debug.Log($"[BuildingSystem] 建筑修补: ID={buildingId}, HP={building.CurrentHP}/{building.BaseHP}");
@@ -197,12 +256,20 @@ namespace DualEnigma.Building
         }
 
         /// <summary>
-        /// 拆除建筑。
+        /// 拆除建筑。仅 Build 和 Rest 阶段允许拆除。
         /// </summary>
         public bool DemolishBuilding(byte playerId, int buildingId)
         {
             BuildingData building = Buildings.Find(b => b.BuildingId == buildingId);
             if (building == null) return false;
+
+            // 阶段限制：仅 Build 和 Rest 阶段允许拆除
+            GamePhase currentPhase = GameStateMachine.Instance.CurrentPhase;
+            if (currentPhase != GamePhase.Build && currentPhase != GamePhase.Rest)
+            {
+                Debug.Log($"[BuildingSystem] 当前阶段 {currentPhase} 不允许拆除建筑");
+                return false;
+            }
 
             _grid.ClearOccupied(building.GridPosition);
             Buildings.Remove(building);
@@ -211,14 +278,30 @@ namespace DualEnigma.Building
         }
 
         /// <summary>
-        /// 建筑受伤害。
+        /// 建筑受伤害。考虑朝向抗性和安全区减免。
         /// </summary>
         public void DamageBuilding(int buildingId, float damage)
         {
             BuildingData building = Buildings.Find(b => b.BuildingId == buildingId);
             if (building == null) return;
 
-            building.CurrentHP -= damage;
+            float finalDamage = damage;
+
+            // 朝向抗性检查：朝向不正确时伤害 ×1.5（抗性降一级）
+            if (!IsFacingCorrect(building))
+            {
+                finalDamage *= 1.5f;
+                Debug.Log($"[BuildingSystem] 朝向不正确，伤害增加50%: ID={buildingId}");
+            }
+
+            // 安全区50%减免
+            if (building.IsInSafeZone)
+            {
+                finalDamage *= 0.5f;
+                Debug.Log($"[BuildingSystem] 安全区减免50%: ID={buildingId}");
+            }
+
+            building.CurrentHP -= finalDamage;
 
             if (building.CurrentHP <= 0f)
             {
@@ -232,6 +315,10 @@ namespace DualEnigma.Building
                 });
 
                 Debug.Log($"[BuildingSystem] 建筑被摧毁: ID={buildingId}");
+            }
+            else
+            {
+                Debug.Log($"[BuildingSystem] 建筑受损: ID={buildingId}, 伤害={finalDamage}, HP={building.CurrentHP}/{building.BaseHP}");
             }
         }
 
@@ -271,6 +358,60 @@ namespace DualEnigma.Building
             _safeZoneCenter = center;
             _safeZoneRadius = radius;
             Debug.Log($"[BuildingSystem] 安全区设置: 中心={center}, 半径={radius}");
+        }
+
+        /// <summary>
+        /// 设置当前庇护环境。
+        /// </summary>
+        /// <param name="env">庇护环境类型</param>
+        public void SetEnvironment(ShelterEnvironment env)
+        {
+            _currentEnvironment = env;
+            Debug.Log($"[BuildingSystem] 庇护环境设置: {env}");
+        }
+
+        /// <summary>
+        /// 设置灾难来源方向（建筑应面向此方向以获得正常抗性）。
+        /// </summary>
+        /// <param name="direction">灾难来源的网格方向向量</param>
+        public void SetDisasterDirection(Vector2Int direction)
+        {
+            _disasterDirection = direction;
+            Debug.Log($"[BuildingSystem] 灾难来源方向设置: {direction}");
+        }
+
+        /// <summary>
+        /// 判断角色是否在安全区范围内。
+        /// 将角色世界坐标与安全区中心（网格坐标）进行比较。
+        /// </summary>
+        private bool IsCharacterInSafeZone(CharacterController character)
+        {
+            if (character == null) return false;
+            Vector2 charPos = character.transform.position;
+            Vector2 center = new Vector2(_safeZoneCenter.x, _safeZoneCenter.y);
+            float distance = Vector2.Distance(charPos, center);
+            return distance <= _safeZoneRadius;
+        }
+
+        /// <summary>
+        /// 判断建筑朝向是否正确（面对灾难来源方向）。
+        /// Facing: 0=上, 1=右, 2=下, 3=左。
+        /// 无朝向要求的建筑类型（ReinforcedTower, Shelter）始终返回 true。
+        /// </summary>
+        private bool IsFacingCorrect(BuildingData building)
+        {
+            // 无朝向要求的建筑类型：ReinforcedTower(2), Shelter(3)
+            bool[] hasFacing = { true, true, false, false, true };
+            if ((int)building.Type < hasFacing.Length && !hasFacing[(int)building.Type])
+                return true;
+
+            // 将 Facing 归一化到 [0,3]
+            int facingIdx = ((building.Facing % 4) + 4) % 4;
+            Vector2Int[] facingDirs = { Vector2Int.up, Vector2Int.right, Vector2Int.down, Vector2Int.left };
+            Vector2Int buildingFacing = facingDirs[facingIdx];
+
+            // 建筑应面向灾难来源方向
+            return buildingFacing == _disasterDirection;
         }
 
         /// <summary>
