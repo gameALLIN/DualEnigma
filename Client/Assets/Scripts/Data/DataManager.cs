@@ -11,6 +11,14 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using DualEnigma.Core;
+using DualEnigma.Character;
+using DualEnigma.Fragment;
+using DualEnigma.Disaster;
+using DualEnigma.Skill;
+using DualEnigma.Talent;
+using DualEnigma.Synthesis;
+using DualEnigma.Building;
+using DualEnigma.Shelter;
 
 namespace DualEnigma.Data
 {
@@ -37,6 +45,7 @@ namespace DualEnigma.Data
 
         /// <summary>
         /// 初始化数据管理器（由 GameLaunch 调用）。
+        /// 预加载所有 ScriptableObject 配置，加载失败时输出警告但不中断初始化（配置可能尚未创建）。
         /// </summary>
         public void Initialize()
         {
@@ -45,9 +54,22 @@ namespace DualEnigma.Data
                 Debug.LogWarning("[DataManager] 已初始化，跳过重复调用");
                 return;
             }
+
+            int loadedCount = 0;
+
+            // 预加载所有 ScriptableObject 配置
+            if (LoadConfig<CharacterConfig>("CharacterConfig") != null) loadedCount++;
+            if (LoadConfig<FragmentConfig>("FragmentConfig") != null) loadedCount++;
+            if (LoadConfig<DisasterConfig>("DisasterConfig") != null) loadedCount++;
+            if (LoadConfig<SkillConfig>("SkillConfig") != null) loadedCount++;
+            if (LoadConfig<TalentConfig>("TalentConfig") != null) loadedCount++;
+            if (LoadConfig<SynthesisConfig>("SynthesisConfig") != null) loadedCount++;
+            if (LoadConfig<BuildingConfig>("BuildingConfig") != null) loadedCount++;
+            if (LoadConfig<ShelterConfig>("ShelterConfig") != null) loadedCount++;
+
             _isInitialized = true;
 
-            Debug.Log("[DataManager] 数据管理器初始化完成");
+            Debug.Log($"DataManager: 已预加载 {loadedCount} 个配置");
         }
 
         /// <summary>
@@ -116,6 +138,44 @@ namespace DualEnigma.Data
             if (config == null)
             {
                 Debug.LogError($"[DataManager] ScriptableObject 配置加载失败: {path}");
+                return null;
+            }
+
+            _soCache[type] = config;
+            Debug.Log($"[DataManager] ScriptableObject 配置加载成功: {configName}");
+            return config;
+        }
+
+        /// <summary>
+        /// 加载 ScriptableObject 配置（指定配置名）。首次加载后缓存，后续直接返回缓存。
+        /// 文件名由参数指定（如 "DisasterConfig" → Data/DisasterConfig.asset）。
+        /// </summary>
+        /// <typeparam name="T">配置类型（ScriptableObject 子类）</typeparam>
+        /// <param name="configName">配置文件名（不含扩展名，对应 Data/{configName}.asset）</param>
+        /// <returns>配置实例，加载失败返回 null</returns>
+        public T LoadConfig<T>(string configName) where T : ScriptableObject
+        {
+            if (string.IsNullOrEmpty(configName))
+            {
+                Debug.LogWarning("[DataManager] LoadConfig 失败: configName 为空");
+                return null;
+            }
+
+            Type type = typeof(T);
+
+            // 检查缓存
+            if (_soCache.TryGetValue(type, out ScriptableObject cached))
+            {
+                return cached as T;
+            }
+
+            // 构建路径：Data/{configName}.asset
+            string path = $"Data/{configName}.asset";
+
+            T config = ResMgr.Instance.Load<T>(path);
+            if (config == null)
+            {
+                Debug.LogWarning($"[DataManager] ScriptableObject 配置加载失败: {path}（配置可能尚未创建）");
                 return null;
             }
 

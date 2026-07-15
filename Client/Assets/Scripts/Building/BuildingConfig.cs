@@ -31,11 +31,18 @@ namespace DualEnigma.Building
         [SerializeField] private int[] _minBlocks = { 3, 5, 7 };
         [SerializeField] private int[] _maxBlocks = { 4, 6, 8 };
 
+        [Header("安全区")]
+        [SerializeField] private Vector2Int _defaultSafeZoneCenter = new Vector2Int(7, 4);
+        [SerializeField] private float _defaultSafeZoneRadius = 5f;
+
         public int GridWidth => _gridWidth;
         public int GridHeight => _gridHeight;
         public float PlaceTime => _placeTime;
         public float RepairTime => _repairTime;
         public float DemolishTime => _demolishTime;
+
+        public Vector2Int DefaultSafeZoneCenter => _defaultSafeZoneCenter;
+        public float DefaultSafeZoneRadius => _defaultSafeZoneRadius;
 
         public float GetBuildingHP(BuildingType type) => _buildingHP[(int)type];
         public bool HasFacing(BuildingType type) => _hasFacing[(int)type];

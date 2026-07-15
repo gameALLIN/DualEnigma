@@ -7,6 +7,7 @@
 
 using UnityEngine;
 using DualEnigma.Core;
+using DualEnigma.Data;
 using DualEnigma.Building;
 using DualEnigma.Synthesis;
 using DualEnigma.Shelter;
@@ -40,7 +41,7 @@ namespace DualEnigma.Disaster
         public void StartDisaster(DisasterId disasterId, float difficultyMultiplier, uint seed)
         {
             if (_config == null)
-                _config = Resources.Load<DisasterConfig>("DisasterConfig");
+                _config = DataManager.Instance.LoadConfig<DisasterConfig>("DisasterConfig");
 
             DisasterParams parameters;
             if (disasterId == DisasterId.E3Enhanced && _config != null && _config.E3Enhanced != null)

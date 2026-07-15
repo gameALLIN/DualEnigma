@@ -37,6 +37,8 @@ namespace DualEnigma.Skill
         public string Description;
         /// <summary>所属角色（Aqua/Ignis）</summary>
         public CharacterType Owner;
+        /// <summary>技能效果类型（用于效果分发）</summary>
+        public SkillEffectType EffectType;
     }
 
     /// <summary>

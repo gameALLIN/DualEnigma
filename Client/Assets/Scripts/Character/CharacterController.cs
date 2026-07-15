@@ -45,6 +45,9 @@ namespace DualEnigma.Character
         private Collider2D _collider;
         private bool _hasDoubleJumped;
 
+        /// <summary>移动速度乘数（受环境效果影响，如暴风雪）</summary>
+        private float _moveSpeedMultiplier = 1f;
+
         /// <summary>
         /// 初始化角色控制器。
         /// </summary>
@@ -81,7 +84,7 @@ namespace DualEnigma.Character
         {
             if (Stats == null) return;
 
-            float speed = Stats.MoveSpeed;
+            float speed = Stats.MoveSpeed * _moveSpeedMultiplier;
             _rb.velocity = new Vector2(direction * speed, _rb.velocity.y);
 
             if (direction > 0.01f && !FacingRight)
@@ -132,37 +135,81 @@ namespace DualEnigma.Character
         }
 
         /// <summary>
-        /// 受伤害。
+        /// 尝试消耗携带的材料。
+        /// </summary>
+        /// <param name="type">材料类型</param>
+        /// <param name="count">消耗数量</param>
+        /// <returns>数量足够且扣除成功返回 true，否则 false</returns>
+        public bool TryConsumeMaterial(MaterialType type, int count = 1)
+        {
+            if (Stats == null) return false;
+
+            if (!Stats.CarriedMaterials.ContainsKey(type) || Stats.CarriedMaterials[type] < count)
+                return false;
+
+            Stats.CarriedMaterials[type] -= count;
+            if (Stats.CarriedMaterials[type] <= 0)
+                Stats.CarriedMaterials.Remove(type);
+
+            return true;
+        }
+
+        /// <summary>
+        /// 添加携带材料（合成产出时调用）。
+        /// </summary>
+        /// <param name="type">材料类型</param>
+        /// <param name="count">添加数量</param>
+        public void AddMaterial(MaterialType type, int count = 1)
+        {
+            if (Stats == null) return;
+
+            if (!Stats.CarriedMaterials.ContainsKey(type))
+                Stats.CarriedMaterials[type] = 0;
+
+            Stats.CarriedMaterials[type] += count;
+        }
+
+        /// <summary>
+        /// 受伤害。委托 ShelterSystem 处理，由 ShelterSystem 作为HP唯一权威。
         /// </summary>
         public void TakeDamage(int damage)
         {
             if (Stats == null) return;
 
-            Stats.CurrentHP -= damage;
-            EventBus.Instance.Publish(new PlayerDamagedEvent
-            {
-                playerId = PlayerId,
-                damage = damage
-            });
-
-            if (Stats.CurrentHP <= 0)
-            {
-                Stats.CurrentHP = 0;
-                EventBus.Instance.Publish(new PlayerDiedEvent
-                {
-                    playerId = PlayerId
-                });
-            }
+            ShelterSystem.Instance.DealDamage(Stats.Type, damage);
         }
 
         /// <summary>
-        /// 治疗。
+        /// 治疗。委托 ShelterSystem 处理，由 ShelterSystem 作为HP唯一权威。
         /// </summary>
         public void Heal(int amount)
         {
             if (Stats == null) return;
 
-            Stats.CurrentHP = Mathf.Min(Stats.CurrentHP + amount, Stats.MaxHP);
+            ShelterSystem.Instance.Heal(Stats.Type, amount);
+        }
+
+        /// <summary>
+        /// 设置移动速度乘数（供外部系统调用，如暴风雪环境降低移速）。
+        /// </summary>
+        /// <param name="multiplier">乘数（1.0=正常，0.5=50%移速）</param>
+        public void SetMoveSpeedMultiplier(float multiplier)
+        {
+            _moveSpeedMultiplier = multiplier;
+        }
+
+        /// <summary>
+        /// 碰撞检测：碎片收集。
+        /// 引用：角色系统.md §4.3 碎片交互
+        /// </summary>
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            FragmentController fragment = other.GetComponent<FragmentController>();
+            if (fragment != null)
+            {
+                bool isJumping = !IsGrounded;
+                FragmentSystem.Instance.OnFragmentCollected(fragment.FragmentId, PlayerId, isJumping);
+            }
         }
 
         private void ApplyJumpForce(float heightInUnits)

@@ -6,6 +6,7 @@
 /// ============================================================
 
 using System.Collections.Generic;
+using DualEnigma.Synthesis;
 
 namespace DualEnigma.Character
 {
@@ -32,5 +33,8 @@ namespace DualEnigma.Character
         public int CarryLimit = 3;
         /// <summary>当前携带的碎片列表</summary>
         public List<int> CarriedFragmentIds = new List<int>();
+
+        /// <summary>携带的材料及数量</summary>
+        public Dictionary<MaterialType, int> CarriedMaterials = new Dictionary<MaterialType, int>();
     }
 }

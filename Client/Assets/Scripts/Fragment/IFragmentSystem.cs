@@ -18,5 +18,14 @@ namespace DualEnigma.Fragment
 
         /// <summary>碎片被接住（由角色碰撞触发）</summary>
         void OnFragmentCollected(int fragmentId, byte playerId, bool isJumping);
+
+        /// <summary>
+        /// 查询碎片类型（包括已收集但未消耗的碎片）。
+        /// 引用：合成系统.md §4.2 碎片验证消耗
+        /// </summary>
+        /// <param name="fragmentId">碎片唯一ID</param>
+        /// <param name="type">输出的碎片类型</param>
+        /// <returns>是否查找到对应碎片</returns>
+        bool TryGetFragmentType(int fragmentId, out FragmentType type);
     }
 }

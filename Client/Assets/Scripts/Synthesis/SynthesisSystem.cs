@@ -8,6 +8,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DualEnigma.Core;
+using DualEnigma.Data;
+using DualEnigma.Character;
 using DualEnigma.Fragment;
 using DualEnigma.Shelter;
 
@@ -26,6 +28,19 @@ namespace DualEnigma.Synthesis
         private readonly Dictionary<byte, float> _synthesisTimers = new Dictionary<byte, float>();
         /// <summary>合成中的玩家配方</summary>
         private readonly Dictionary<byte, SynthesisRecipe> _activeRecipes = new Dictionary<byte, SynthesisRecipe>();
+        /// <summary>合成开始时消耗的碎片记录（用于打断返还）</summary>
+        private readonly Dictionary<byte, ConsumedFragmentRecord> _consumedRecords = new Dictionary<byte, ConsumedFragmentRecord>();
+
+        /// <summary>消耗碎片记录：存储合成开始时消耗的碎片信息</summary>
+        private struct ConsumedFragmentRecord
+        {
+            /// <summary>消耗的碎片类型</summary>
+            public FragmentType FragmentType;
+            /// <summary>消耗的碎片数量</summary>
+            public int Count;
+            /// <summary>消耗的碎片ID列表（用于精确返还）</summary>
+            public List<int> FragmentIds;
+        }
 
         /// <summary>M1元素枯竭：碎片需求翻倍</summary>
         private bool _m1ElementDepletion;
@@ -41,7 +56,7 @@ namespace DualEnigma.Synthesis
         /// </summary>
         public void SetEnvironment(ShelterEnvironment environment)
         {
-            var config = Resources.Load<SynthesisConfig>("SynthesisConfig");
+            var config = DataManager.Instance.LoadConfig<SynthesisConfig>("SynthesisConfig");
             if (config != null)
             {
                 CurrentRecipes = config.GetRecipes(environment);
@@ -65,6 +80,7 @@ namespace DualEnigma.Synthesis
 
         /// <summary>
         /// 尝试开始合成（指定输出材料类型）。
+        /// 引用：合成系统.md §4.2 合成流程
         /// </summary>
         public SynthesisRecipe? TryStartSynthesis(byte playerId, FragmentType fragmentType, MaterialType desiredOutput)
         {
@@ -75,9 +91,65 @@ namespace DualEnigma.Synthesis
 
                 int required = _m1ElementDepletion ? recipe.RequiredCount * 2 : recipe.RequiredCount;
 
+                // 获取角色控制器
+                var characterSystem = ServiceLocator.Get<ICharacterSystem>();
+                if (characterSystem == null)
+                {
+                    Debug.LogWarning("[SynthesisSystem] CharacterSystem 未注册，无法验证碎片");
+                    return null;
+                }
+
+                CharacterController character = characterSystem.GetCharacter((CharacterType)playerId);
+                if (character == null || character.Stats == null)
+                {
+                    Debug.LogWarning($"[SynthesisSystem] 找不到玩家{playerId}的角色实例");
+                    return null;
+                }
+
+                // 获取碎片系统以查询碎片类型
+                var fragmentSystem = ServiceLocator.Get<IFragmentSystem>();
+                if (fragmentSystem == null)
+                {
+                    Debug.LogWarning("[SynthesisSystem] FragmentSystem 未注册，无法验证碎片");
+                    return null;
+                }
+
+                // 检查角色携带碎片中是否有足够数量的对应 FragmentType 碎片
+                List<int> matchedIds = new List<int>();
+                foreach (int fragmentId in character.Stats.CarriedFragmentIds)
+                {
+                    if (fragmentSystem.TryGetFragmentType(fragmentId, out FragmentType type) && type == fragmentType)
+                    {
+                        matchedIds.Add(fragmentId);
+                        if (matchedIds.Count >= required)
+                            break;
+                    }
+                }
+
+                if (matchedIds.Count < required)
+                {
+                    Debug.Log($"[SynthesisSystem] 玩家{playerId}碎片不足: 需要{required}个{fragmentType}, 仅有{matchedIds.Count}个");
+                    return null;
+                }
+
+                // 满足条件，消耗碎片
+                foreach (int fragmentId in matchedIds)
+                {
+                    character.RemoveFragment(fragmentId);
+                }
+
+                // 记录消耗的碎片信息（用于打断返还）
+                _consumedRecords[playerId] = new ConsumedFragmentRecord
+                {
+                    FragmentType = fragmentType,
+                    Count = required,
+                    FragmentIds = matchedIds
+                };
+
+                // 启动合成计时
                 _activeRecipes[playerId] = recipe;
                 _synthesisTimers[playerId] = recipe.SynthesisTime;
-                Debug.Log($"[SynthesisSystem] 玩家{playerId}开始合成: {recipe.OutputType}, 需{required}个{fragmentType}, {recipe.SynthesisTime}秒");
+                Debug.Log($"[SynthesisSystem] 玩家{playerId}开始合成: {recipe.OutputType}, 消耗{required}个{fragmentType}, {recipe.SynthesisTime}秒");
                 return recipe;
             }
 
@@ -100,13 +172,36 @@ namespace DualEnigma.Synthesis
         }
 
         /// <summary>
-        /// 打断合成（移动或被击中时调用）。
+        /// 打断合成（移动或被击中时调用），返还已消耗的碎片。
+        /// 引用：合成系统.md §4.2 打断规则
         /// </summary>
         public void InterruptSynthesis(byte playerId)
         {
+            // 返还已消耗的碎片
+            if (_consumedRecords.TryGetValue(playerId, out ConsumedFragmentRecord record))
+            {
+                var characterSystem = ServiceLocator.Get<ICharacterSystem>();
+                if (characterSystem != null)
+                {
+                    CharacterController character = characterSystem.GetCharacter((CharacterType)playerId);
+                    if (character != null)
+                    {
+                        int returned = 0;
+                        foreach (int fragmentId in record.FragmentIds)
+                        {
+                            if (character.AddFragment(fragmentId))
+                                returned++;
+                            else
+                                Debug.LogWarning($"[SynthesisSystem] 玩家{playerId}碎片背包已满，碎片{fragmentId}返还失败");
+                        }
+                        Debug.Log($"[SynthesisSystem] 玩家{playerId}合成被打断，返还{returned}/{record.Count}个{record.FragmentType}碎片");
+                    }
+                }
+                _consumedRecords.Remove(playerId);
+            }
+
             _activeRecipes.Remove(playerId);
             _synthesisTimers.Remove(playerId);
-            Debug.Log($"[SynthesisSystem] 玩家{playerId}合成被打断，碎片返还");
         }
 
         /// <summary>
@@ -132,6 +227,7 @@ namespace DualEnigma.Synthesis
                 SynthesisRecipe recipe = _activeRecipes[playerId];
                 _synthesisTimers.Remove(playerId);
                 _activeRecipes.Remove(playerId);
+                _consumedRecords.Remove(playerId);
 
                 EventBus.Instance.Publish(new MaterialProducedEvent
                 {
@@ -148,6 +244,18 @@ namespace DualEnigma.Synthesis
         public void SetM1ElementDepletion(bool enabled)
         {
             _m1ElementDepletion = enabled;
+        }
+
+        /// <summary>
+        /// 合成台可用回调（由 SynthesisStation.Release 在队列中有等待者时调用）。
+        /// 引用：合成系统.md §4.1 队列规则
+        /// </summary>
+        /// <param name="station">可用的合成台</param>
+        /// <param name="playerId">被分配到的玩家ID</param>
+        public void OnStationAvailable(SynthesisStation station, byte playerId)
+        {
+            Debug.Log($"[SynthesisSystem] 合成台{station.StationId}可用，通知玩家{playerId}");
+            // 可扩展：发布事件通知 UI 或角色控制器
         }
     }
 }

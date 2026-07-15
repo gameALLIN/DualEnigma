@@ -54,6 +54,33 @@ namespace DualEnigma.Fragment
             State = state;
         }
 
+        /// <summary>
+        /// 点燃碎片（由被动技能 FlameAura 触发）。
+        /// 仅 Falling 状态碎片可被点燃，点燃后通知 FragmentSystem 记录时间戳。
+        /// </summary>
+        public void SetIgnited()
+        {
+            if (State != FragmentState.Falling)
+                return;
+
+            SetState(FragmentState.Ignited);
+            FragmentSystem.Instance.OnFragmentIgnited(FragmentId);
+        }
+
+        /// <summary>
+        /// 冻结碎片（由被动技能 FrostAura 触发）。
+        /// Falling 或 Ignited 状态碎片可被冻结。若碎片此前被点燃且在温砖窗口内，
+        /// FragmentSystem.OnFragmentFrozen 将执行温砖转换。
+        /// </summary>
+        public void SetFrozen()
+        {
+            if (State != FragmentState.Falling && State != FragmentState.Ignited)
+                return;
+
+            SetState(FragmentState.Frozen);
+            FragmentSystem.Instance.OnFragmentFrozen(FragmentId);
+        }
+
         private void Update()
         {
             if (!_isInitialized || State != FragmentState.Falling)
@@ -64,7 +91,14 @@ namespace DualEnigma.Fragment
             if (RemainingTime <= 0f)
             {
                 SetState(FragmentState.Despawned);
-                FragmentSystem.Instance.OnFragmentDespawned(FragmentId);
+                // 通过 EventBus 发布消失事件，由 FragmentSystem 订阅处理
+                if (EventBus.HasInstance)
+                {
+                    EventBus.Instance.Publish(new FragmentDespawnedEvent
+                    {
+                        fragmentId = FragmentId
+                    });
+                }
             }
         }
     }

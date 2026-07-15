@@ -33,6 +33,9 @@ namespace DualEnigma.Building
         public float CurrentHP;
         /// <summary>是否在安全区内</summary>
         public bool IsInSafeZone;
+
+        /// <summary>最大HP（等于BaseHP，用于Clamp校正）</summary>
+        public float MaxHP => BaseHP;
     }
 
     /// <summary>

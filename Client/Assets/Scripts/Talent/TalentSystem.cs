@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DualEnigma.Core;
 using DualEnigma.Character;
+using DualEnigma.Data;
 using DualEnigma.Skill;
 using DualEnigma.Shelter;
 
@@ -35,12 +36,26 @@ namespace DualEnigma.Talent
         private int _firstAidCount;
         /// <summary>当前章节</summary>
         private int _currentChapter = 1;
+        /// <summary>确定性随机数生成器（Host/Client 同种子同步）</summary>
+        private System.Random _random = new System.Random();
+        /// <summary>每章是否已获得史诗天赋（Key=章节, Value=是否已获得）</summary>
+        private readonly Dictionary<int, bool> _chapterEpicHistory = new Dictionary<int, bool>();
 
         protected override void OnSingletonInitialized()
         {
             ServiceLocator.Register<ITalentSystem>(this);
             EventBus.Instance.Subscribe<PhaseChangedEvent>(OnPhaseChanged);
             Debug.Log("[TalentSystem] 天赋系统初始化完成");
+        }
+
+        /// <summary>
+        /// 设置随机种子，确保 Host 和 Client 产生相同的抽卡结果。
+        /// 应在游戏开始前由 Host 生成种子并同步给 Client。
+        /// </summary>
+        public void SetSeed(uint seed)
+        {
+            _random = new System.Random((int)seed);
+            Debug.Log($"[TalentSystem] 随机种子已设置: {seed}");
         }
 
         protected override void OnDestroy()
@@ -58,7 +73,7 @@ namespace DualEnigma.Talent
             _currentChapter = chapter;
 
             if (_config == null)
-                _config = Resources.Load<TalentConfig>("TalentConfig");
+                _config = DataManager.Instance.LoadConfig<TalentConfig>();
 
             if (_config == null)
             {
@@ -76,7 +91,98 @@ namespace DualEnigma.Talent
             }
 
             List<TalentData> pool = GetTargetPool(owner);
-            return DrawFromPool(pool, 3, rates, applyBoost);
+            List<TalentData> result = DrawFromPool(pool, 3, rates, applyBoost);
+
+            ApplyEpicPity(pool, result, chapter);
+            ApplyFirstAidPity(pool, result);
+
+            return result;
+        }
+
+        /// <summary>
+        /// 史诗保底：每章第12轮（globalRound % 12 == 0）时，若本章未获得过史诗天赋，
+        /// 则强制将1张史诗天赋放入3选1选项中。
+        /// 引用：天赋系统.md §4.3 史诗保底
+        /// </summary>
+        private void ApplyEpicPity(List<TalentData> pool, List<TalentData> result, int chapter)
+        {
+            int globalRound = GameManager.Instance.State.Progress.GlobalRound;
+            if (globalRound % 12 != 0)
+                return;
+
+            // 本章已获得过史诗，无需保底
+            if (_chapterEpicHistory.TryGetValue(chapter, out bool epicObtained) && epicObtained)
+                return;
+
+            // 当前选项中已包含史诗天赋，视为本章已获得
+            if (result.Exists(t => t.Rarity == Rarity.Epic))
+            {
+                _chapterEpicHistory[chapter] = true;
+                return;
+            }
+
+            // 从史诗池中抽取1张（排除已在选项中的）
+            List<TalentData> epicPool = pool.FindAll(
+                t => t.Rarity == Rarity.Epic && !result.Exists(r => r.Id == t.Id));
+
+            if (epicPool.Count == 0)
+            {
+                Debug.LogWarning("[TalentSystem] 史诗保底触发，但史诗池为空");
+                return;
+            }
+
+            int idx = _random.Next(epicPool.Count);
+            TalentData epicTalent = epicPool[idx];
+
+            // 替换1个非史诗选项
+            int replaceIdx = result.FindIndex(t => t.Rarity != Rarity.Epic);
+            if (replaceIdx >= 0)
+                result[replaceIdx] = epicTalent;
+            else
+                result[0] = epicTalent;
+
+            _chapterEpicHistory[chapter] = true;
+            Debug.Log($"[TalentSystem] 史诗保底触发（第{chapter}章，全局第{globalRound}轮）");
+        }
+
+        /// <summary>
+        /// 急救保底：全游戏急救天赋出现次数不足时，有概率将1个选项替换为急救天赋。
+        /// 引用：天赋系统.md §4.3 急救保底
+        /// </summary>
+        private void ApplyFirstAidPity(List<TalentData> pool, List<TalentData> result)
+        {
+            // 已满足最低出现次数，无需保底
+            if (_firstAidCount >= _config.MinFirstAidAppearances)
+                return;
+
+            // 当前选项中已包含急救天赋
+            if (result.Exists(t => t.EffectId == TalentEffectId.FirstAid))
+                return;
+
+            // 从急救池中抽取1张（排除已在选项中的）
+            List<TalentData> firstAidPool = pool.FindAll(
+                t => t.EffectId == TalentEffectId.FirstAid && !result.Exists(r => r.Id == t.Id));
+
+            if (firstAidPool.Count == 0)
+                return;
+
+            // 50% 概率触发替换
+            if (_random.NextDouble() >= 0.5)
+                return;
+
+            int idx = _random.Next(firstAidPool.Count);
+            TalentData firstAidTalent = firstAidPool[idx];
+
+            // 替换1个非史诗、非急救的选项（避免覆盖史诗保底结果）
+            int replaceIdx = result.FindIndex(
+                t => t.Rarity != Rarity.Epic && t.EffectId != TalentEffectId.FirstAid);
+
+            if (replaceIdx < 0)
+                return; // 所有选项均为史诗或急救，不替换
+
+            result[replaceIdx] = firstAidTalent;
+
+            Debug.Log($"[TalentSystem] 急救保底触发（当前急救出现次数: {_firstAidCount}/{_config.MinFirstAidAppearances}）");
         }
 
         /// <summary>
@@ -115,6 +221,14 @@ namespace DualEnigma.Talent
                 _noRarityCounter = 0;
             else
                 _noRarityCounter++;
+
+            // 记录本章是否已获得史诗天赋（保底机制用）
+            if (talent.Rarity == Rarity.Epic)
+                _chapterEpicHistory[_currentChapter] = true;
+
+            // 急救天赋被选中时计数（保底机制用）
+            if (talent.EffectId == TalentEffectId.FirstAid)
+                _firstAidCount++;
 
             ApplyTalentEffects(owner, talent);
 
@@ -156,7 +270,23 @@ namespace DualEnigma.Talent
             var skillSystem = ServiceLocator.Get<ISkillSystem>();
             if (skillSystem != null)
             {
+                byte playerId = (byte)(owner == CharacterType.Aqua ? 0 : 1);
+
+                // 冷却缩短
                 skillSystem.SetCooldownReduction(summary.CooldownReduction);
+
+                // 范围扩大（summary.RangeMultiplier 默认 1f，天赋加成叠加其上）
+                if (summary.RangeMultiplier > 1f)
+                    skillSystem.SetRangeMultiplier(playerId, summary.RangeMultiplier - 1f);
+
+                // 双重释放（不叠加，激活即 100% 概率）
+                if (summary.CanDoubleRelease)
+                    skillSystem.SetDoubleCastChance(playerId, 1f);
+
+                // 护盾强化（DamageReduction 天赋同时激活护盾强化标志，
+                // 使护盾类技能持续时间 +50%）
+                if (talent.EffectId == TalentEffectId.DamageReduction)
+                    skillSystem.SetShieldActive(true);
             }
 
             var shelterSystem = ServiceLocator.Get<IShelterSystem>();
@@ -233,7 +363,7 @@ namespace DualEnigma.Talent
                     rarityPool = available;
                 }
 
-                int idx = Random.Range(0, rarityPool.Count);
+                int idx = _random.Next(rarityPool.Count);
                 TalentData drawn = rarityPool[idx];
                 result.Add(drawn);
                 available.Remove(drawn);
@@ -293,7 +423,7 @@ namespace DualEnigma.Talent
             float total = 0f;
             foreach (float w in weights) total += w;
 
-            float roll = Random.Range(0f, total);
+            float roll = (float)_random.NextDouble() * total;
             float cumulative = 0f;
 
             for (int i = 0; i < weights.Length; i++)

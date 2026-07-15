@@ -10,6 +10,18 @@ using UnityEngine;
 namespace DualEnigma.Fragment
 {
     /// <summary>
+    /// 碎片类型概率配置项（可序列化，供 Inspector 编辑）。
+    /// </summary>
+    [System.Serializable]
+    public struct TypeProbabilityEntry
+    {
+        /// <summary>碎片类型</summary>
+        public FragmentType type;
+        /// <summary>生成概率（0-1）</summary>
+        [Range(0f, 1f)] public float probability;
+    }
+
+    /// <summary>
     /// 碎片系统配置。
     /// 引用：碎片系统.md §2.3, §2.4
     /// </summary>
@@ -30,6 +42,9 @@ namespace DualEnigma.Fragment
         [SerializeField] private float _dropRangeMin = 8f;
         [SerializeField] private float _dropRangeMax = 18f;
 
+        [Header("碎片类型生成概率")]
+        [SerializeField] private TypeProbabilityEntry[] _typeProbabilities;
+
         /// <summary>密度系数</summary>
         public float[] DensityFactors => _densityFactors;
         /// <summary>存续时间</summary>
@@ -42,6 +57,8 @@ namespace DualEnigma.Fragment
         public float DropRangeMin => _dropRangeMin;
         /// <summary>掉落范围最大值</summary>
         public float DropRangeMax => _dropRangeMax;
+        /// <summary>碎片类型概率配置</summary>
+        public TypeProbabilityEntry[] TypeProbabilities => _typeProbabilities;
 
         /// <summary>获取指定轮次的密度系数</summary>
         public float GetDensityFactor(int round)
@@ -55,6 +72,31 @@ namespace DualEnigma.Fragment
         {
             int index = Mathf.Clamp(round - 1, 0, _lifetimes.Length - 1);
             return _lifetimes[index];
+        }
+
+        /// <summary>
+        /// 获取指定碎片类型的生成概率。
+        /// 如果未配置 _typeProbabilities，返回默认值（IceCrystal 55%, Lava 30%, Rock 15%）。
+        /// </summary>
+        public float GetTypeProbability(FragmentType type)
+        {
+            if (_typeProbabilities != null && _typeProbabilities.Length > 0)
+            {
+                foreach (var entry in _typeProbabilities)
+                {
+                    if (entry.type == type)
+                        return entry.probability;
+                }
+            }
+
+            // 默认概率（与原硬编码值一致）
+            switch (type)
+            {
+                case FragmentType.IceCrystal: return 0.55f;
+                case FragmentType.Lava: return 0.30f;
+                case FragmentType.Rock: return 0.15f;
+                default: return 0f;
+            }
         }
     }
 }

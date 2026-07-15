@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DualEnigma.Synthesis;
+using DualEnigma.Disaster;
 
 namespace DualEnigma.Building
 {
@@ -24,7 +25,7 @@ namespace DualEnigma.Building
         List<BuildingData> Buildings { get; }
 
         /// <summary>生成蓝图</summary>
-        void GenerateBlueprint(int disasterType, int round);
+        void GenerateBlueprint(DisasterCategory disasterType, int round);
 
         /// <summary>放置建筑</summary>
         bool PlaceBuilding(byte playerId, BuildingType type, MaterialType material, Vector2Int gridPos, int facing);

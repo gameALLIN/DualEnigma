@@ -24,7 +24,11 @@ namespace DualEnigma.Synthesis
         void SetEnvironment(ShelterEnvironment environment);
 
         /// <summary>尝试开始合成</summary>
-        SynthesisRecipe? TryStartSynthesis(byte playerId, FragmentType fragmentType);
+        /// <param name="playerId">操作玩家ID</param>
+        /// <param name="fragmentType">选择的碎片类型</param>
+        /// <param name="desiredOutput">期望产出的材料类型</param>
+        /// <returns>匹配到的配方，无匹配或碎片不足返回 null</returns>
+        SynthesisRecipe? TryStartSynthesis(byte playerId, FragmentType fragmentType, MaterialType desiredOutput);
 
         /// <summary>合成进度更新</summary>
         float GetSynthesisProgress(byte playerId);

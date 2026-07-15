@@ -9,6 +9,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DualEnigma.Core;
+using DualEnigma.Data;
+using DualEnigma.Skill;
 
 namespace DualEnigma.Fragment
 {
@@ -20,6 +22,15 @@ namespace DualEnigma.Fragment
     {
         /// <summary>同时接住判定窗口（秒）</summary>
         private const float SIMULTANEOUS_WINDOW = 0.1f;
+
+        /// <summary>温砖转换窗口（秒）— 点燃后 100ms 内冻结则转化为温砖</summary>
+        private const float WARM_BRICK_WINDOW = 0.1f;
+
+        /// <summary>被动技能触发半径（世界单位）</summary>
+        private const float PASSIVE_TRIGGER_RADIUS = 3f;
+
+        /// <summary>被动技能触发概率（0-1）</summary>
+        [SerializeField] private float _passiveTriggerChance = 0.3f;
 
         /// <summary>碎片预制体（待赋值）</summary>
         [SerializeField] private FragmentController _fragmentPrefab;
@@ -39,6 +50,12 @@ namespace DualEnigma.Fragment
         /// <summary>活跃碎片字典</summary>
         private readonly Dictionary<int, FragmentController> _activeFragments = new Dictionary<int, FragmentController>();
 
+        /// <summary>已收集碎片的类型记录（碎片被收集后仍可查询类型）</summary>
+        private readonly Dictionary<int, FragmentType> _collectedFragmentTypes = new Dictionary<int, FragmentType>();
+
+        /// <summary>碎片被点燃的时间戳记录（用于温砖转换判定）</summary>
+        private readonly Dictionary<int, float> _ignitedTimestamps = new Dictionary<int, float>();
+
         /// <summary>碎片ID自增计数器</summary>
         private int _nextFragmentId;
 
@@ -55,22 +72,68 @@ namespace DualEnigma.Fragment
         public int ActiveCount => _activeFragments.Count;
 
         protected override void OnSingletonInitialized()
+
         {
+
             ServiceLocator.Register<IFragmentSystem>(this);
 
             _poolRoot = new GameObject("FragmentPoolRoot").transform;
+
             _poolRoot.SetParent(transform);
 
+
             if (_fragmentPrefab != null)
+
             {
+
                 _fragmentPool = new ObjectPool<FragmentController>(_fragmentPrefab, 40, _poolRoot);
-            }
-            else
-            {
-                Debug.LogWarning("[FragmentSystem] 碎片预制体未赋值，对象池未初始化");
+
             }
 
+            else
+
+            {
+
+                Debug.LogWarning("[FragmentSystem] 碎片预制体未赋值，对象池未初始化");
+
+            }
+
+
+            // 尝试通过 DataManager 加载碎片配置，失败则回退到 Inspector 手动赋值的 SerializeField
+
+            FragmentConfig dmConfig = DataManager.Instance.LoadConfig<FragmentConfig>("FragmentConfig");
+
+            if (dmConfig != null)
+
+            {
+
+                _config = dmConfig;
+
+            }
+
+            else if (_config != null)
+
+            {
+
+                Debug.LogWarning("[FragmentSystem] DataManager 加载 FragmentConfig 失败，回退到 Inspector 手动赋值");
+
+            }
+
+
+            // 订阅碎片消失事件（由 FragmentController 通过 EventBus 发布）
+
+            EventBus.Instance.Subscribe<FragmentDespawnedEvent>(OnFragmentDespawnedEvent);
+
+
             Debug.Log("[FragmentSystem] 碎片系统初始化完成");
+
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            if (EventBus.HasInstance)
+                EventBus.Instance.Unsubscribe<FragmentDespawnedEvent>(OnFragmentDespawnedEvent);
         }
 
         /// <summary>设置当前轮次（影响存续时间）</summary>
@@ -150,8 +213,20 @@ namespace DualEnigma.Fragment
                 multiplier = multiplier
             });
 
+            // 被动技能检查（在释放碎片前获取位置和类型）
+            CheckPassiveSkills(playerId, fragment.Type, fragment.transform.position);
+
             fragment.SetState(FragmentState.Collected);
+            _collectedFragmentTypes[fragmentId] = fragment.Type;
             ReleaseFragment(fragmentId);
+        }
+
+        /// <summary>
+        /// 碎片自然消失事件处理（由 FragmentController 通过 EventBus 发布）。
+        /// </summary>
+        private void OnFragmentDespawnedEvent(FragmentDespawnedEvent evt)
+        {
+            OnFragmentDespawned(evt.fragmentId);
         }
 
         /// <summary>
@@ -160,6 +235,160 @@ namespace DualEnigma.Fragment
         public void OnFragmentDespawned(int fragmentId)
         {
             ReleaseFragment(fragmentId);
+        }
+
+        /// <summary>
+        /// 查询碎片类型（包括已收集但未消耗的碎片）。
+        /// 引用：合成系统.md §4.2 碎片验证消耗
+        /// </summary>
+        public bool TryGetFragmentType(int fragmentId, out FragmentType type)
+        {
+            if (_collectedFragmentTypes.TryGetValue(fragmentId, out type))
+                return true;
+
+            if (_activeFragments.TryGetValue(fragmentId, out FragmentController fragment))
+            {
+                type = fragment.Type;
+                return true;
+            }
+
+            type = default;
+            return false;
+        }
+
+        // ──────────────────────────────────────────────
+        //  被动技能触发
+        // ──────────────────────────────────────────────
+
+        /// <summary>
+        /// 检查收集者被动技能并触发效果。
+        /// - FrostAura（寒霜体质）：收集冰晶碎片时有概率冻结周围碎片
+        /// - FlameAura（烈焰体质）：收集熔岩碎片时有概率点燃周围碎片
+        /// 引用：技能系统.md §4.2 被动技能触发时机
+        /// </summary>
+        private void CheckPassiveSkills(byte playerId, FragmentType collectedType, Vector2 position)
+        {
+            ISkillSystem skillSys = ServiceLocator.Get<ISkillSystem>();
+            if (skillSys == null)
+                return;
+
+            // 寒霜体质：收集冰晶碎片时有概率冻结周围碎片
+            if (collectedType == FragmentType.IceCrystal
+                && skillSys.IsPassiveActive(playerId, PassiveSkillType.FrostAura)
+                && Random.Range(0f, 1f) <= _passiveTriggerChance)
+            {
+                FreezeNearbyFragments(position, PASSIVE_TRIGGER_RADIUS);
+                Debug.Log($"[FragmentSystem] 玩家{playerId} 寒霜体质触发，冻结周围碎片");
+            }
+
+            // 烈焰体质：收集熔岩碎片时有概率点燃周围碎片
+            if (collectedType == FragmentType.Lava
+                && skillSys.IsPassiveActive(playerId, PassiveSkillType.FlameAura)
+                && Random.Range(0f, 1f) <= _passiveTriggerChance)
+            {
+                IgniteNearbyFragments(position, PASSIVE_TRIGGER_RADIUS);
+                Debug.Log($"[FragmentSystem] 玩家{playerId} 烈焰体质触发，点燃周围碎片");
+            }
+        }
+
+        /// <summary>
+        /// 点燃范围内的 Falling 状态碎片。
+        /// </summary>
+        private void IgniteNearbyFragments(Vector2 center, float radius)
+        {
+            foreach (var kvp in _activeFragments)
+            {
+                FragmentController fragment = kvp.Value;
+                if (fragment == null || fragment.State != FragmentState.Falling)
+                    continue;
+
+                if (Vector2.Distance(fragment.transform.position, center) <= radius)
+                {
+                    fragment.SetIgnited();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 冻结范围内的 Falling 或 Ignited 状态碎片。
+        /// 若碎片此前被点燃且在温砖窗口内，将触发温砖转换。
+        /// </summary>
+        private void FreezeNearbyFragments(Vector2 center, float radius)
+        {
+            foreach (var kvp in _activeFragments)
+            {
+                FragmentController fragment = kvp.Value;
+                if (fragment == null)
+                    continue;
+
+                // 仅 Falling 或 Ignited 状态碎片可被冻结
+                if (fragment.State != FragmentState.Falling
+                    && fragment.State != FragmentState.Ignited)
+                    continue;
+
+                if (Vector2.Distance(fragment.transform.position, center) <= radius)
+                {
+                    fragment.SetFrozen();
+                }
+            }
+        }
+
+        // ──────────────────────────────────────────────
+        //  温砖触发逻辑
+        // ──────────────────────────────────────────────
+
+        /// <summary>
+        /// 碎片被点燃回调（由 FragmentController.SetIgnited 调用）。
+        /// 记录点燃时间戳，用于后续温砖转换判定。
+        /// </summary>
+        public void OnFragmentIgnited(int fragmentId)
+        {
+            _ignitedTimestamps[fragmentId] = Time.time;
+            Debug.Log($"[FragmentSystem] 碎片{fragmentId}被点燃");
+        }
+
+        /// <summary>
+        /// 碎片被冻结回调（由 FragmentController.SetFrozen 调用）。
+        /// 若碎片在温砖窗口内被点燃后冻结，则转化为温砖。
+        /// 引用：碎片系统.md §4.4 温砖触发
+        /// </summary>
+        public void OnFragmentFrozen(int fragmentId)
+        {
+            Debug.Log($"[FragmentSystem] 碎片{fragmentId}被冻结");
+
+            // 检查温砖转换：点燃后 100ms 内冻结
+            if (_ignitedTimestamps.TryGetValue(fragmentId, out float ignitedTime))
+            {
+                _ignitedTimestamps.Remove(fragmentId);
+
+                if (Time.time - ignitedTime <= WARM_BRICK_WINDOW)
+                {
+                    ConvertToWarmBrick(fragmentId);
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 将碎片转化为温砖。
+        /// 设置状态为 ConvertedToWarmBrick 并发布事件通知其他系统。
+        /// 温砖作为特殊材料，角色拾取后可直接用于建造。
+        /// </summary>
+        private void ConvertToWarmBrick(int fragmentId)
+        {
+            if (!_activeFragments.TryGetValue(fragmentId, out FragmentController fragment))
+                return;
+
+            Vector2 position = fragment.transform.position;
+            fragment.SetState(FragmentState.ConvertedToWarmBrick);
+
+            EventBus.Instance.Publish(new FragmentWarmBrickConvertedEvent
+            {
+                fragmentId = fragmentId,
+                position = position
+            });
+
+            Debug.Log($"[FragmentSystem] 碎片{fragmentId}转化为温砖 @ {position}");
         }
 
         private int DetermineMultiplier(int fragmentId, byte playerId, bool isJumping)
@@ -212,6 +441,7 @@ namespace DualEnigma.Fragment
 
             _activeFragments.Remove(fragmentId);
             _collectRecords.Remove(fragmentId);
+            _ignitedTimestamps.Remove(fragmentId);
 
             if (_fragmentPool != null)
             {
@@ -225,9 +455,22 @@ namespace DualEnigma.Fragment
 
         private FragmentType GenerateFragmentType(System.Random rng)
         {
-            int roll = rng.Next(100);
-            if (roll < 55) return FragmentType.IceCrystal;
-            if (roll < 85) return FragmentType.Lava;
+            float roll = (float)rng.NextDouble();
+
+            if (_config != null)
+            {
+                // 从 FragmentConfig 读取概率配置
+                float iceProb = _config.GetTypeProbability(FragmentType.IceCrystal);
+                float lavaProb = _config.GetTypeProbability(FragmentType.Lava);
+
+                if (roll < iceProb) return FragmentType.IceCrystal;
+                if (roll < iceProb + lavaProb) return FragmentType.Lava;
+                return FragmentType.Rock;
+            }
+
+            // 回退到默认硬编码概率
+            if (roll < 0.55f) return FragmentType.IceCrystal;
+            if (roll < 0.85f) return FragmentType.Lava;
             return FragmentType.Rock;
         }
 

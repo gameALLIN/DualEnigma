@@ -22,6 +22,9 @@ namespace DualEnigma.Character
         /// <summary>火人角色实例</summary>
         public CharacterController Ignis { get; private set; }
 
+        /// <summary>角色配置数据（ScriptableObject）</summary>
+        [SerializeField] private CharacterConfig _characterConfig;
+
         protected override void OnSingletonInitialized()
         {
             ServiceLocator.Register<ICharacterSystem>(this);
@@ -61,7 +64,50 @@ namespace DualEnigma.Character
             go.AddComponent<SpriteRenderer>();
 
             CharacterController controller = go.AddComponent<CharacterController>();
-            CharacterStats stats = new CharacterStats
+
+            // 从 CharacterConfig 加载属性，配置未赋值时使用默认值
+            CharacterStats sourceStats = null;
+            if (_characterConfig != null)
+            {
+                sourceStats = type == CharacterType.Aqua
+                    ? _characterConfig.AquaStats
+                    : _characterConfig.IgnisStats;
+            }
+
+            CharacterStats stats = sourceStats != null
+                ? CloneStats(sourceStats)
+                : CreateDefaultStats(type);
+
+            controller.Initialize(stats, playerId);
+
+            return controller;
+        }
+
+        /// <summary>
+        /// 克隆配置属性（深拷贝，避免修改 ScriptableObject 原始数据）。
+        /// CurrentHP 重置为 MaxHP，确保新局开始满血。
+        /// </summary>
+        private CharacterStats CloneStats(CharacterStats source)
+        {
+            return new CharacterStats
+            {
+                Type = source.Type,
+                MaxHP = source.MaxHP,
+                CurrentHP = source.MaxHP,
+                MoveSpeed = source.MoveSpeed,
+                JumpHeight = source.JumpHeight,
+                CanDoubleJump = source.CanDoubleJump,
+                CarryLimit = source.CarryLimit,
+                CarriedFragmentIds = new System.Collections.Generic.List<int>()
+            };
+        }
+
+        /// <summary>
+        /// 创建默认属性（CharacterConfig 未赋值时的兜底）。
+        /// </summary>
+        private CharacterStats CreateDefaultStats(CharacterType type)
+        {
+            return new CharacterStats
             {
                 Type = type,
                 MaxHP = 100,
@@ -72,9 +118,6 @@ namespace DualEnigma.Character
                 CarryLimit = 3,
                 CarriedFragmentIds = new System.Collections.Generic.List<int>()
             };
-            controller.Initialize(stats, playerId);
-
-            return controller;
         }
     }
 }

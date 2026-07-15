@@ -57,5 +57,7 @@ namespace DualEnigma.Talent
         FragmentLifetime,
         BuildingHP,
         PlaceSpeed,
+        /// <summary>急救天赋（保底机制识别用）</summary>
+        FirstAid,
     }
 }

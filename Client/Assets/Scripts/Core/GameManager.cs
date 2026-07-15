@@ -7,6 +7,7 @@
 /// ============================================================
 
 using UnityEngine;
+using DualEnigma.Shelter;
 
 namespace DualEnigma.Core
 {
@@ -76,17 +77,14 @@ namespace DualEnigma.Core
     /// </summary>
     public class GameManager : Singleton<GameManager>
     {
-        /// <summary>初始 HP</summary>
-        private const int INITIAL_HP = 100;
-
         /// <summary>全局游戏状态</summary>
         public GameState State { get; } = new GameState();
 
-        /// <summary>水人 HP</summary>
-        public int AquaHP { get; set; }
+        /// <summary>水人 HP（从 ShelterSystem 读取，ShelterSystem 为HP唯一权威）</summary>
+        public int AquaHP => ShelterSystem.HasInstance ? ShelterSystem.Instance.AquaHP : 0;
 
-        /// <summary>火人 HP</summary>
-        public int IgnisHP { get; set; }
+        /// <summary>火人 HP（从 ShelterSystem 读取，ShelterSystem 为HP唯一权威）</summary>
+        public int IgnisHP => ShelterSystem.HasInstance ? ShelterSystem.Instance.IgnisHP : 0;
 
         protected override void OnSingletonInitialized()
         {
@@ -100,8 +98,7 @@ namespace DualEnigma.Core
         {
             State.IsGameOver = false;
             State.IsPaused = false;
-            AquaHP = INITIAL_HP;
-            IgnisHP = INITIAL_HP;
+            ShelterSystem.Instance.ResetHP();
 
             GameStateMachine.Instance.StartNewRound();
             EventBus.Instance.Publish(new GameStartEvent());

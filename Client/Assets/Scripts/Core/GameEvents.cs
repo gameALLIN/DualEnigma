@@ -26,6 +26,19 @@ namespace DualEnigma.Core
         public int multiplier;
     }
 
+    /// <summary>碎片自然消失事件（由 FragmentController 发布，FragmentSystem 订阅）</summary>
+    public struct FragmentDespawnedEvent : IEventData
+    {
+        public int fragmentId;
+    }
+
+    /// <summary>碎片转化为温砖事件（由 FragmentSystem 发布）</summary>
+    public struct FragmentWarmBrickConvertedEvent : IEventData
+    {
+        public int fragmentId;
+        public Vector2 position;
+    }
+
     /// <summary>建筑放置完成事件（由 BuildingSystem 发布）</summary>
     public struct BuildingPlacedEvent : IEventData
     {
