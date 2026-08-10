@@ -63,6 +63,13 @@ namespace DualEnigma.Skill
         void SetPassiveChanceBonus(byte playerId, float bonus);
 
         /// <summary>
+        /// 查询被动技能触发概率加成（供 FragmentSystem 调用）。
+        /// </summary>
+        /// <param name="playerId">玩家ID（0=Aqua, 1=Ignis）</param>
+        /// <returns>概率加成（0-1，未设置则返回0）</returns>
+        float GetPassiveChanceBonus(byte playerId);
+
+        /// <summary>
         /// 注册被动技能。
         /// 引用：技能系统.md §4.2 被动技能
         /// </summary>

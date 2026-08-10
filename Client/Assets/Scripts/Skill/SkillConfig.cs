@@ -28,10 +28,18 @@ namespace DualEnigma.Skill
         [Header("抽卡权重（普通/稀有/史诗）")]
         [SerializeField] private float[] _drawWeights = { 0.5f, 0.35f, 0.15f };
 
+        [Header("被动技能卡池")]
+        [SerializeField] private List<SkillData> _passivePool = new List<SkillData>();
+
+        [Header("技能基础伤害")]
+        [SerializeField] private float _baseSkillDamage = 50f;
+
         public List<SkillData> AquaEPool => _aquaEPool;
         public List<SkillData> AquaQPool => _aquaQPool;
         public List<SkillData> IgnisEPool => _ignisEPool;
         public List<SkillData> IgnisQPool => _ignisQPool;
+        public List<SkillData> PassivePool => _passivePool;
         public float[] DrawWeights => _drawWeights;
+        public float BaseSkillDamage => _baseSkillDamage;
     }
 }

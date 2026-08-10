@@ -12,6 +12,7 @@ using DualEnigma.Character;
 using DualEnigma.Data;
 using DualEnigma.Skill;
 using DualEnigma.Shelter;
+using CharacterController = DualEnigma.Character.CharacterController;
 
 namespace DualEnigma.Talent
 {
@@ -86,7 +87,6 @@ namespace DualEnigma.Talent
             bool applyBoost = _noRarityCounter >= _config.RarityBoostThreshold;
             if (applyBoost)
             {
-                rates = BoostRates(rates);
                 Debug.Log("[TalentSystem] 稀有提升触发！");
             }
 
@@ -116,6 +116,8 @@ namespace DualEnigma.Talent
         /// </summary>
         private void ApplyEpicPity(List<TalentData> pool, List<TalentData> result, int chapter)
         {
+            if (!GameManager.HasInstance)
+                return;
             int globalRound = GameManager.Instance.State.Progress.GlobalRound;
             if (globalRound % 12 != 0)
                 return;
@@ -266,103 +268,74 @@ namespace DualEnigma.Talent
         {
             TalentEffectSummary summary = GetEffectSummary(owner);
 
+            var characterSystem = ServiceLocator.Get<ICharacterSystem>();
+            if (characterSystem != null)
+            {
+                ApplyCharacterStats(characterSystem, owner, summary);
+            }
+
+            var shelterSystem = ServiceLocator.Get<IShelterSystem>();
+            if (shelterSystem != null)
+            {
+                ApplyShelterParams(shelterSystem, summary);
+            }
+
             var skillSystem = ServiceLocator.Get<ISkillSystem>();
             if (skillSystem != null)
             {
                 byte playerId = (byte)(owner == CharacterType.Aqua ? 0 : 1);
 
-                // 冷却缩短
                 skillSystem.SetCooldownReduction(summary.CooldownReduction);
 
-                // 范围扩大（summary.RangeMultiplier 默认 1f，天赋加成叠加其上）
                 if (summary.RangeMultiplier > 1f)
                     skillSystem.SetRangeMultiplier(playerId, summary.RangeMultiplier - 1f);
 
-                // 双重释放（不叠加，激活即 100% 概率）
                 if (summary.CanDoubleRelease)
                     skillSystem.SetDoubleCastChance(playerId, 1f);
 
-                // 护盾强化（DamageReduction 天赋同时激活护盾强化标志，
-                // 使护盾类技能持续时间 +50%）
                 if (talent.EffectId == TalentEffectId.DamageReduction)
                     skillSystem.SetShieldActive(true);
 
-                // 被动技能触发概率加成（对两个角色都应用）
-                skillSystem.SetPassiveChanceBonus(0, summary.PassiveChanceBonus);
-                skillSystem.SetPassiveChanceBonus(1, summary.PassiveChanceBonus);
-            }
-
-            // 角色属性修改：HP、搬运上限、移动速度（对两个角色都应用）
-            var characterSystem = ServiceLocator.Get<ICharacterSystem>();
-            if (characterSystem != null)
-            {
-                ApplyCharacterStats(characterSystem, CharacterType.Aqua, summary);
-                ApplyCharacterStats(characterSystem, CharacterType.Ignis, summary);
-            }
-
-            // 庇护参数修改（使用 summary 汇总值）
-            var shelterSystem = ServiceLocator.Get<IShelterSystem>();
-            if (shelterSystem != null)
-            {
-                ShelterParams shelterParams = new ShelterParams
-                {
-                    MaxEnergy = 0f,
-                    RecoveryRate = 0f,
-                    ShelterDistance = 0f,
-                    DamageMultiplier = 1f
-                };
-                bool needsShelterUpdate = false;
-
-                if (summary.EnergyMaxBonus != 0f)
-                {
-                    shelterParams.MaxEnergy = summary.EnergyMaxBonus;
-                    needsShelterUpdate = true;
-                }
-                if (summary.ShelterDistanceBonus != 0f)
-                {
-                    shelterParams.ShelterDistance = summary.ShelterDistanceBonus;
-                    needsShelterUpdate = true;
-                }
-                if (summary.DamageMultiplier != 1f)
-                {
-                    shelterParams.DamageMultiplier = summary.DamageMultiplier;
-                    needsShelterUpdate = true;
-                }
-                if (summary.EnergyRecoveryMultiplier != 1f)
-                {
-                    shelterParams.RecoveryRate = summary.EnergyRecoveryMultiplier;
-                    needsShelterUpdate = true;
-                }
-
-                if (needsShelterUpdate)
-                    shelterSystem.ModifyParams(shelterParams);
+                skillSystem.SetPassiveChanceBonus(playerId, summary.PassiveChanceBonus);
             }
         }
 
-        /// <summary>
-        /// 将天赋汇总效果应用到角色属性（HP、搬运上限、移动速度）。
-        /// 引用：天赋系统.md §4.2 天赋效果应用
-        /// </summary>
         private void ApplyCharacterStats(ICharacterSystem characterSystem, CharacterType type, TalentEffectSummary summary)
         {
             CharacterController character = characterSystem.GetCharacter(type);
             if (character == null || character.Stats == null)
                 return;
 
-            // HP 加成：同时增加最大生命值和当前生命值
-            if (summary.HPBonus != 0)
+            CharacterConfig config = DataManager.Instance.LoadConfig<CharacterConfig>("CharacterConfig");
+            if (config != null)
             {
-                character.Stats.MaxHP += summary.HPBonus;
-                character.Stats.CurrentHP += summary.HPBonus;
+                CharacterStats baseStats = type == CharacterType.Aqua ? config.AquaStats : config.IgnisStats;
+                if (baseStats != null)
+                {
+                    character.Stats.MaxHP = baseStats.MaxHP;
+                    character.Stats.MoveSpeed = baseStats.MoveSpeed;
+                    character.Stats.CarryLimit = baseStats.CarryLimit;
+                }
             }
 
-            // 搬运上限
-            if (summary.CarryLimitBonus != 0)
-                character.Stats.CarryLimit += summary.CarryLimitBonus;
+            character.Stats.MaxHP += summary.HPBonus;
+            character.Stats.MoveSpeed *= summary.MoveSpeedMultiplier;
+            character.Stats.CarryLimit += summary.CarryLimitBonus;
 
-            // 移动速度
-            if (summary.MoveSpeedMultiplier != 1f)
-                character.Stats.MoveSpeed *= summary.MoveSpeedMultiplier;
+            if (character.Stats.CurrentHP > character.Stats.MaxHP)
+                character.Stats.CurrentHP = character.Stats.MaxHP;
+        }
+
+        private void ApplyShelterParams(IShelterSystem shelterSys, TalentEffectSummary summary)
+        {
+            ShelterParams baseParams = new ShelterParams();
+            baseParams.MaxEnergy += summary.EnergyMaxBonus;
+            baseParams.RecoveryRate *= summary.EnergyRecoveryMultiplier;
+            baseParams.ShelterDistance += summary.ShelterDistanceBonus;
+            baseParams.DamageMultiplier *= summary.DamageMultiplier;
+            baseParams.RecoveryRate = Mathf.Min(baseParams.RecoveryRate, 20f * 3f);
+            baseParams.DamageMultiplier = Mathf.Max(baseParams.DamageMultiplier, 0.1f);
+            shelterSys.ModifyParams(baseParams);
         }
 
         private List<TalentData> GetTargetPool(CharacterType owner)
@@ -398,12 +371,21 @@ namespace DualEnigma.Talent
 
         private List<TalentData> DrawFromPool(List<TalentData> pool, int count, float[] rates, bool boost)
         {
+            float[] effectiveRates = rates;
+            if (boost)
+            {
+                float[] boosts = BoostRates(rates);
+                effectiveRates = new float[rates.Length];
+                for (int i = 0; i < rates.Length; i++)
+                    effectiveRates[i] = rates[i] + boosts[i];
+            }
+
             List<TalentData> result = new List<TalentData>();
             List<TalentData> available = new List<TalentData>(pool);
 
             for (int i = 0; i < count && available.Count > 0; i++)
             {
-                int rarityIndex = WeightedRandom(rates);
+                int rarityIndex = WeightedRandom(effectiveRates);
                 Rarity targetRarity = (Rarity)rarityIndex;
 
                 List<TalentData> rarityPool = available.FindAll(t => t.Rarity == targetRarity);
@@ -423,11 +405,11 @@ namespace DualEnigma.Talent
 
         private float[] BoostRates(float[] original)
         {
-            float[] boosted = new float[3];
-            boosted[0] = 0f;
-            boosted[1] = original[1] + original[0] * 0.5f;
-            boosted[2] = original[2] + original[0] * 0.5f;
-            return boosted;
+            float[] boost = new float[3];
+            boost[0] = 0f;    // Common: no boost
+            boost[1] = 0.1f;  // Rare: +10%
+            boost[2] = 0.2f;  // Epic: +20%
+            return boost;
         }
 
         private void ApplyEffect(TalentEffectSummary summary, TalentData talent)
@@ -490,7 +472,7 @@ namespace DualEnigma.Talent
 
         private void OnPhaseChanged(PhaseChangedEvent evt)
         {
-            if (evt.phase == GamePhase.Upgrade)
+            if (evt.phase == GamePhase.Upgrade && GameManager.HasInstance)
             {
                 _currentChapter = GameManager.Instance.State.Progress.Chapter;
             }

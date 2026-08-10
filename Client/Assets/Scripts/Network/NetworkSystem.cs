@@ -8,6 +8,7 @@
 using UnityEngine;
 using DualEnigma.Core;
 using DualEnigma.Character;
+using DualEnigma.Data;
 
 namespace DualEnigma.Network
 {
@@ -39,6 +40,7 @@ namespace DualEnigma.Network
         protected override void OnSingletonInitialized()
         {
             ServiceLocator.Register<INetworkSystem>(this);
+            _config = DataManager.Instance.LoadConfig<NetworkConfig>("NetworkConfig");
             Debug.Log("[NetworkSystem] 网络系统初始化完成 (Host模式)");
         }
 

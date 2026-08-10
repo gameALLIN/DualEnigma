@@ -12,9 +12,10 @@ using DualEnigma.Character;
 using DualEnigma.Fragment;
 using DualEnigma.Shelter;
 using DualEnigma.Disaster;
+using DualEnigma.Disaster.Mechanism;
 using DualEnigma.Building;
 using DualEnigma.Data;
-
+using CharacterController = DualEnigma.Character.CharacterController;
 namespace DualEnigma.Skill
 {
     /// <summary>
@@ -85,6 +86,9 @@ namespace DualEnigma.Skill
         private struct SpeedBoostState { public float originalSpeed; public float remainingTime; }
         private readonly Dictionary<byte, SpeedBoostState> _speedBoostStates = new Dictionary<byte, SpeedBoostState>();
 
+        private readonly List<byte> _shieldKeysCache = new List<byte>();
+        private readonly List<byte> _boostKeysCache = new List<byte>();
+
         // ──────────────────────────────────────────────
         //  阶段追踪（跨轮冷却）
         // ──────────────────────────────────────────────
@@ -108,15 +112,6 @@ namespace DualEnigma.Skill
             base.OnDestroy();
             if (EventBus.HasInstance)
                 EventBus.Instance.Unsubscribe<PhaseChangedEvent>(OnPhaseChanged);
-        }
-
-        /// <summary>
-        /// MonoBehaviour Update — 自驱动冷却递减，确保所有阶段（含修整/升级）冷却持续。
-        /// 引用：技能系统.md §4.4 Q技能跨轮冷却规则
-        /// </summary>
-        private void Update()
-        {
-            OnUpdate(Time.deltaTime);
         }
 
         // ──────────────────────────────────────────────
@@ -174,6 +169,14 @@ namespace DualEnigma.Skill
         public void SetPassiveChanceBonus(byte playerId, float bonus)
         {
             _passiveChanceBonuses[playerId] = Mathf.Clamp01(bonus);
+        }
+
+        /// <summary>
+        /// 查询被动技能触发概率加成（供 FragmentSystem 调用）。
+        /// </summary>
+        public float GetPassiveChanceBonus(byte playerId)
+        {
+            return _passiveChanceBonuses.TryGetValue(playerId, out float bonus) ? bonus : 0f;
         }
 
         /// <summary>
@@ -290,16 +293,19 @@ namespace DualEnigma.Skill
         /// </summary>
         private void SelectPassiveCard(CharacterType owner, int skillId)
         {
+            EnsureConfigLoaded();
+
             byte playerId = (byte)(owner == CharacterType.Aqua ? 0 : 1);
 
-            // 根据 skillId 映射到 PassiveSkillType
-            // 水人 → FrostAura, 火人 → FlameAura
-            PassiveSkillType passive = owner == CharacterType.Aqua
-                ? PassiveSkillType.FrostAura
-                : PassiveSkillType.FlameAura;
+            SkillData skill = FindPassiveSkillById(skillId);
+            if (skill == null)
+            {
+                Debug.LogWarning($"[SkillSystem] 未找到被动技能: {skillId}");
+                return;
+            }
 
-            RegisterPassive(playerId, passive);
-            Debug.Log($"[SkillSystem] {owner} 选定被动技能: {passive}");
+            RegisterPassive(playerId, skill.PassiveType);
+            Debug.Log($"[SkillSystem] {owner} 选定被动技能: {skill.PassiveType}");
         }
 
         // ──────────────────────────────────────────────
@@ -316,6 +322,14 @@ namespace DualEnigma.Skill
             if (skill == null || !skill.IsReady)
             {
                 Debug.Log($"[SkillSystem] {owner}的{type}技能不可用");
+                return;
+            }
+
+            var disasterSys = ServiceLocator.Get<IDisasterSystem>();
+            if (disasterSys != null && disasterSys.CurrentDisaster is M4_SkillSeal m4
+                && m4.IsSkillSealed(skill.Data.SkillId))
+            {
+                Debug.Log($"[SkillSystem] {owner}的{type}技能被封印，无法释放");
                 return;
             }
 
@@ -425,8 +439,9 @@ namespace DualEnigma.Skill
 
                 if (distanceToDisaster <= disasterRange + range)
                 {
-                    // 伤害计算：基础伤害 × 效果系数
-                    float damage = 50f * multiplier;
+                    EnsureConfigLoaded();
+                    float baseDamage = _config != null ? _config.BaseSkillDamage : 50f;
+                    float damage = baseDamage * multiplier;
                     Debug.Log($"[SkillSystem] 技能{skill.Name} 对灾难造成{damage}伤害 " +
                               $"(灾难DPS={disasterSys.CurrentDisaster.Params.BaseDPS})");
 
@@ -534,16 +549,14 @@ namespace DualEnigma.Skill
             if (_speedBoostStates.TryGetValue(playerId, out SpeedBoostState existing) && existing.remainingTime > 0f)
                 RestoreMoveSpeed(playerId);
 
-            float originalSpeed = character.Stats.MoveSpeed;
             _speedBoostStates[playerId] = new SpeedBoostState
             {
-                originalSpeed = originalSpeed,
+                originalSpeed = character.Stats.MoveSpeed,
                 remainingTime = duration
             };
 
-            // 移速提升：基础+50%，效果系数影响
             float boost = 0.5f * multiplier;
-            character.Stats.MoveSpeed = originalSpeed * (1f + boost);
+            character.SetMoveSpeedMultiplier(1f + boost);
 
             Debug.Log($"[SkillSystem] {owner} 获得加速，移速 +{boost * 100}%，持续{duration}s");
         }
@@ -587,10 +600,11 @@ namespace DualEnigma.Skill
             // 护盾效果计时（遍历所有角色的护盾）
             if (_shieldStates.Count > 0)
             {
-                var shieldKeys = new List<byte>(_shieldStates.Keys);
-                for (int i = 0; i < shieldKeys.Count; i++)
+                _shieldKeysCache.Clear();
+                _shieldKeysCache.AddRange(_shieldStates.Keys);
+                for (int i = 0; i < _shieldKeysCache.Count; i++)
                 {
-                    byte id = shieldKeys[i];
+                    byte id = _shieldKeysCache[i];
                     var state = _shieldStates[id];
                     state.remainingTime -= deltaTime;
                     if (state.remainingTime <= 0f)
@@ -608,10 +622,11 @@ namespace DualEnigma.Skill
             // 加速效果计时（遍历所有角色的加速）
             if (_speedBoostStates.Count > 0)
             {
-                var boostKeys = new List<byte>(_speedBoostStates.Keys);
-                for (int i = 0; i < boostKeys.Count; i++)
+                _boostKeysCache.Clear();
+                _boostKeysCache.AddRange(_speedBoostStates.Keys);
+                for (int i = 0; i < _boostKeysCache.Count; i++)
                 {
-                    byte id = boostKeys[i];
+                    byte id = _boostKeysCache[i];
                     var state = _speedBoostStates[id];
                     state.remainingTime -= deltaTime;
                     if (state.remainingTime <= 0f)
@@ -697,7 +712,7 @@ namespace DualEnigma.Skill
                 CharacterType owner = playerId == 0 ? CharacterType.Aqua : CharacterType.Ignis;
                 CharacterController character = charSys.GetCharacter(owner);
                 if (character != null && character.Stats != null)
-                    character.Stats.MoveSpeed = state.originalSpeed;
+                    character.SetMoveSpeedMultiplier(1f);
             }
 
             _speedBoostStates.Remove(playerId);
@@ -740,6 +755,9 @@ namespace DualEnigma.Skill
 
         private SkillState GetSkillState(CharacterType owner, SkillType type)
         {
+            if (type == SkillType.Passive)
+                return null;
+
             if (owner == CharacterType.Aqua)
                 return type == SkillType.E ? AquaESkill : AquaQSkill;
             else
@@ -760,6 +778,18 @@ namespace DualEnigma.Skill
         {
             List<SkillData> pool = GetPool(owner, type);
             foreach (var skill in pool)
+            {
+                if (skill.SkillId == skillId)
+                    return skill;
+            }
+            return null;
+        }
+
+        private SkillData FindPassiveSkillById(int skillId)
+        {
+            if (_config == null) return null;
+
+            foreach (var skill in _config.PassivePool)
             {
                 if (skill.SkillId == skillId)
                     return skill;

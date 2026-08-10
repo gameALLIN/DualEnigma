@@ -6,11 +6,14 @@
 /// ============================================================
 
 using UnityEngine;
+using System.Collections.Generic;
 using DualEnigma.Core;
 using DualEnigma.Character;
 using DualEnigma.Building;
 using DualEnigma.Data;
-
+using DualEnigma.Disaster;
+using DualEnigma.Skill;
+using CharacterController = DualEnigma.Character.CharacterController;
 namespace DualEnigma.Shelter
 {
     /// <summary>
@@ -19,16 +22,16 @@ namespace DualEnigma.Shelter
     /// </summary>
     public class ShelterSystem : Singleton<ShelterSystem>, IShelterSystem
     {
-        private const int MAX_HP = 100;
+        private int _maxHP = 100;
 
         /// <summary>水人能量</summary>
         private float _aquaEnergy = 100f;
         /// <summary>火人能量</summary>
         private float _ignisEnergy = 100f;
         /// <summary>水人HP</summary>
-        private int _aquaHP = MAX_HP;
+        private int _aquaHP = 100;
         /// <summary>火人HP</summary>
-        private int _ignisHP = MAX_HP;
+        private int _ignisHP = 100;
         /// <summary>水人缓冲计时器</summary>
         private float _aquaBufferTimer;
         /// <summary>火人缓冲计时器</summary>
@@ -64,6 +67,15 @@ namespace DualEnigma.Shelter
         /// <summary>章节恢复HP</summary>
         private int _chapterRestoreHP = 15;
 
+        private float _earthquakeShockwaveTimer = 0f;
+        private const float EARTHQUAKE_SHOCKWAVE_INTERVAL = 2f;
+        private const int EARTHQUAKE_DAMAGE_PER_WAVE = 3;
+
+        private readonly HashSet<Vector2Int> _buildingGridPositions = new HashSet<Vector2Int>();
+        private bool _buildingPositionsDirty = true;
+
+        private System.Random _meteoriteRandom;
+
         public float AquaEnergy => _aquaEnergy;
         public float IgnisEnergy => _ignisEnergy;
         public int AquaHP => _aquaHP;
@@ -73,6 +85,9 @@ namespace DualEnigma.Shelter
         {
             ServiceLocator.Register<IShelterSystem>(this);
             EventBus.Instance.Subscribe<PhaseChangedEvent>(OnPhaseChanged);
+            EventBus.Instance.Subscribe<BuildingPlacedEvent>(OnBuildingPlaced);
+            EventBus.Instance.Subscribe<BuildingDestroyedEvent>(OnBuildingDestroyed);
+            EventBus.Instance.Subscribe<DisasterStartedEvent>(OnDisasterStarted);
 
             // 从 ShelterConfig 加载参数
             var config = DataManager.Instance.LoadConfig<ShelterConfig>("ShelterConfig");
@@ -106,6 +121,10 @@ namespace DualEnigma.Shelter
                 _params = new ShelterParams();
             }
 
+            CharacterConfig charConfig = DataManager.Instance.LoadConfig<CharacterConfig>("CharacterConfig");
+            if (charConfig != null)
+                _maxHP = charConfig.AquaStats.MaxHP;
+
             Debug.Log("[ShelterSystem] 庇护系统初始化完成");
         }
 
@@ -113,7 +132,12 @@ namespace DualEnigma.Shelter
         {
             base.OnDestroy();
             if (EventBus.HasInstance)
+            {
                 EventBus.Instance.Unsubscribe<PhaseChangedEvent>(OnPhaseChanged);
+                EventBus.Instance.Unsubscribe<BuildingPlacedEvent>(OnBuildingPlaced);
+                EventBus.Instance.Unsubscribe<BuildingDestroyedEvent>(OnBuildingDestroyed);
+                EventBus.Instance.Unsubscribe<DisasterStartedEvent>(OnDisasterStarted);
+            }
         }
 
         /// <summary>
@@ -144,8 +168,12 @@ namespace DualEnigma.Shelter
         /// </summary>
         public void OnUpdate(float deltaTime)
         {
-            if (GameManager.Instance.State.IsGameOver)
+            if (GameManager.HasInstance && GameManager.Instance.State.IsGameOver)
                 return;
+
+            bool energyActive = _currentPhase == GamePhase.FragmentCollect
+                             || _currentPhase == GamePhase.DisasterPreview
+                             || _currentPhase == GamePhase.DisasterImpact;
 
             Vector2 aquaPos, ignisPos;
             GetCharacterPositions(out aquaPos, out ignisPos);
@@ -154,21 +182,29 @@ namespace DualEnigma.Shelter
             float shelterDist = _isFragmentCollectPhase
                 ? _params.FragmentCollectDistance
                 : _params.ShelterDistance;
-            float consumptionRate = _isFragmentCollectPhase
-                ? _params.FragmentCollectConsumptionRate
-                : _params.ConsumptionRate;
 
             bool inRange = distance <= shelterDist;
 
-            UpdateEnergy(ref _aquaEnergy, inRange, deltaTime, consumptionRate);
-            UpdateEnergy(ref _ignisEnergy, inRange, deltaTime, consumptionRate);
+            if (energyActive)
+            {
+                float consumptionRate = _isFragmentCollectPhase
+                    ? _params.FragmentCollectConsumptionRate
+                    : _params.ConsumptionRate;
+                UpdateEnergy(ref _aquaEnergy, inRange, deltaTime, consumptionRate);
+                UpdateEnergy(ref _ignisEnergy, inRange, deltaTime, consumptionRate);
 
-            UpdateBufferAndDamage(
-                _aquaEnergy, ref _aquaBuffering, ref _aquaBufferTimer,
-                deltaTime, CharacterType.Aqua, true, aquaPos);
-            UpdateBufferAndDamage(
-                _ignisEnergy, ref _ignisBuffering, ref _ignisBufferTimer,
-                deltaTime, CharacterType.Ignis, false, ignisPos);
+                UpdateBufferAndDamage(
+                    _aquaEnergy, ref _aquaBuffering, ref _aquaBufferTimer,
+                    deltaTime, CharacterType.Aqua, true, aquaPos);
+                UpdateBufferAndDamage(
+                    _ignisEnergy, ref _ignisBuffering, ref _ignisBufferTimer,
+                    deltaTime, CharacterType.Ignis, false, ignisPos);
+            }
+            else
+            {
+                UpdateEnergy(ref _aquaEnergy, true, deltaTime, 0f);
+                UpdateEnergy(ref _ignisEnergy, true, deltaTime, 0f);
+            }
         }
 
         /// <summary>
@@ -176,6 +212,15 @@ namespace DualEnigma.Shelter
         /// </summary>
         public void DealDamage(CharacterType target, int damage)
         {
+            ISkillSystem skillSys = ServiceLocator.Get<ISkillSystem>();
+            if (skillSys != null)
+            {
+                float shieldReduction = skillSys.GetShieldReduction((byte)target);
+                damage = Mathf.RoundToInt(damage * (1f - shieldReduction));
+            }
+
+            if (damage <= 0) return;
+
             if (target == CharacterType.Aqua)
             {
                 _aquaHP = Mathf.Max(0, _aquaHP - damage);
@@ -201,33 +246,38 @@ namespace DualEnigma.Shelter
         {
             if (target == CharacterType.Aqua)
             {
-                _aquaHP = Mathf.Min(MAX_HP, _aquaHP + amount);
+                _aquaHP = Mathf.Min(_maxHP, _aquaHP + amount);
                 SyncHPToCharacter(target);
             }
             else
             {
-                _ignisHP = Mathf.Min(MAX_HP, _ignisHP + amount);
+                _ignisHP = Mathf.Min(_maxHP, _ignisHP + amount);
                 SyncHPToCharacter(target);
             }
+
+            EventBus.Instance.Publish(new PlayerHealedEvent
+            {
+                playerId = (byte)(target == CharacterType.Aqua ? 0 : 1),
+                amount = amount
+            });
         }
 
         /// <summary>
         /// 修改庇护参数（天赋系统调用）。
         /// </summary>
-        public void ModifyParams(ShelterParams modifications)
+        public void ModifyParams(ShelterParams newParams)
         {
-            if (modifications == null) return;
+            if (newParams == null) return;
 
-            _params.MaxEnergy += modifications.MaxEnergy;
-            _params.RecoveryRate *= (1f + modifications.RecoveryRate / 20f);
-            _params.ShelterDistance += modifications.ShelterDistance;
-            _params.DamageMultiplier *= modifications.DamageMultiplier;
-            _params.DamageMultiplier = Mathf.Max(_params.DamageMultiplier, 0.1f);
+            _params.MaxEnergy = newParams.MaxEnergy;
+            _params.RecoveryRate = newParams.RecoveryRate;
+            _params.ShelterDistance = newParams.ShelterDistance;
+            _params.DamageMultiplier = Mathf.Max(newParams.DamageMultiplier, 0.1f);
         }
 
         /// <summary>
         /// 设置 M5 庇护削弱状态。
-        /// 开启后恢复速率减半、消耗速率增加50%。
+        /// 开启后恢复速率减半、消耗速率翻倍。
         /// </summary>
         public void SetM5Weakening(bool enabled)
         {
@@ -238,7 +288,7 @@ namespace DualEnigma.Shelter
         private void UpdateEnergy(ref float energy, bool inRange, float dt, float consumptionRate)
         {
             float recoveryRate = _m5Weakening ? _params.RecoveryRate * 0.5f : _params.RecoveryRate;
-            float actualConsumptionRate = _m5Weakening ? consumptionRate * 1.5f : consumptionRate;
+            float actualConsumptionRate = _m5Weakening ? consumptionRate * 2f : consumptionRate;
 
             if (inRange)
             {
@@ -272,32 +322,87 @@ namespace DualEnigma.Shelter
             if (bufferTimer > 0f)
                 return;
 
-            float damageRate = GetEnvironmentDamageRate(type);
-            if (damageRate <= 0f)
-                return;
+            if (CurrentEnvironment == ShelterEnvironment.Earthquake)
+            {
+                _earthquakeShockwaveTimer += dt;
+                if (_earthquakeShockwaveTimer >= EARTHQUAKE_SHOCKWAVE_INTERVAL)
+                {
+                    _earthquakeShockwaveTimer = 0f;
 
-            // 陨石环境：掩体内0%概率，掩体外50%概率扣血
+                    float multiplier = _params.DamageMultiplier;
+                    int currentHP = isAqua ? _aquaHP : _ignisHP;
+                    if (currentHP <= _dyingProtectThreshold)
+                        multiplier *= (1f - _dyingProtectReduction);
+
+                    if (_currentPhase == GamePhase.DisasterImpact && IsInBuildingZone(charPos))
+                        return;
+
+                    int damage = Mathf.CeilToInt(EARTHQUAKE_DAMAGE_PER_WAVE * multiplier);
+                    if (damage > 0)
+                        DealDamage(type, damage);
+                }
+                return;
+            }
+
             if (CurrentEnvironment == ShelterEnvironment.Meteorite)
             {
                 if (IsInBuildingZone(charPos))
-                    return; // 掩体内不扣血
-                if (Random.Range(0f, 1f) >= 0.5f)
-                    return; // 50%概率不扣血
+                    return;
+
+                IDisasterSystem disasterSys = ServiceLocator.Get<IDisasterSystem>();
+                float meteoriteChance;
+                if (disasterSys != null)
+                {
+                    Vector2 disasterPos = disasterSys.GetDisasterPosition();
+                    float distToDisaster = Vector2.Distance(charPos, disasterPos);
+
+                    if (distToDisaster <= 1f)
+                        meteoriteChance = 0.9f;
+                    else if (distToDisaster <= 3f)
+                        meteoriteChance = 0.25f;
+                    else
+                        meteoriteChance = 0.05f;
+                }
+                else
+                {
+                    meteoriteChance = 0.5f;
+                }
+
+                if (_meteoriteRandom != null && _meteoriteRandom.NextDouble() >= meteoriteChance)
+                    return;
+
+                float damageRate = GetEnvironmentDamageRate(type);
+                if (damageRate <= 0f)
+                    return;
+
+                float multiplier = _params.DamageMultiplier;
+                int currentHP = isAqua ? _aquaHP : _ignisHP;
+                if (currentHP <= _dyingProtectThreshold)
+                    multiplier *= (1f - _dyingProtectReduction);
+
+                float damage = damageRate * multiplier * dt;
+                int intDamage = Mathf.CeilToInt(damage);
+                if (intDamage > 0)
+                    DealDamage(type, intDamage);
+                return;
             }
 
-            // 灾害冲击阶段，建筑区域内扣血减免50%
+            float baseDamageRate = GetEnvironmentDamageRate(type);
+            if (baseDamageRate <= 0f)
+                return;
+
             if (_currentPhase == GamePhase.DisasterImpact && IsInBuildingZone(charPos))
-                damageRate *= 0.5f;
+                return;
 
-            float multiplier = _params.DamageMultiplier;
-            int currentHP = isAqua ? _aquaHP : _ignisHP;
-            if (currentHP <= _dyingProtectThreshold)
-                multiplier *= (1f - _dyingProtectReduction);
+            float dmgMultiplier = _params.DamageMultiplier;
+            int hp = isAqua ? _aquaHP : _ignisHP;
+            if (hp <= _dyingProtectThreshold)
+                dmgMultiplier *= (1f - _dyingProtectReduction);
 
-            float damage = damageRate * multiplier * dt;
-            int intDamage = Mathf.CeilToInt(damage);
-            if (intDamage > 0)
-                DealDamage(type, intDamage);
+            float continuousDamage = baseDamageRate * dmgMultiplier * dt;
+            int intDmg = Mathf.CeilToInt(continuousDamage);
+            if (intDmg > 0)
+                DealDamage(type, intDmg);
         }
 
         private float GetEnvironmentDamageRate(CharacterType type)
@@ -330,18 +435,62 @@ namespace DualEnigma.Shelter
         /// </summary>
         private bool IsInBuildingZone(Vector2 worldPos)
         {
-            IBuildSystem buildSys = ServiceLocator.Get<IBuildSystem>();
-            if (buildSys == null || buildSys.Buildings.Count == 0)
+            if (_buildingPositionsDirty)
+                RebuildBuildingPositions();
+
+            if (_buildingGridPositions.Count == 0)
                 return false;
 
             const float proximityThreshold = 2.5f;
-            foreach (var building in buildSys.Buildings)
+            int radius = Mathf.CeilToInt(proximityThreshold);
+            int centerX = Mathf.RoundToInt(worldPos.x);
+            int centerY = Mathf.RoundToInt(worldPos.y);
+
+            for (int dx = -radius; dx <= radius; dx++)
             {
-                Vector2 buildingPos = new Vector2(building.GridPosition.x, building.GridPosition.y);
-                if (Vector2.Distance(worldPos, buildingPos) < proximityThreshold)
-                    return true;
+                for (int dy = -radius; dy <= radius; dy++)
+                {
+                    var gridPos = new Vector2Int(centerX + dx, centerY + dy);
+                    if (_buildingGridPositions.Contains(gridPos))
+                    {
+                        float dist = Vector2.Distance(worldPos, new Vector2(gridPos.x, gridPos.y));
+                        if (dist < proximityThreshold)
+                            return true;
+                    }
+                }
             }
             return false;
+        }
+
+        private void RebuildBuildingPositions()
+        {
+            _buildingGridPositions.Clear();
+            IBuildSystem buildSys = ServiceLocator.Get<IBuildSystem>();
+            if (buildSys != null)
+            {
+                foreach (var building in buildSys.Buildings)
+                    _buildingGridPositions.Add(building.GridPosition);
+            }
+            _buildingPositionsDirty = false;
+        }
+
+        private void OnBuildingPlaced(BuildingPlacedEvent evt)
+        {
+            _buildingGridPositions.Add(evt.gridPos);
+        }
+
+        private void OnBuildingDestroyed(BuildingDestroyedEvent evt)
+        {
+            _buildingPositionsDirty = true;
+        }
+
+        private void OnDisasterStarted(DisasterStartedEvent evt)
+        {
+            IDisasterSystem disasterSys = ServiceLocator.Get<IDisasterSystem>();
+            if (disasterSys != null && disasterSys.CurrentDisaster != null && disasterSys.CurrentDisaster.Params != null)
+                _meteoriteRandom = new System.Random((int)disasterSys.CurrentDisaster.Params.RandomSeed);
+            else
+                _meteoriteRandom = new System.Random();
         }
 
         private void GetCharacterPositions(out Vector2 aqua, out Vector2 ignis)
@@ -349,12 +498,11 @@ namespace DualEnigma.Shelter
             ICharacterSystem charSys = ServiceLocator.Get<ICharacterSystem>();
             if (charSys != null)
             {
-                aqua = charSys.GetCharacter(CharacterType.Aqua) != null
-                    ? charSys.GetCharacter(CharacterType.Aqua).transform.position
-                    : Vector2.zero;
-                ignis = charSys.GetCharacter(CharacterType.Ignis) != null
-                    ? charSys.GetCharacter(CharacterType.Ignis).transform.position
-                    : Vector2.zero;
+                var aquaChar = charSys.GetCharacter(CharacterType.Aqua);
+                aqua = aquaChar != null ? (Vector2)aquaChar.transform.position : Vector2.zero;
+
+                var ignisChar = charSys.GetCharacter(CharacterType.Ignis);
+                ignis = ignisChar != null ? (Vector2)ignisChar.transform.position : Vector2.zero;
             }
             else
             {
@@ -417,8 +565,8 @@ namespace DualEnigma.Shelter
         /// </summary>
         public void ResetHP()
         {
-            _aquaHP = MAX_HP;
-            _ignisHP = MAX_HP;
+            _aquaHP = _maxHP;
+            _ignisHP = _maxHP;
             _aquaEnergy = _params.MaxEnergy;
             _ignisEnergy = _params.MaxEnergy;
             _aquaBuffering = false;

@@ -39,6 +39,8 @@ namespace DualEnigma.Skill
         public CharacterType Owner;
         /// <summary>技能效果类型（用于效果分发）</summary>
         public SkillEffectType EffectType;
+        /// <summary>被动技能类型（仅 Passive 类型有效）</summary>
+        public PassiveSkillType PassiveType;
     }
 
     /// <summary>

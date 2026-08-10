@@ -92,6 +92,13 @@ namespace DualEnigma.Core
         public byte playerId;
     }
 
+    /// <summary>角色治疗事件（由 ShelterSystem 发布）</summary>
+    public struct PlayerHealedEvent : IEventData
+    {
+        public byte playerId;
+        public int amount;
+    }
+
     /// <summary>单局开始事件（由 GameManager 发布）</summary>
     public struct GameStartEvent : IEventData
     {

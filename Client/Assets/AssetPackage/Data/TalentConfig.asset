@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f91d6c94ae8ac043bd62c0f048e31fb, type: 3}
+  m_Name: TalentConfig
+  m_EditorClassIdentifier:
+  _aquaPool: []
+  _ignisPool: []
+  _sharedPool: []
+  _chapter1Rates:
+  - 0.75
+  - 0.2
+  - 0.05
+  _chapter2Rates:
+  - 0.55
+  - 0.35
+  - 0.1
+  _chapter3Rates:
+  - 0.4
+  - 0.4
+  - 0.2
+  _rarityBoostThreshold: 3
+  _minFirstAidAppearances: 2

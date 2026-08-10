@@ -22,8 +22,8 @@ namespace DualEnigma.Character
     [RequireComponent(typeof(Rigidbody2D))]
     public class CharacterController : MonoBehaviour
     {
-        /// <summary>Ground 层索引（Layer 7）</summary>
-        private const int GROUND_LAYER = 7;
+        /// <summary>Ground 层索引（动态获取）</summary>
+        private static int GROUND_LAYER = -1;
 
         /// <summary>角色属性</summary>
         public CharacterStats Stats { get; private set; }
@@ -60,6 +60,9 @@ namespace DualEnigma.Character
 
         private void Awake()
         {
+            if (GROUND_LAYER < 0)
+                GROUND_LAYER = LayerMask.NameToLayer("Ground");
+
             _rb = GetComponent<Rigidbody2D>();
             _spriteRenderer = GetComponent<SpriteRenderer>();
             _collider = GetComponent<Collider2D>();
@@ -84,6 +87,7 @@ namespace DualEnigma.Character
         {
             if (Stats == null) return;
 
+            direction = Mathf.Clamp(direction, -1f, 1f);
             float speed = Stats.MoveSpeed * _moveSpeedMultiplier;
             _rb.velocity = new Vector2(direction * speed, _rb.velocity.y);
 
@@ -119,6 +123,9 @@ namespace DualEnigma.Character
         public bool AddFragment(int fragmentId)
         {
             if (Stats == null || Stats.CarriedFragmentIds.Count >= Stats.CarryLimit)
+                return false;
+
+            if (Stats.CarriedFragmentIds.Contains(fragmentId))
                 return false;
 
             Stats.CarriedFragmentIds.Add(fragmentId);
@@ -176,7 +183,11 @@ namespace DualEnigma.Character
         {
             if (Stats == null) return;
 
-            ShelterSystem.Instance.DealDamage(Stats.Type, damage);
+            IShelterSystem shelterSys = ServiceLocator.Get<IShelterSystem>();
+            if (shelterSys != null)
+                shelterSys.DealDamage(Stats.Type, damage);
+
+            CurrentAnimState = AnimState.Hurt;
         }
 
         /// <summary>
@@ -186,7 +197,9 @@ namespace DualEnigma.Character
         {
             if (Stats == null) return;
 
-            ShelterSystem.Instance.Heal(Stats.Type, amount);
+            IShelterSystem shelterSys = ServiceLocator.Get<IShelterSystem>();
+            if (shelterSys != null)
+                shelterSys.Heal(Stats.Type, amount);
         }
 
         /// <summary>
@@ -208,7 +221,9 @@ namespace DualEnigma.Character
             if (fragment != null)
             {
                 bool isJumping = !IsGrounded;
-                FragmentSystem.Instance.OnFragmentCollected(fragment.FragmentId, PlayerId, isJumping);
+                IFragmentSystem fragSys = ServiceLocator.Get<IFragmentSystem>();
+                if (fragSys != null)
+                    fragSys.OnFragmentCollected(fragment.FragmentId, PlayerId, isJumping);
             }
         }
 
@@ -225,14 +240,15 @@ namespace DualEnigma.Character
         {
             if (_collider == null) return;
 
-            float rayDistance = _collider.bounds.extents.y + 0.15f;
-            RaycastHit2D hit = Physics2D.Raycast(
-                transform.position,
-                Vector2.down,
-                rayDistance,
-                1 << GROUND_LAYER);
+            Bounds bounds = _collider.bounds;
+            float rayDistance = bounds.extents.y + 0.15f;
+            int groundMask = 1 << GROUND_LAYER;
+            float halfWidth = bounds.extents.x;
+            Vector2 center = transform.position;
 
-            IsGrounded = hit.collider != null;
+            IsGrounded = Physics2D.Raycast(center, Vector2.down, rayDistance, groundMask).collider != null
+                || Physics2D.Raycast(new Vector2(center.x - halfWidth, center.y), Vector2.down, rayDistance, groundMask).collider != null
+                || Physics2D.Raycast(new Vector2(center.x + halfWidth, center.y), Vector2.down, rayDistance, groundMask).collider != null;
         }
 
         private void UpdateAnimState()

@@ -16,6 +16,7 @@ namespace DualEnigma.Fragment
     /// 引用：碎片系统.md §3.2
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
+    [RequireComponent(typeof(Rigidbody2D))]
     public class FragmentController : MonoBehaviour
     {
         /// <summary>碎片唯一ID</summary>
@@ -31,6 +32,19 @@ namespace DualEnigma.Fragment
         public float RemainingTime { get; private set; }
 
         private bool _isInitialized;
+        private bool _hasLanded;
+        private Rigidbody2D _rb;
+        private int _groundLayerMask;
+
+        private void Awake()
+        {
+            _rb = GetComponent<Rigidbody2D>();
+            _rb.gravityScale = 1f;
+            _rb.freezeRotation = true;
+
+            int groundLayer = LayerMask.NameToLayer("Ground");
+            _groundLayerMask = groundLayer >= 0 ? 1 << groundLayer : 0;
+        }
 
         /// <summary>
         /// 初始化碎片。
@@ -44,6 +58,29 @@ namespace DualEnigma.Fragment
             _isInitialized = true;
 
             transform.position = plan.Position;
+
+            if (_rb != null)
+            {
+                _rb.velocity = Vector2.zero;
+                _rb.angularVelocity = 0f;
+            }
+        }
+
+        /// <summary>
+        /// 重置碎片状态，供对象池回收后复用前调用。
+        /// </summary>
+        public void ResetState()
+        {
+            _hasLanded = false;
+            _isInitialized = false;
+            State = FragmentState.Falling;
+
+            if (_rb != null)
+            {
+                _rb.isKinematic = false;
+                _rb.velocity = Vector2.zero;
+                _rb.angularVelocity = 0f;
+            }
         }
 
         /// <summary>
@@ -86,12 +123,17 @@ namespace DualEnigma.Fragment
             if (!_isInitialized || State != FragmentState.Falling)
                 return;
 
+            if (!_hasLanded)
+            {
+                CheckLanding();
+                return;
+            }
+
             RemainingTime -= Time.deltaTime;
 
             if (RemainingTime <= 0f)
             {
                 SetState(FragmentState.Despawned);
-                // 通过 EventBus 发布消失事件，由 FragmentSystem 订阅处理
                 if (EventBus.HasInstance)
                 {
                     EventBus.Instance.Publish(new FragmentDespawnedEvent
@@ -99,6 +141,28 @@ namespace DualEnigma.Fragment
                         fragmentId = FragmentId
                     });
                 }
+            }
+        }
+
+        private void CheckLanding()
+        {
+            if (_rb == null || _rb.velocity.y > 0.01f)
+                return;
+
+            if (_groundLayerMask == 0)
+            {
+                _hasLanded = true;
+                return;
+            }
+
+            RaycastHit2D hit = Physics2D.Raycast(
+                transform.position, Vector2.down, 0.2f, _groundLayerMask);
+
+            if (hit.collider != null)
+            {
+                _hasLanded = true;
+                _rb.velocity = Vector2.zero;
+                _rb.isKinematic = true;
             }
         }
     }

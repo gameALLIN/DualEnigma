@@ -29519,4 +29519,204 @@ MonoBehaviour:
     m_importFrom: Assets/Scripts/Character/CharacterStats.cs
     m_exportTo: 
     m_variantName: 
+  - m_assetDatabaseId: 9429e38f0f9e5b64983674b253136cd6
+    m_importFrom: Assets/Scripts/Disaster/Element
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 7bad8a45265c30f4fa5e103163a96dbe
+    m_importFrom: Assets/Scripts/Disaster/TimeSpaceDisaster.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: de4c6fdf907316440aaa972c7d6f41a4
+    m_importFrom: Assets/Scripts/Disaster/TimeSpace
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 27920b7c73cba2842abf88ee698216ce
+    m_importFrom: Assets/Scripts/Disaster/Environment/V4_Sandstorm.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: b52819b9e3a0e7b4a81675d1c44cf259
+    m_importFrom: Assets/Scripts/Disaster/Perception/S1_Fog.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 6c1e3e4107d37594ebf12211250ffe77
+    m_importFrom: Assets/Scripts/Disaster/Mechanism/M3_SynthesisInterference.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: d79e7714fd1630f4b851e18d4d34f75b
+    m_importFrom: Assets/Scripts/Disaster/Mechanism/M1_BuildingCorrosion.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 3bac3329023f08b4bbfedbab212347dd
+    m_importFrom: Assets/Scripts/Disaster/Element/E5_WindBlade.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 925fbb4b727bb4d4d81dff0c55431a7d
+    m_importFrom: Assets/Scripts/Disaster/Environment/V5_Aurora.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: f2882456026b6ab4984be3f67684b601
+    m_importFrom: Assets/Scripts/Disaster/Element/E3Enhanced_ThunderStrike.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: af8faa4b0d669a64ab6b33f2ed3aa025
+    m_importFrom: Assets/Scripts/Disaster/TimeSpace/T3_GravityAnomaly.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 4003b6e586ee0364fbe6e19d56fdc45b
+    m_importFrom: Assets/Scripts/Disaster/Physics/P4_Tornado.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 6ef8848589892314fb0ee2327373f536
+    m_importFrom: Assets/Scripts/Disaster/Environment/V6_AcidRain.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 0019f4941bf712049b53d3e35ff8350c
+    m_importFrom: Assets/Scripts/Disaster/Mechanism/M4_SkillSeal.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 4af5b6d2ea8f23e41a2431c6fe3218e0
+    m_importFrom: Assets/Scripts/Disaster/Perception/S3_Deafness.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 88c7da5292318764691b1bfbcdf644b1
+    m_importFrom: Assets/Scripts/Disaster/Perception
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 0349b9d304720ae47a664d73986c79ba
+    m_importFrom: Assets/Scripts/Disaster/PhysicsDisaster.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 27093ba897803524fb4bf3c054b390e4
+    m_importFrom: Assets/Scripts/Disaster/TimeSpace/T5_TimeAccelerate.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: f914fbfd89fc5de4f8f030eefbdf32c3
+    m_importFrom: Assets/Scripts/Disaster/Element/E6_LightBeam.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 486c6ae1ba1698a4b8a9e78cea52ba3e
+    m_importFrom: Assets/Scripts/Disaster/MechanismDisaster.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 246690b475466f549ad1b07c2f2b2a59
+    m_importFrom: Assets/Scripts/Disaster/Element/E3_ThunderStrike.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: df83546f24110f14d9afbab04b84c54f
+    m_importFrom: Assets/Scripts/Disaster/Perception/S5_PerceptionTwist.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 56dc9c221455be84399d4f6eab0fa470
+    m_importFrom: Assets/Scripts/Disaster/TimeSpace/T4_TimeRift.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 49b1687883a19e14da1be82b61c57a53
+    m_importFrom: Assets/Scripts/Disaster/Element/E8_ElementStorm.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: ec6f742c061266445b966e34c3289929
+    m_importFrom: Assets/Scripts/Disaster/Environment/V3_Blizzard.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 6fe31c2030961d84db9848c14580ec9d
+    m_importFrom: Assets/Scripts/Network/NetworkMessages.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: cb8ab03bf88901e4ab0b7455ad7e54ed
+    m_importFrom: Assets/Scripts/Disaster/Physics/P3_FallingRocks.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: c3a62f92d589c97458d3baa2e95c08af
+    m_importFrom: Assets/Scripts/Disaster/Physics
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 62e4652570ae3ca449e4c9535ef3cf15
+    m_importFrom: Assets/Scripts/Disaster/Element/E4_PoisonFog.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: d1fd85233518e1e409ff85a2bbc16555
+    m_importFrom: Assets/Scripts/Disaster/PerceptionDisaster.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 8558299592d2e254f8dd9ec4e30a4b5d
+    m_importFrom: Assets/Scripts/Disaster/Environment
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 1dac4f378bccad74c8c83218944e56e0
+    m_importFrom: Assets/Scripts/Disaster/Mechanism/M6_Apocalypse.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 030124bcbb63a844aad516c7e048454e
+    m_importFrom: Assets/Scripts/Disaster/Element/E7_Shadow.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 30973e26b2933b745aa627470a99f900
+    m_importFrom: Assets/Scripts/Disaster/Environment/V1_VolcanoEruption.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 1cc36aa93928e4849922ad2ddfec8d52
+    m_importFrom: Assets/Scripts/Disaster/TimeSpace/T1_TimeSlow.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: bbb187c11c8cf5542be81b967b49ca30
+    m_importFrom: Assets/Scripts/Disaster/Element/E1_FireSpray.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 87b8117384752f54bbc6b0a6b6da939b
+    m_importFrom: Assets/Scripts/Disaster/ElementDisaster.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 7dbdd77a6b132424ea51c0d445a24db5
+    m_importFrom: Assets/Scripts/Disaster/Mechanism
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 0fd451449b1955f4f8f524ec47b7e34b
+    m_importFrom: Assets/Scripts/Disaster/Physics/P2_Earthquake.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: a222157c228744d408d4470040998317
+    m_importFrom: Assets/Scripts/Disaster/Perception/S4_Delusion.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 5820be5ac84108d4ab259ccde7d080bc
+    m_importFrom: Assets/Scripts/Disaster/Physics/P5_Tsunami.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 115d404be4b9b5d4a8ca86aa1508cb48
+    m_importFrom: Assets/Scripts/Disaster/TimeSpace/T2_SpaceWarp.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 844dfb0a0080f1b4fb821bded200fc7a
+    m_importFrom: Assets/Scripts/Disaster/Element/E2_FrostRay.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: de7e9e964daa2f943ab11a39a4c7f9d8
+    m_importFrom: Assets/Scripts/Disaster/Perception/S2_Illusion.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: c1aee59ca35adff4f93afbb0a7829bae
+    m_importFrom: Assets/Scripts/Disaster/Mechanism/M2_MaterialMutation.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: cd9626bb409e03a428a60da35580a25d
+    m_importFrom: Assets/Scripts/Disaster/EnvironmentDisaster.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: f793c690925160e43b6489f5a11e9be6
+    m_importFrom: Assets/Scripts/Disaster/Environment/V2_Flood.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: c26ad53c3315b1641873ab26e2d47b96
+    m_importFrom: Assets/Scripts/Disaster/Mechanism/M5_ShelterWeaken.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: e76c4dafea8fb57429ea9484eaed534f
+    m_importFrom: Assets/Editor/ConfigAssetGenerator.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: d010e604500028a48bdf127e028aef06
+    m_importFrom: Assets/Scripts/Disaster/Physics/P1_Meteor.cs
+    m_exportTo: 
+    m_variantName: 
   m_version: 2

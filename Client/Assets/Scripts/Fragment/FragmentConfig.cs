@@ -42,6 +42,12 @@ namespace DualEnigma.Fragment
         [SerializeField] private float _dropRangeMin = 8f;
         [SerializeField] private float _dropRangeMax = 18f;
 
+        [Header("温砖转换窗口（秒）")]
+        [SerializeField] private float _warmBrickWindow = 0.1f;
+
+        [Header("被动技能触发半径")]
+        [SerializeField] private float _passiveTriggerRadius = 3f;
+
         [Header("碎片类型生成概率")]
         [SerializeField] private TypeProbabilityEntry[] _typeProbabilities;
 
@@ -57,6 +63,10 @@ namespace DualEnigma.Fragment
         public float DropRangeMin => _dropRangeMin;
         /// <summary>掉落范围最大值</summary>
         public float DropRangeMax => _dropRangeMax;
+        /// <summary>温砖转换窗口（秒）</summary>
+        public float WarmBrickWindow => _warmBrickWindow;
+        /// <summary>被动技能触发半径</summary>
+        public float PassiveTriggerRadius => _passiveTriggerRadius;
         /// <summary>碎片类型概率配置</summary>
         public TypeProbabilityEntry[] TypeProbabilities => _typeProbabilities;
 

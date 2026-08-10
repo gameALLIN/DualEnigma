@@ -25,6 +25,8 @@ namespace DualEnigma.Character
         /// <summary>角色配置数据（ScriptableObject）</summary>
         [SerializeField] private CharacterConfig _characterConfig;
 
+        private bool _isInitialized;
+
         protected override void OnSingletonInitialized()
         {
             ServiceLocator.Register<ICharacterSystem>(this);
@@ -36,8 +38,11 @@ namespace DualEnigma.Character
         /// </summary>
         public void Initialize()
         {
+            if (_isInitialized) return;
+
             Aqua = CreateCharacter(CharacterType.Aqua, 0);
             Ignis = CreateCharacter(CharacterType.Ignis, 1);
+            _isInitialized = true;
             Debug.Log("[CharacterSystem] 角色实例创建完成");
         }
 
@@ -53,6 +58,11 @@ namespace DualEnigma.Character
         {
             string name = type == CharacterType.Aqua ? "Character_Aqua" : "Character_Ignis";
             GameObject go = new GameObject(name);
+
+            Vector2 spawnPosition = _characterConfig != null
+                ? _characterConfig.GetSpawnPosition(type)
+                : (type == CharacterType.Aqua ? new Vector2(-2f, 0f) : new Vector2(2f, 0f));
+            go.transform.position = spawnPosition;
 
             Rigidbody2D rb = go.AddComponent<Rigidbody2D>();
             rb.gravityScale = 1f;

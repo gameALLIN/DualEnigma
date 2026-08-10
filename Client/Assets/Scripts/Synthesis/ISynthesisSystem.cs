@@ -35,5 +35,8 @@ namespace DualEnigma.Synthesis
 
         /// <summary>打断合成</summary>
         void InterruptSynthesis(byte playerId);
+
+        /// <summary>设置 M1 元素枯竭状态</summary>
+        void SetM1ElementDepletion(bool enabled);
     }
 }

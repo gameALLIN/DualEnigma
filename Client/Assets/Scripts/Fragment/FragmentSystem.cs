@@ -11,6 +11,7 @@ using UnityEngine;
 using DualEnigma.Core;
 using DualEnigma.Data;
 using DualEnigma.Skill;
+using DualEnigma.Building;
 
 namespace DualEnigma.Fragment
 {
@@ -23,11 +24,8 @@ namespace DualEnigma.Fragment
         /// <summary>同时接住判定窗口（秒）</summary>
         private const float SIMULTANEOUS_WINDOW = 0.1f;
 
-        /// <summary>温砖转换窗口（秒）— 点燃后 100ms 内冻结则转化为温砖</summary>
-        private const float WARM_BRICK_WINDOW = 0.1f;
-
-        /// <summary>被动技能触发半径（世界单位）</summary>
-        private const float PASSIVE_TRIGGER_RADIUS = 3f;
+        private float WarmBrickWindow => _config != null ? _config.WarmBrickWindow : 0.1f;
+        private float PassiveTriggerRadius => _config != null ? _config.PassiveTriggerRadius : 3f;
 
         /// <summary>被动技能触发概率（0-1）</summary>
         [SerializeField] private float _passiveTriggerChance = 0.3f;
@@ -59,6 +57,12 @@ namespace DualEnigma.Fragment
         /// <summary>碎片ID自增计数器</summary>
         private int _nextFragmentId;
 
+        /// <summary>OnUpdate 超时碎片ID缓存（复用避免每帧分配）</summary>
+        private readonly List<int> _timedOutCache = new List<int>();
+
+        /// <summary>GetActiveFragments 返回的缓存列表（复用避免每帧分配）</summary>
+        private readonly List<FragmentController> _activeFragmentsCache = new List<FragmentController>();
+
         /// <summary>收集记录（用于同时接住判定）</summary>
         private readonly Dictionary<int, CollectRecord> _collectRecords = new Dictionary<int, CollectRecord>();
 
@@ -86,17 +90,18 @@ namespace DualEnigma.Fragment
         /// <summary>
         /// 获取当前场上所有活跃碎片的列表。
         /// 供技能系统（冻结效果等）遍历碎片使用，避免 FindObjectsOfType 调用。
+        /// 返回缓存的 List 引用，调用方不应修改返回的 List。
         /// </summary>
-        /// <returns>活跃碎片列表的副本</returns>
+        /// <returns>活跃碎片列表（缓存引用，只读使用）</returns>
         public List<FragmentController> GetActiveFragments()
         {
-            List<FragmentController> result = new List<FragmentController>(_activeFragments.Count);
+            _activeFragmentsCache.Clear();
             foreach (var kvp in _activeFragments)
             {
                 if (kvp.Value != null)
-                    result.Add(kvp.Value);
+                    _activeFragmentsCache.Add(kvp.Value);
             }
-            return result;
+            return _activeFragmentsCache;
         }
 
         protected override void OnSingletonInitialized()
@@ -150,7 +155,8 @@ namespace DualEnigma.Fragment
 
             // 订阅碎片消失事件（由 FragmentController 通过 EventBus 发布）
 
-            EventBus.Instance.Subscribe<FragmentDespawnedEvent>(OnFragmentDespawnedEvent);
+            if (EventBus.HasInstance)
+                EventBus.Instance.Subscribe<FragmentDespawnedEvent>(OnFragmentDespawnedEvent);
 
 
             Debug.Log("[FragmentSystem] 碎片系统初始化完成");
@@ -172,26 +178,41 @@ namespace DualEnigma.Fragment
 
         /// <summary>
         /// 生成碎片掉落计划（Host 调用）。
+        /// 分预告阶段和收集阶段：预告阶段少量碎片1s间隔，收集阶段大量碎片0.5s间隔。
         /// </summary>
         public List<FragmentDropPlan> GenerateDropPlan(int disasterType, float densityFactor, uint seed)
         {
             List<FragmentDropPlan> plan = new List<FragmentDropPlan>();
             System.Random rng = new System.Random((int)seed);
 
-            int totalBase = Mathf.RoundToInt(28 * densityFactor);
-            int totalCount = Mathf.Max(totalBase, 10);
+            int previewCount = _config != null ? _config.PreviewCount : 5;
+            int collectCount = _config != null ? _config.CollectPhaseCount : 25;
 
-            for (int i = 0; i < totalCount; i++)
+            collectCount = Mathf.RoundToInt(collectCount * densityFactor);
+            collectCount = Mathf.Max(collectCount, 10);
+
+            int disasterCategory = disasterType / 100;
+
+            for (int i = 0; i < previewCount; i++)
             {
-                FragmentType type = GenerateFragmentType(rng);
-                Vector2 pos = GenerateDropPosition(rng);
-
                 plan.Add(new FragmentDropPlan
                 {
                     FragmentId = _nextFragmentId++,
-                    Type = type,
-                    Position = pos,
-                    DropTime = i < 5 ? i * 1f : 5f + (i - 5) * 0.5f,
+                    Type = GenerateFragmentType(rng, disasterCategory),
+                    Position = GenerateDropPosition(rng),
+                    DropTime = i * 1f,
+                    Seed = (uint)rng.Next(),
+                });
+            }
+
+            for (int i = 0; i < collectCount; i++)
+            {
+                plan.Add(new FragmentDropPlan
+                {
+                    FragmentId = _nextFragmentId++,
+                    Type = GenerateFragmentType(rng, disasterCategory),
+                    Position = GenerateDropPosition(rng),
+                    DropTime = previewCount + i * 0.5f,
                     Seed = (uint)rng.Next(),
                 });
             }
@@ -308,17 +329,16 @@ namespace DualEnigma.Fragment
             if (_pendingCollects.Count == 0)
                 return;
 
-            // 收集超时的 fragmentId，避免在遍历中修改字典
-            List<int> timedOut = new List<int>();
+            _timedOutCache.Clear();
             foreach (var kvp in _pendingCollects)
             {
                 if (Time.time - kvp.Value.timestamp >= SIMULTANEOUS_WINDOW)
                 {
-                    timedOut.Add(kvp.Key);
+                    _timedOutCache.Add(kvp.Key);
                 }
             }
 
-            foreach (int fragmentId in timedOut)
+            foreach (int fragmentId in _timedOutCache)
             {
                 CompletePendingCollect(fragmentId);
             }
@@ -407,7 +427,6 @@ namespace DualEnigma.Fragment
             if (skillSys == null)
                 return;
 
-            // 根据接住方式动态设置触发概率：地面30% / 跳跃50% / 同时接住100%
             float triggerChance;
             if (isSimultaneous)
                 triggerChance = 1.0f;
@@ -416,22 +435,24 @@ namespace DualEnigma.Fragment
             else
                 triggerChance = _passiveTriggerChance;
 
-            // 寒霜体质：收集冰晶碎片时有概率冻结周围碎片
+            float passiveBonus = skillSys.GetPassiveChanceBonus(playerId);
+            triggerChance += passiveBonus;
+            triggerChance = Mathf.Clamp01(triggerChance);
+
             if (collectedType == FragmentType.IceCrystal
                 && skillSys.IsPassiveActive(playerId, PassiveSkillType.FrostAura)
                 && Random.Range(0f, 1f) <= triggerChance)
             {
-                FreezeNearbyFragments(position, PASSIVE_TRIGGER_RADIUS);
-                Debug.Log($"[FragmentSystem] 玩家{playerId} 寒霜体质触发，冻结周围碎片");
+                FreezeNearbyFragments(position, PassiveTriggerRadius);
+                Debug.Log($"[FragmentSystem] 玩家{playerId} 寒霜体质触发 (概率{triggerChance:F2})");
             }
 
-            // 烈焰体质：收集熔岩碎片时有概率点燃周围碎片
             if (collectedType == FragmentType.Lava
                 && skillSys.IsPassiveActive(playerId, PassiveSkillType.FlameAura)
                 && Random.Range(0f, 1f) <= triggerChance)
             {
-                IgniteNearbyFragments(position, PASSIVE_TRIGGER_RADIUS);
-                Debug.Log($"[FragmentSystem] 玩家{playerId} 烈焰体质触发，点燃周围碎片");
+                IgniteNearbyFragments(position, PassiveTriggerRadius);
+                Debug.Log($"[FragmentSystem] 玩家{playerId} 烈焰体质触发 (概率{triggerChance:F2})");
             }
         }
 
@@ -505,7 +526,7 @@ namespace DualEnigma.Fragment
             {
                 _ignitedTimestamps.Remove(fragmentId);
 
-                if (Time.time - ignitedTime <= WARM_BRICK_WINDOW)
+                if (Time.time - ignitedTime <= WarmBrickWindow)
                 {
                     ConvertToWarmBrick(fragmentId);
                     return;
@@ -565,11 +586,13 @@ namespace DualEnigma.Fragment
             if (_fragmentPool != null)
             {
                 fragment = _fragmentPool.Get();
+                fragment.ResetState();
             }
             else
             {
                 GameObject go = new GameObject($"Fragment_{plan.FragmentId}");
                 go.AddComponent<BoxCollider2D>().isTrigger = true;
+                go.AddComponent<Rigidbody2D>();
                 fragment = go.AddComponent<FragmentController>();
             }
 
@@ -598,31 +621,108 @@ namespace DualEnigma.Fragment
             }
         }
 
-        private FragmentType GenerateFragmentType(System.Random rng)
+        /// <summary>
+        /// 清除所有碎片状态并清空对象池（新局开始或系统重置时调用）。
+        /// </summary>
+        public void ClearPool()
+        {
+            foreach (var kvp in _activeFragments)
+            {
+                if (kvp.Value != null)
+                {
+                    if (_fragmentPool != null)
+                        _fragmentPool.Release(kvp.Value);
+                    else
+                        Destroy(kvp.Value.gameObject);
+                }
+            }
+
+            _activeFragments.Clear();
+            _collectedFragmentTypes.Clear();
+            _ignitedTimestamps.Clear();
+            _pendingCollects.Clear();
+            _collectRecords.Clear();
+            _timedOutCache.Clear();
+            _activeFragmentsCache.Clear();
+
+            if (_fragmentPool != null)
+                _fragmentPool.Clear();
+        }
+
+        private FragmentType GenerateFragmentType(System.Random rng, int disasterCategory)
         {
             float roll = (float)rng.NextDouble();
 
+            float iceProb;
+            float lavaProb;
+
             if (_config != null)
             {
-                // 从 FragmentConfig 读取概率配置
-                float iceProb = _config.GetTypeProbability(FragmentType.IceCrystal);
-                float lavaProb = _config.GetTypeProbability(FragmentType.Lava);
-
-                if (roll < iceProb) return FragmentType.IceCrystal;
-                if (roll < iceProb + lavaProb) return FragmentType.Lava;
-                return FragmentType.Rock;
+                iceProb = _config.GetTypeProbability(FragmentType.IceCrystal);
+                lavaProb = _config.GetTypeProbability(FragmentType.Lava);
+            }
+            else
+            {
+                iceProb = 0.55f;
+                lavaProb = 0.30f;
             }
 
-            // 回退到默认硬编码概率
-            if (roll < 0.55f) return FragmentType.IceCrystal;
-            if (roll < 0.85f) return FragmentType.Lava;
+            switch (disasterCategory)
+            {
+                case 0:
+                    iceProb += 0.05f;
+                    lavaProb += 0.05f;
+                    break;
+                case 1:
+                    break;
+                case 3:
+                    iceProb -= 0.05f;
+                    lavaProb -= 0.05f;
+                    break;
+            }
+
+            if (roll < iceProb) return FragmentType.IceCrystal;
+            if (roll < iceProb + lavaProb) return FragmentType.Lava;
             return FragmentType.Rock;
         }
 
         private Vector2 GenerateDropPosition(System.Random rng)
         {
-            float x = (float)(rng.NextDouble() * 20f - 10f);
-            float y = (float)(rng.NextDouble() * 5f + 8f);
+            float minX, maxX;
+            const float minY = 8f;
+            const float maxY = 13f;
+
+            if (_config != null)
+            {
+                minX = _config.DropRangeMin;
+                maxX = _config.DropRangeMax;
+            }
+            else
+            {
+                minX = -10f;
+                maxX = 10f;
+            }
+
+            IBuildSystem buildSys = ServiceLocator.Get<IBuildSystem>();
+            if (buildSys != null && buildSys.Buildings.Count > 0)
+            {
+                float buildingCenterX = 0f;
+                int count = 0;
+                foreach (var b in buildSys.Buildings)
+                {
+                    buildingCenterX += b.GridPosition.x;
+                    count++;
+                }
+                if (count > 0)
+                    buildingCenterX /= count;
+
+                float halfRange = (maxX - minX) * 0.5f;
+                minX = buildingCenterX - halfRange;
+                maxX = buildingCenterX + halfRange;
+            }
+
+            float x = (float)(rng.NextDouble() * (maxX - minX) + minX);
+            float y = (float)(rng.NextDouble() * (maxY - minY) + minY);
             return new Vector2(x, y);
         }
     }

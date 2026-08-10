@@ -13,6 +13,7 @@ using DualEnigma.Synthesis;
 using DualEnigma.Character;
 using DualEnigma.Disaster;
 using DualEnigma.Shelter;
+using CharacterController = DualEnigma.Character.CharacterController;
 
 namespace DualEnigma.Building
 {
@@ -27,6 +28,8 @@ namespace DualEnigma.Building
 
         /// <summary>所有已放置建筑</summary>
         public List<BuildingData> Buildings { get; } = new List<BuildingData>();
+
+        [SerializeField] private BuildingConfig _buildingConfig;
 
         /// <summary>网格管理</summary>
         private readonly BuildingGrid _grid = new BuildingGrid();
@@ -228,14 +231,13 @@ namespace DualEnigma.Building
         }
 
         /// <summary>
-        /// 修补建筑。消耗1个对应材料，恢复50%基础HP。
+        /// 修补建筑。消耗1个对应材料，1秒后恢复至满血。
         /// </summary>
         public bool RepairBuilding(byte playerId, int buildingId)
         {
             BuildingData building = Buildings.Find(b => b.BuildingId == buildingId);
             if (building == null) return false;
 
-            // 通过 ICharacterSystem 获取角色，检查并消耗材料
             ICharacterSystem charSystem = ServiceLocator.Get<ICharacterSystem>();
             if (charSystem != null)
             {
@@ -250,56 +252,79 @@ namespace DualEnigma.Building
                 }
             }
 
-            building.CurrentHP = Mathf.Min(building.CurrentHP + building.BaseHP * 0.5f, building.BaseHP);
-            Debug.Log($"[BuildingSystem] 建筑修补: ID={buildingId}, HP={building.CurrentHP}/{building.BaseHP}");
+            StartCoroutine(RepairBuildingCoroutine(buildingId));
+            Debug.Log($"[BuildingSystem] 建筑修补中: ID={buildingId}, 预计1秒后完成");
             return true;
         }
 
+        private IEnumerator RepairBuildingCoroutine(int buildingId)
+        {
+            yield return new WaitForSeconds(1f);
+
+            BuildingData building = Buildings.Find(b => b.BuildingId == buildingId);
+            if (building == null) yield break;
+
+            building.CurrentHP = building.BaseHP;
+            Debug.Log($"[BuildingSystem] 建筑修补完成: ID={buildingId}, HP={building.CurrentHP}/{building.BaseHP}");
+        }
+
         /// <summary>
-        /// 拆除建筑。仅 Build 和 Rest 阶段允许拆除。
+        /// 拆除建筑。仅修整阶段允许拆除，1秒后完成并返还50%材料。
         /// </summary>
         public bool DemolishBuilding(byte playerId, int buildingId)
         {
             BuildingData building = Buildings.Find(b => b.BuildingId == buildingId);
             if (building == null) return false;
 
-            // 阶段限制：仅 Build 和 Rest 阶段允许拆除
             GamePhase currentPhase = GameStateMachine.Instance.CurrentPhase;
-            if (currentPhase != GamePhase.Build && currentPhase != GamePhase.Rest)
+            if (currentPhase != GamePhase.Rest)
             {
-                Debug.Log($"[BuildingSystem] 当前阶段 {currentPhase} 不允许拆除建筑");
+                Debug.Log($"[BuildingSystem] 仅修整阶段可拆除建筑，当前阶段: {currentPhase}");
                 return false;
             }
 
-            _grid.ClearOccupied(building.GridPosition);
-            Buildings.Remove(building);
-            Debug.Log($"[BuildingSystem] 建筑拆除: ID={buildingId}");
+            MaterialType returnMaterial = building.Material;
+            StartCoroutine(DemolishBuildingCoroutine(buildingId, returnMaterial, playerId));
+            Debug.Log($"[BuildingSystem] 建筑拆除中: ID={buildingId}, 预计1秒后完成");
             return true;
         }
 
+        private IEnumerator DemolishBuildingCoroutine(int buildingId, MaterialType material, byte playerId)
+        {
+            yield return new WaitForSeconds(1f);
+
+            BuildingData building = Buildings.Find(b => b.BuildingId == buildingId);
+            if (building == null) yield break;
+
+            _grid.ClearOccupied(building.GridPosition);
+            Buildings.Remove(building);
+
+            ICharacterSystem charSystem = ServiceLocator.Get<ICharacterSystem>();
+            if (charSystem != null)
+            {
+                CharacterController character = charSystem.GetCharacter((CharacterType)playerId);
+                if (character != null)
+                {
+                    character.AddMaterial(material, 1);
+                }
+            }
+
+            Debug.Log($"[BuildingSystem] 建筑拆除完成: ID={buildingId}, 返还1个{material}");
+        }
+
         /// <summary>
-        /// 建筑受伤害。考虑朝向抗性和安全区减免。
+        /// 建筑受伤害。考虑抗性矩阵、朝向抗性和安全区减免。
         /// </summary>
         public void DamageBuilding(int buildingId, float damage)
         {
             BuildingData building = Buildings.Find(b => b.BuildingId == buildingId);
             if (building == null) return;
 
-            float finalDamage = damage;
+            float resistanceCoeff = GetResistanceCoefficient(building.Material, _currentEnvironment);
+            float facingMultiplier = IsFacingCorrect(building) ? 1f : 1.5f;
+            float zoneMultiplier = building.IsInSafeZone ? 0.5f : 1f;
 
-            // 朝向抗性检查：朝向不正确时伤害 ×1.5（抗性降一级）
-            if (!IsFacingCorrect(building))
-            {
-                finalDamage *= 1.5f;
-                Debug.Log($"[BuildingSystem] 朝向不正确，伤害增加50%: ID={buildingId}");
-            }
-
-            // 安全区50%减免
-            if (building.IsInSafeZone)
-            {
-                finalDamage *= 0.5f;
-                Debug.Log($"[BuildingSystem] 安全区减免50%: ID={buildingId}");
-            }
+            float finalDamage = damage * resistanceCoeff * facingMultiplier * zoneMultiplier;
 
             building.CurrentHP -= finalDamage;
 
@@ -318,8 +343,33 @@ namespace DualEnigma.Building
             }
             else
             {
-                Debug.Log($"[BuildingSystem] 建筑受损: ID={buildingId}, 伤害={finalDamage}, HP={building.CurrentHP}/{building.BaseHP}");
+                Debug.Log($"[BuildingSystem] 建筑受损: ID={buildingId}, 伤害={finalDamage}(抗性={resistanceCoeff}, 朝向={facingMultiplier}, 安全区={zoneMultiplier}), HP={building.CurrentHP}/{building.BaseHP}");
             }
+        }
+
+        /// <summary>
+        /// 获取抗性系数。5种环境×6种材料的完整矩阵。
+        /// ★★★ 免疫(0×) | ★★ 强抗性(0.3×) | ★ 抗性(0.6×) | — 正常(1.0×) | ✗ 弱点(1.5×)
+        /// 引用：灾难系统设计.md §4.3 建筑×材料×环境 抗性矩阵
+        /// </summary>
+        private float GetResistanceCoefficient(MaterialType material, ShelterEnvironment environment)
+        {
+            float[,] matrix = new float[,]
+            {
+                { 0.3f, 0f,   1.5f, 1.5f, 0.6f, 0.6f },
+                { 1.5f, 1.5f, 0.3f, 0f,   0.6f, 0.6f },
+                { 0.3f, 0f,   0.3f, 0.3f, 0.3f, 0.6f },
+                { 0.6f, 0.6f, 0.6f, 0.6f, 0f,   0.6f },
+                { 0.6f, 0.6f, 0.6f, 0.6f, 0f,   0.6f },
+            };
+
+            int envIdx = (int)environment;
+            int matIdx = (int)material;
+
+            if (envIdx < 0 || envIdx >= 5 || matIdx < 0 || matIdx >= 6)
+                return 1.0f;
+
+            return matrix[envIdx, matIdx];
         }
 
         /// <summary>
@@ -401,8 +451,7 @@ namespace DualEnigma.Building
         private bool IsFacingCorrect(BuildingData building)
         {
             // 无朝向要求的建筑类型：ReinforcedTower(2), Shelter(3)
-            bool[] hasFacing = { true, true, false, false, true };
-            if ((int)building.Type < hasFacing.Length && !hasFacing[(int)building.Type])
+            if (_buildingConfig != null && !_buildingConfig.HasFacing(building.Type))
                 return true;
 
             // 将 Facing 归一化到 [0,3]

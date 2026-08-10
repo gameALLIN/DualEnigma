@@ -12,6 +12,12 @@ using DualEnigma.Data;
 using DualEnigma.Building;
 using DualEnigma.Synthesis;
 using DualEnigma.Shelter;
+using DualEnigma.Disaster.Element;
+using DualEnigma.Disaster.Environment;
+using DualEnigma.Disaster.TimeSpace;
+using DualEnigma.Disaster.Perception;
+using DualEnigma.Disaster.Physics;
+using DualEnigma.Disaster.Mechanism;
 
 namespace DualEnigma.Disaster
 {
@@ -83,10 +89,9 @@ namespace DualEnigma.Disaster
                 Position = parameters.Position
             };
 
-            CurrentDisaster = CreateDisaster(disasterId);
+            CurrentDisaster = CreateDisaster(disasterId, paramsClone);
             if (CurrentDisaster != null)
             {
-                CurrentDisaster.Initialize(paramsClone);
                 CurrentDisaster.OnStart();
                 _elapsedTime = 0f;
 
@@ -130,7 +135,7 @@ namespace DualEnigma.Disaster
                 return;
             }
 
-            CurrentDisaster.OnUpdate(deltaTime, _elapsedTime);
+            CurrentDisaster.Tick(deltaTime, _elapsedTime);
         }
 
         /// <summary>
@@ -144,9 +149,115 @@ namespace DualEnigma.Disaster
             return Vector2.zero;
         }
 
-        private DisasterBase CreateDisaster(DisasterId id)
+        private DisasterBase CreateDisaster(DisasterId id, DisasterParams parameters)
         {
-            return new GenericDisaster();
+            if (CurrentDisaster != null && CurrentDisaster.IsRunning)
+            {
+                CurrentDisaster.OnEnd();
+            }
+
+            DisasterBase disaster;
+            int category = (int)id / 100;
+
+            switch (category)
+            {
+                case 0:
+                    disaster = id switch
+                    {
+                        DisasterId.E1 => new E1_FireSpray(),
+                        DisasterId.E2 => new E2_FrostRay(),
+                        DisasterId.E3 => new E3_ThunderStrike(),
+                        DisasterId.E3Enhanced => new E3Enhanced_ThunderStrike(),
+                        DisasterId.E4 => new E4_PoisonFog(),
+                        DisasterId.E5 => new E5_WindBlade(),
+                        DisasterId.E6 => new E6_LightBeam(),
+                        DisasterId.E7 => new E7_Shadow(),
+                        DisasterId.E8 => new E8_ElementStorm(),
+                        _ => new ElementDisaster(),
+                    };
+                    break;
+                case 1:
+                    disaster = id switch
+                    {
+                        DisasterId.V1 => new V1_VolcanoEruption(),
+                        DisasterId.V2 => new V2_Flood(),
+                        DisasterId.V3 => new V3_Blizzard(),
+                        DisasterId.V4 => new V4_Sandstorm(),
+                        DisasterId.V5 => new V5_Aurora(),
+                        DisasterId.V6 => new V6_AcidRain(),
+                        _ => new EnvironmentDisaster(),
+                    };
+                    break;
+                case 2:
+                    disaster = id switch
+                    {
+                        DisasterId.T1 => new T1_TimeSlow(),
+                        DisasterId.T2 => new T2_SpaceWarp(),
+                        DisasterId.T3 => new T3_GravityAnomaly(),
+                        DisasterId.T4 => new T4_TimeRift(),
+                        DisasterId.T5 => new T5_TimeAccelerate(),
+                        _ => new TimeSpaceDisaster(),
+                    };
+                    break;
+                case 3:
+                    disaster = id switch
+                    {
+                        DisasterId.S1 => new S1_Fog(),
+                        DisasterId.S2 => new S2_Illusion(),
+                        DisasterId.S3 => new S3_Deafness(),
+                        DisasterId.S4 => new S4_Delusion(),
+                        DisasterId.S5 => new S5_PerceptionTwist(),
+                        _ => new PerceptionDisaster(),
+                    };
+                    break;
+                case 4:
+                    disaster = id switch
+                    {
+                        DisasterId.P1 => new P1_Meteor(),
+                        DisasterId.P2 => new P2_Earthquake(),
+                        DisasterId.P3 => new P3_FallingRocks(),
+                        DisasterId.P4 => new P4_Tornado(),
+                        DisasterId.P5 => new P5_Tsunami(),
+                        _ => new PhysicsDisaster(),
+                    };
+                    break;
+                case 5:
+                    disaster = id switch
+                    {
+                        DisasterId.M1 => new M1_BuildingCorrosion(),
+                        DisasterId.M2 => new M2_MaterialMutation(),
+                        DisasterId.M3 => new M3_SynthesisInterference(),
+                        DisasterId.M4 => new M4_SkillSeal(),
+                        DisasterId.M5 => new M5_ShelterWeaken(),
+                        DisasterId.M6 => new M6_Apocalypse(),
+                        _ => new MechanismDisaster(),
+                    };
+                    break;
+                default:
+                    disaster = new GenericDisaster();
+                    break;
+            }
+
+            DisasterParams clonedParams = CloneParams(parameters);
+            disaster.Initialize(clonedParams);
+            return disaster;
+        }
+
+        private DisasterParams CloneParams(DisasterParams original)
+        {
+            return new DisasterParams
+            {
+                Id = original.Id,
+                Name = original.Name,
+                Category = original.Category,
+                Environment = original.Environment,
+                BaseDPS = original.BaseDPS,
+                Range = original.Range,
+                Duration = original.Duration,
+                RandomSeed = original.RandomSeed,
+                DifficultyMultiplier = original.DifficultyMultiplier,
+                Position = original.Position
+            };
         }
     }
 
@@ -164,81 +275,7 @@ namespace DualEnigma.Disaster
         public override void OnUpdate(float deltaTime, float elapsedTime)
         {
             CurrentIntensity = CalculateIntensity(elapsedTime);
-
-            var buildSystem = ServiceLocator.Get<IBuildSystem>();
-            if (buildSystem == null || buildSystem.Buildings.Count == 0)
-                return;
-
-            // 复制列表避免迭代时 DamageBuilding 移除元素导致异常
-            List<BuildingData> snapshot = new List<BuildingData>(buildSystem.Buildings);
-
-            foreach (var building in snapshot)
-            {
-                float resistanceCoeff = GetResistanceCoefficient(
-                    building.Type, building.Material, Params.Environment);
-
-                // 建筑区域内 50% 减免
-                float zoneMultiplier = building.IsInSafeZone ? 0.5f : 1f;
-
-                float damage = Params.BaseDPS * CurrentIntensity
-                    * Params.DifficultyMultiplier * resistanceCoeff
-                    * zoneMultiplier * deltaTime;
-
-                if (damage > 0f)
-                    buildSystem.DamageBuilding(building.BuildingId, damage);
-            }
-        }
-
-        /// <summary>
-        /// 获取建筑抗性系数。
-        /// 引用：灾难系统设计.md §4.3 建筑×材料×环境 抗性矩阵
-        /// </summary>
-        private float GetResistanceCoefficient(
-            BuildingType buildingType, MaterialType material, ShelterEnvironment env)
-        {
-            // 简化抗性矩阵：根据材料类型和环境判断抗性等级
-            // ★★★ 免疫(0×) / ★★ 强抗性(0.3×) / ★ 抗性(0.6×) / — 无加成(1.0×) / ✗ 弱点(1.5×)
-
-            switch (env)
-            {
-                case ShelterEnvironment.Volcano:
-                    // 火山环境：冰砖免疫，水砖抗性，火砖/岩浆砖弱点
-                    if (material == MaterialType.IceBrick) return 0f;
-                    if (material == MaterialType.WaterBrick) return 0.3f;
-                    if (material == MaterialType.FireBrick || material == MaterialType.LavaBrick) return 1.5f;
-                    return 0.6f; // 石砖
-
-                case ShelterEnvironment.Flood:
-                    // 洪水环境：岩浆砖免疫，火砖抗性，水砖/冰砖弱点
-                    if (material == MaterialType.LavaBrick) return 0f;
-                    if (material == MaterialType.FireBrick) return 0.3f;
-                    if (material == MaterialType.WaterBrick || material == MaterialType.IceBrick) return 1.5f;
-                    return 0.6f;
-
-                case ShelterEnvironment.Blizzard:
-                    // 暴风雪环境：冰砖强化(免疫+HP50%)，火砖/岩浆砖抗性
-                    if (material == MaterialType.IceBrick) return 0f;
-                    if (material == MaterialType.FireBrick || material == MaterialType.LavaBrick) return 0.3f;
-                    return 0.6f;
-
-                case ShelterEnvironment.Earthquake:
-                    // 地震环境：石砖抗震，加固塔+石砖免疫
-                    if (material == MaterialType.StoneBrick)
-                        return buildingType == BuildingType.ReinforcedTower ? 0f : 0.3f;
-                    return 1.5f; // 非石砖脆裂
-
-                case ShelterEnvironment.Meteorite:
-                    // 陨石环境：石砖抗冲击，避难所+石砖坚固
-                    if (material == MaterialType.StoneBrick)
-                    {
-                        if (buildingType == BuildingType.Shelter) return 0f;
-                        return 0.3f;
-                    }
-                    return 1.0f;
-
-                default:
-                    return 1.0f;
-            }
+            ApplyDamageToBuildings(deltaTime);
         }
 
         public override void OnEnd()

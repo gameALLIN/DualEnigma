@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DualEnigma.Shelter;
+using DualEnigma.Fragment;
 
 namespace DualEnigma.Synthesis
 {

@@ -44,5 +44,8 @@ namespace DualEnigma.Shelter
 
         /// <summary>修改庇护参数（天赋系统调用）</summary>
         void ModifyParams(ShelterParams modifications);
+
+        /// <summary>设置 M5 庇护削弱状态</summary>
+        void SetM5Weakening(bool enabled);
     }
 }

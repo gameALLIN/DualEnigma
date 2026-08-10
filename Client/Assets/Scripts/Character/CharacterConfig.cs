@@ -22,6 +22,15 @@ namespace DualEnigma.Character
         [Header("火人配置")]
         public CharacterStats IgnisStats;
 
+        [Header("生成位置")]
+        [SerializeField] private Vector2 _aquaSpawnPosition = new Vector2(-2f, 0f);
+        [SerializeField] private Vector2 _ignisSpawnPosition = new Vector2(2f, 0f);
+
+        public Vector2 GetSpawnPosition(CharacterType type)
+        {
+            return type == CharacterType.Aqua ? _aquaSpawnPosition : _ignisSpawnPosition;
+        }
+
         private void Reset()
         {
             AquaStats = new CharacterStats

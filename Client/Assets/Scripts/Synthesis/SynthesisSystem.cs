@@ -12,6 +12,9 @@ using DualEnigma.Data;
 using DualEnigma.Character;
 using DualEnigma.Fragment;
 using DualEnigma.Shelter;
+using DualEnigma.Disaster;
+using DualEnigma.Disaster.Mechanism;
+using CharacterController = DualEnigma.Character.CharacterController;
 
 namespace DualEnigma.Synthesis
 {
@@ -93,7 +96,6 @@ namespace DualEnigma.Synthesis
 
                 int required = _m1ElementDepletion ? recipe.RequiredCount * 2 : recipe.RequiredCount;
 
-                // 获取角色控制器
                 var characterSystem = ServiceLocator.Get<ICharacterSystem>();
                 if (characterSystem == null)
                 {
@@ -108,47 +110,22 @@ namespace DualEnigma.Synthesis
                     return null;
                 }
 
-                // 获取碎片系统以查询碎片类型
-                var fragmentSystem = ServiceLocator.Get<IFragmentSystem>();
-                if (fragmentSystem == null)
+                int carriedCount = CountCarriedFragmentsByType(character.Stats.CarriedFragmentIds, fragmentType);
+                if (carriedCount < required)
                 {
-                    Debug.LogWarning("[SynthesisSystem] FragmentSystem 未注册，无法验证碎片");
+                    Debug.Log($"[SynthesisSystem] 玩家{playerId}碎片不足: 需要{required}个{fragmentType}, 仅有{carriedCount}个");
                     return null;
                 }
 
-                // 检查角色携带碎片中是否有足够数量的对应 FragmentType 碎片
-                List<int> matchedIds = new List<int>();
-                foreach (int fragmentId in character.Stats.CarriedFragmentIds)
-                {
-                    if (fragmentSystem.TryGetFragmentType(fragmentId, out FragmentType type) && type == fragmentType)
-                    {
-                        matchedIds.Add(fragmentId);
-                        if (matchedIds.Count >= required)
-                            break;
-                    }
-                }
+                List<int> consumedIds = ConsumeFragmentsByType(character, fragmentType, required);
 
-                if (matchedIds.Count < required)
-                {
-                    Debug.Log($"[SynthesisSystem] 玩家{playerId}碎片不足: 需要{required}个{fragmentType}, 仅有{matchedIds.Count}个");
-                    return null;
-                }
-
-                // 满足条件，消耗碎片
-                foreach (int fragmentId in matchedIds)
-                {
-                    character.RemoveFragment(fragmentId);
-                }
-
-                // 记录消耗的碎片信息（用于打断返还）
                 _consumedRecords[playerId] = new ConsumedFragmentRecord
                 {
                     FragmentType = fragmentType,
                     Count = required,
-                    FragmentIds = matchedIds
+                    FragmentIds = consumedIds
                 };
 
-                // 启动合成计时
                 _activeRecipes[playerId] = recipe;
                 _synthesisTimers[playerId] = recipe.SynthesisTime;
                 Debug.Log($"[SynthesisSystem] 玩家{playerId}开始合成: {recipe.OutputType}, 消耗{required}个{fragmentType}, {recipe.SynthesisTime}秒");
@@ -156,6 +133,49 @@ namespace DualEnigma.Synthesis
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// 统计角色携带的指定类型碎片数量。
+        /// 引用：合成系统.md §4.2 碎片验证消耗
+        /// </summary>
+        private int CountCarriedFragmentsByType(List<int> fragmentIds, FragmentType type)
+        {
+            int count = 0;
+            IFragmentSystem fragSys = ServiceLocator.Get<IFragmentSystem>();
+            if (fragSys == null) return 0;
+
+            foreach (int id in fragmentIds)
+            {
+                if (fragSys.TryGetFragmentType(id, out FragmentType t) && t == type)
+                    count++;
+            }
+            return count;
+        }
+
+        /// <summary>
+        /// 从角色携带的碎片中消耗指定类型和数量的碎片，返回被消耗的碎片ID列表。
+        /// 引用：合成系统.md §4.2 碎片验证消耗
+        /// </summary>
+        private List<int> ConsumeFragmentsByType(CharacterController character, FragmentType type, int count)
+        {
+            List<int> consumedIds = new List<int>();
+            IFragmentSystem fragSys = ServiceLocator.Get<IFragmentSystem>();
+            if (fragSys == null) return consumedIds;
+
+            foreach (int id in character.Stats.CarriedFragmentIds)
+            {
+                if (consumedIds.Count >= count) break;
+                if (fragSys.TryGetFragmentType(id, out FragmentType t) && t == type)
+                    consumedIds.Add(id);
+            }
+
+            foreach (int id in consumedIds)
+            {
+                character.RemoveFragment(id);
+            }
+
+            return consumedIds;
         }
 
         /// <summary>
@@ -213,11 +233,18 @@ namespace DualEnigma.Synthesis
         {
             if (_synthesisTimers.Count == 0) return;
 
+            float timeMultiplier = 1f;
+            var disasterSys = ServiceLocator.Get<IDisasterSystem>();
+            if (disasterSys != null && disasterSys.CurrentDisaster is M3_SynthesisInterference m3)
+                timeMultiplier = m3.GetSynthesisTimeMultiplier();
+
+            float effectiveDeltaTime = deltaTime / timeMultiplier;
+
             List<byte> completed = new List<byte>();
 
             foreach (var kvp in _synthesisTimers)
             {
-                float remaining = kvp.Value - deltaTime;
+                float remaining = kvp.Value - effectiveDeltaTime;
                 _synthesisTimers[kvp.Key] = remaining;
 
                 if (remaining <= 0f)
