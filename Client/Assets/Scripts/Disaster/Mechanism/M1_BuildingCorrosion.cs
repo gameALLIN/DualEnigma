@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using DualEnigma.Disaster;
 using DualEnigma.Core;
+using DualEnigma.Framework.Core;
 using DualEnigma.Building;
 using DualEnigma.Synthesis;
 

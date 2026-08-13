@@ -1,6 +1,7 @@
 using UnityEngine;
 using DualEnigma.Disaster;
 using DualEnigma.Core;
+using DualEnigma.Framework.Core;
 using DualEnigma.Shelter;
 
 namespace DualEnigma.Disaster.Mechanism

@@ -5,6 +5,8 @@
 /// 描述: 一个面板测试
 /// ============================================================
 
+using DualEnigma.Framework.UI;
+
 namespace DualEnigma.UI
 {
     public class UITestModel : UIModelBase

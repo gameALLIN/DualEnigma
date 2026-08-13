@@ -8,6 +8,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using DualEnigma.Core;
+using DualEnigma.Framework.Core;
 using DualEnigma.Character;
 using DualEnigma.Building;
 using DualEnigma.Data;

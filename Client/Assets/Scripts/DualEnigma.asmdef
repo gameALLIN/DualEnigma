@@ -1,7 +1,9 @@
 {
     "name": "DualEnigma",
     "rootNamespace": "DualEnigma",
-    "references": [],
+    "references": [
+        "DualEnigma.Framework"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

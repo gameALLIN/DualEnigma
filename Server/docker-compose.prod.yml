@@ -1,0 +1,17 @@
+# 生产环境覆盖：不暴露 DB 端口
+
+services:
+  mariadb:
+    ports: []
+
+  gameserver:
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+
+  accountserver:
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+
+volumes:
+  mariadb_data:
+    driver: local

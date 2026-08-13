@@ -7,6 +7,7 @@
 
 using UnityEngine;
 using DualEnigma.Core;
+using DualEnigma.Framework.Core;
 
 namespace DualEnigma.Fragment
 {

@@ -7,6 +7,7 @@
 /// ============================================================
 
 using UnityEngine;
+using DualEnigma.Framework.Core;
 using DualEnigma.Shelter;
 using DualEnigma.Synthesis;
 using DualEnigma.Skill;

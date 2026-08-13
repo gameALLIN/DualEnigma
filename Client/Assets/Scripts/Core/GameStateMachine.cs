@@ -8,6 +8,7 @@
 /// ============================================================
 
 using UnityEngine;
+using DualEnigma.Framework.Core;
 
 namespace DualEnigma.Core
 {

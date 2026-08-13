@@ -7,6 +7,8 @@
 
 using UnityEngine;
 using DualEnigma.Core;
+using DualEnigma.Framework.Core;
+using DualEnigma.Art;
 
 namespace DualEnigma.Character
 {
@@ -71,7 +73,8 @@ namespace DualEnigma.Character
             BoxCollider2D collider = go.AddComponent<BoxCollider2D>();
             collider.size = new Vector2(0.8f, 1.8f);
 
-            go.AddComponent<SpriteRenderer>();
+            SpriteRenderer spriteRenderer = go.AddComponent<SpriteRenderer>();
+            spriteRenderer.sprite = CharacterSpriteGenerator.GenerateCharacterSprite(type);
 
             CharacterController controller = go.AddComponent<CharacterController>();
 
@@ -89,6 +92,9 @@ namespace DualEnigma.Character
                 : CreateDefaultStats(type);
 
             controller.Initialize(stats, playerId);
+
+            // 挂载输入控制器（本地测试用）
+            go.AddComponent<CharacterInputController>();
 
             return controller;
         }

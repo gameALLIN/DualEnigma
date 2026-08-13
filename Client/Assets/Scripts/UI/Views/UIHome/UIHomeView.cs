@@ -7,6 +7,7 @@
 
 using UnityEngine;
 using UnityEngine.UI;
+using DualEnigma.Framework.UI;
 
 namespace DualEnigma.UI
 {

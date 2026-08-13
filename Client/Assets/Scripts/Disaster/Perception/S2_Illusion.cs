@@ -1,6 +1,7 @@
 using UnityEngine;
 using DualEnigma.Disaster;
 using DualEnigma.Core;
+using DualEnigma.Framework.Core;
 using DualEnigma.Fragment;
 
 namespace DualEnigma.Disaster.Perception

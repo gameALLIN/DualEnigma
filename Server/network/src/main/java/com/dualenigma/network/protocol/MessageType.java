@@ -1,0 +1,35 @@
+package com.dualenigma.network.protocol;
+
+/**
+ * 消息类型枚举 — 所有 WebSocket 消息类型的统一定义.
+ */
+public enum MessageType {
+    // ── C2S (客户端 → 服务器) ──
+    C2S_CONNECT,
+    C2S_HIGH_FREQ_STATE,
+    C2S_FRAGMENT_CAUGHT,
+    C2S_BUILDING_PLACE,
+    C2S_BUILDING_REMOVE,
+    C2S_SYNTHESIZE,
+    C2S_SKILL_ACTIVATE,
+    C2S_TALENT_SELECT,
+    C2S_HEARTBEAT,
+
+    // ── S2C (服务器 → 客户端) ──
+    S2C_CONNECT_ACK,
+    S2C_GAME_START,
+    S2C_PHASE_CHANGE,
+    S2C_HIGH_FREQ_STATE,
+    S2C_MID_FREQ_STATE,
+    S2C_FRAGMENT_DROP_PLAN,
+    S2C_FRAGMENT_RESULT,
+    S2C_DISASTER_START,
+    S2C_DISASTER_END,
+    S2C_BUILDING_UPDATE,
+    S2C_SKILL_RESULT,
+    S2C_TALENT_OPTIONS,
+    S2C_TALENT_SELECTED,
+    S2C_RECONNECT_SNAPSHOT,
+    S2C_OPPONENT_DISCONNECT,
+    S2C_HEARTBEAT_ACK,
+}

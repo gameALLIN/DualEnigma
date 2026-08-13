@@ -6,6 +6,8 @@
 /// ============================================================
 
 using DualEnigma.UI;
+using DualEnigma.Framework.UI;
+using DualEnigma.Framework.Core;
 using DualEnigma.Data;
 using DualEnigma.Character;
 using DualEnigma.Fragment;
@@ -28,7 +30,7 @@ namespace DualEnigma.Core
     {
         [Header("启动配置")]
         [Tooltip("游戏启动后自动打开的第一个面板名称（需以 UI 开头，对应 Prefabs/UI/{面板名}/{面板名}.prefab）")]
-        [SerializeField] private string m_EntryPanelName = "UITest";
+        [SerializeField] private string m_EntryPanelName = "UILogin";
 
         private void Awake()
         {
@@ -82,6 +84,12 @@ namespace DualEnigma.Core
             // 初始化 UI 系统
             _ = UIManager.Instance;
 
+            // 加载地图（背景、天空、地面、墙壁、安全区、网格）
+            MapLoader.Load();
+
+            // 确保场景中有正交相机
+            EnsureCamera();
+
             // 初始化业务系统（触发 Singleton 创建 + ServiceLocator 注册）
             _ = CharacterSystem.Instance;
             CharacterSystem.Instance.Initialize();
@@ -93,8 +101,46 @@ namespace DualEnigma.Core
             _ = SkillSystem.Instance;
             _ = TalentSystem.Instance;
             _ = NetworkSystem.Instance;
+            _ = AuthService.Instance;
 
             Debug.Log("[GameLaunch] 全系统初始化完成（Core + 9个业务系统 + UI）");
+        }
+
+        /// <summary>
+        /// 确保场景中有正交相机，位置覆盖整个地图（40×20格）。
+        /// 修复多相机 ClearFlags 冲突：MainCamera 清屏，其他相机仅 Depth。
+        /// </summary>
+        private void EnsureCamera()
+        {
+            Camera mainCam = Camera.main;
+
+            if (mainCam == null)
+            {
+                GameObject camObj = new GameObject("MainCamera");
+                mainCam = camObj.AddComponent<Camera>();
+                camObj.tag = "MainCamera";
+                camObj.AddComponent<AudioListener>();
+                Debug.Log("[GameLaunch] 自动创建 MainCamera");
+            }
+
+            // Main Camera 负责清屏 + 渲染游戏世界
+            mainCam.clearFlags = CameraClearFlags.SolidColor;
+            mainCam.orthographic = true;
+            mainCam.orthographicSize = 12f;
+            mainCam.transform.position = new Vector3(0, 0, -10);
+            mainCam.backgroundColor = new Color(0.15f, 0.20f, 0.22f, 1f);
+            mainCam.depth = -1;
+
+            // 场景中其他相机（如 UI Camera）改为 Depth 模式，不清屏覆盖
+            Camera[] allCams = FindObjectsOfType<Camera>();
+            foreach (Camera c in allCams)
+            {
+                if (c != mainCam && c.clearFlags == CameraClearFlags.SolidColor)
+                {
+                    c.clearFlags = CameraClearFlags.Depth;
+                    Debug.Log($"[GameLaunch] 相机 {c.name} ClearFlags 改为 Depth（避免覆盖游戏画面）");
+                }
+            }
         }
 
         private void Start()

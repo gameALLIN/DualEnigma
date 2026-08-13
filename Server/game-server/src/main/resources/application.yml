@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: dualenigma-game-server
+
+  datasource:
+    url: jdbc:mariadb://localhost:3306/dualenigma
+    username: dualenigma
+    password: dualenigma_dev
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MariaDBDialect
+
+  websocket:
+    enabled: true
+
+# 游戏服务器自定义配置
+dualenigma:
+  game:
+    tick-rate: 20
+    tick-interval-ms: 50
+    high-freq-rate: 20
+    mid-freq-rate: 10
+    heartbeat-interval: 1000
+    heartbeat-timeout: 5000
+    reconnect-window: 30000
+    ai-takeover-timeout: 30000
+    final-timeout: 120000
+    max-rooms: 100
+
+logging:
+  level:
+    com.dualenigma.server: DEBUG
+    com.dualenigma.network: DEBUG
+    org.springframework.web.socket: DEBUG

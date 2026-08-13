@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DualEnigma.Core;
+using DualEnigma.Framework.Core;
 using DualEnigma.Synthesis;
 using DualEnigma.Fragment;
 using DualEnigma.Shelter;

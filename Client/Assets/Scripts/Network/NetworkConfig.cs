@@ -41,6 +41,9 @@ namespace DualEnigma.Network
         [SerializeField] private int _udpPort = 7778;
         [SerializeField] private string _defaultHostAddress = "127.0.0.1";
 
+        [Header("账号服 REST API")]
+        [SerializeField] private string _accountServerUrl = "http://localhost:8081";
+
         public float HighFrequencyRate => _highFrequencyRate;
         public float MidFrequencyRate => _midFrequencyRate;
         public float InterpolationBuffer => _interpolationBuffer;
@@ -56,5 +59,6 @@ namespace DualEnigma.Network
         public int TcpPort => _tcpPort;
         public int UdpPort => _udpPort;
         public string DefaultHostAddress => _defaultHostAddress;
+        public string AccountServerUrl => _accountServerUrl;
     }
 }

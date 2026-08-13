@@ -243,7 +243,8 @@ namespace DualEnigma.UI.Editor
 
             StringBuilder sb = new StringBuilder();
             sb.Append(GenerateFileHeader(fileName, author, desc, timestamp));
-            sb.Append("using UnityEngine;\n\n");
+            sb.Append("using UnityEngine;\n");
+            sb.Append("using DualEnigma.Framework.UI;\n\n");
             sb.Append("namespace DualEnigma.UI\n");
             sb.Append("{\n");
             sb.Append("    public class " + panelName + "Ctrl : UICtrlBase\n");
@@ -277,6 +278,7 @@ namespace DualEnigma.UI.Editor
 
             StringBuilder sb = new StringBuilder();
             sb.Append(GenerateFileHeader(fileName, author, desc, timestamp));
+            sb.Append("using DualEnigma.Framework.UI;\n\n");
             sb.Append("namespace DualEnigma.UI\n");
             sb.Append("{\n");
             sb.Append("    public class " + panelName + "Model : UIModelBase\n");
@@ -297,7 +299,8 @@ namespace DualEnigma.UI.Editor
 
             StringBuilder sb = new StringBuilder();
             sb.Append(GenerateFileHeader(fileName, author, desc, timestamp));
-            sb.Append("using UnityEngine;\n\n");
+            sb.Append("using UnityEngine;\n");
+            sb.Append("using DualEnigma.Framework.UI;\n\n");
             sb.Append("namespace DualEnigma.UI\n");
             sb.Append("{\n");
             sb.Append("    public class " + panelName + "View : UIViewBase\n");

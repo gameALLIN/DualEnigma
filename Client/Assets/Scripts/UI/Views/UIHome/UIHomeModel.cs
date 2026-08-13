@@ -5,6 +5,8 @@
 /// 描述: 是的是的
 /// ============================================================
 
+using DualEnigma.Framework.UI;
+
 namespace DualEnigma.UI
 {
     public class UIHomeModel : UIModelBase

@@ -326,7 +326,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 935db735c871100438b9f3d45ea0bb4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_EntryPanelName: UITest
+  m_EntryPanelName: UILogin
 --- !u!1 &1990579259
 GameObject:
   m_ObjectHideFlags: 0

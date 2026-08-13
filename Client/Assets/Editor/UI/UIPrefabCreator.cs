@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using DualEnigma.UI;
+using DualEnigma.Framework.UI;
 
 namespace DualEnigma.UI.Editor
 {

@@ -1,0 +1,78 @@
+# Mac Linux 虚拟机测试环境：MariaDB + GameServer + AccountServer
+
+services:
+  mariadb:
+    image: mariadb:11.4
+    container_name: dualenigma-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./account-server/src/main/resources/db/schema.sql:/docker-entrypoint-initdb.d/01-account.sql:ro
+      - ./game-server/src/main/resources/db/schema.sql:/docker-entrypoint-initdb.d/02-game.sql:ro
+    networks:
+      - dualenigma-net
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -u root -p${DB_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  gameserver:
+    build:
+      context: .
+      dockerfile: game-server/Dockerfile
+    container_name: dualenigma-game-server
+    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILE:-dev}
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Shanghai
+    ports:
+      - "8080:8080"
+    networks:
+      - dualenigma-net
+
+  accountserver:
+    build:
+      context: .
+      dockerfile: account-server/Dockerfile
+    container_name: dualenigma-account-server
+    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILE:-dev}
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Shanghai
+    ports:
+      - "8081:8081"
+    networks:
+      - dualenigma-net
+
+volumes:
+  mariadb_data:
+    driver: local
+
+networks:
+  dualenigma-net:
+    driver: bridge

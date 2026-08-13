@@ -55,3 +55,11 @@ Client/*.csproj.user
 # MimoCode
 # ===========================
 .mimocode/
+
+# ===========================
+# Server (Java / Maven / Spring Boot 多模块)
+# ===========================
+Server/**/target/
+Server/.env
+Server/**/*.log
+Server/logs/
