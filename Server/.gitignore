@@ -1,7 +1,9 @@
 # ===========================
 # Maven
 # ===========================
-**/target/
+# 忽略 target 目录下所有构建产物，但保留 jar 包供 Docker 直接运行
+**/target/*
+!**/target/*.jar
 !.mvn/wrapper/maven-wrapper.jar
 
 # ===========================
