@@ -83,3 +83,7 @@ packages/
 !Packages/**
 !ProjectSettings/
 !ProjectSettings/**
+
+# AB 构建产物（打包工具生成，体积大且频繁变化，不进 git）
+Assets/StreamingAssets/AssetBundles/
+build-win.log
