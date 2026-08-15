@@ -1,4 +1,4 @@
-﻿package com.dualenigma.accountserver.controller;
+package com.dualenigma.accountserver.controller;
 
 import com.dualenigma.accountserver.dto.FriendInfo;
 import com.dualenigma.accountserver.dto.FriendRequestInfo;
