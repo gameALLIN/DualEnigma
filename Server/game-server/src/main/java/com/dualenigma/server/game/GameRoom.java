@@ -124,8 +124,15 @@ public class GameRoom {
             S2C_HighFreqState fwd = new S2C_HighFreqState();
             fwd.setTimestamp(System.currentTimeMillis());
             fwd.getData().setPlayerId(playerId);
-            fwd.getData().setPosition(state.getData().getPosition());
-            fwd.getData().setVelocity(state.getData().getVelocity());
+            // C2S 与 S2C 的 Vec2 是不同类型，逐字段转换
+            S2C_HighFreqState.Vec2 pos = new S2C_HighFreqState.Vec2();
+            pos.setX(state.getData().getPosition().getX());
+            pos.setY(state.getData().getPosition().getY());
+            S2C_HighFreqState.Vec2 vel = new S2C_HighFreqState.Vec2();
+            vel.setX(state.getData().getVelocity().getX());
+            vel.setY(state.getData().getVelocity().getY());
+            fwd.getData().setPosition(pos);
+            fwd.getData().setVelocity(vel);
             fwd.getData().setAnimState(state.getData().getAnimState());
             fwd.getData().setFacing(state.getData().isFacing());
             fwd.getData().setHp(state.getData().getHp());
