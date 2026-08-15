@@ -17,8 +17,12 @@ public class GameRoom {
     private final String roomCode;
     private final ClientSession[] players = new ClientSession[2];
     private final GameManager gameManager;
+    private final long createdAt = System.currentTimeMillis();
     private int playerCount = 0;
     private boolean gameStarted = false;
+
+    /** 未开局房间的最大存活时间（毫秒），超时由 RoomManager 回收 */
+    private static final long LOBBY_TIMEOUT_MS = 10 * 60 * 1000L;
 
     public GameRoom(String roomCode) {
         this.roomCode = roomCode;
@@ -123,10 +127,14 @@ public class GameRoom {
     }
 
     /**
-     * 房间是否可销毁.
+     * 房间是否可销毁：
+     * 开局后状态机停止（对局结束），或未开局超过 10 分钟（等人超时/房主离开）.
      */
     public boolean isExpired() {
-        return gameStarted && !gameManager.getStateMachine().isRunning();
+        if (gameStarted) {
+            return !gameManager.getStateMachine().isRunning();
+        }
+        return System.currentTimeMillis() - createdAt > LOBBY_TIMEOUT_MS;
     }
 
     // --- Getters ---

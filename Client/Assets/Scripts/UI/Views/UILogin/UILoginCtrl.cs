@@ -30,8 +30,13 @@ namespace DualEnigma.UI
                 _authService = ServiceLocator.Get<IAuthService>();
             }
 
-            BindEvents();
             ApplyMode();
+        }
+
+        protected override void OnShow()
+        {
+            // 每次显示时重新绑定（OnHide 已解绑，覆盖 登录→主界面→退出登录 的往返场景）
+            BindEvents();
         }
 
         private void BindEvents()
@@ -112,7 +117,8 @@ namespace DualEnigma.UI
             _model.SetLoading(false);
             _view.SetLoading(false);
             Debug.Log($"[UILogin] 认证成功: {result.username} (id={result.accountId})");
-            // TODO: 切换到大厅/主界面面板
+            // 登录成功，进入主界面（联机版后续在此改为房间/大厅流程）
+            UIManager.Instance.Push<UIHomeCtrl>(UIMode.FullScreen);
         }
 
         private void OnAuthError(string error)

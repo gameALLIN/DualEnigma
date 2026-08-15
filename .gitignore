@@ -50,6 +50,9 @@ Client/Logs/
 Client/.vs/
 Client/.idea/
 Client/*.csproj.user
+# AB 构建产物（打包工具生成，不进 git）
+Client/Assets/StreamingAssets/AssetBundles/
+Client/build-win.log
 
 # ===========================
 # MimoCode

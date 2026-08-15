@@ -305,4 +305,684 @@ MonoBehaviour:
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UILogin/UILogin.prefab
     m_exportTo: 
     m_variantName: 
+  - m_assetDatabaseId: 2b271fc68769bb94b9ec5becec3a7a53
+    m_importFrom: Assets/Scripts/Shelter/ShelterParams.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 9429e38f0f9e5b64983674b253136cd6
+    m_importFrom: Assets/Scripts/Disaster/Element
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 7bad8a45265c30f4fa5e103163a96dbe
+    m_importFrom: Assets/Scripts/Disaster/TimeSpaceDisaster.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: da93431f205e42f4596b3a00d42570e4
+    m_importFrom: Assets/Scripts/Building
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 4d6e238ada664d43b3e1f3652c5c7119
+    m_importFrom: Packages/com.unity.collab-proxy/Editor/CodeEditor/Utils/ExtensionMethods.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: de4c6fdf907316440aaa972c7d6f41a4
+    m_importFrom: Assets/Scripts/Disaster/TimeSpace
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 791287588334c93448c72b6d705883db
+    m_importFrom: Assets/Scripts/Framework/UI/UIMode.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 27920b7c73cba2842abf88ee698216ce
+    m_importFrom: Assets/Scripts/Disaster/Environment/V4_Sandstorm.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 05c33d7afa5c272449b77e26526e93da
+    m_importFrom: Assets/Scripts/Framework/Core/Tests
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: b52819b9e3a0e7b4a81675d1c44cf259
+    m_importFrom: Assets/Scripts/Disaster/Perception/S1_Fog.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 9f8b078d7e1cfbf4cbc36930093321df
+    m_importFrom: Assets/Scripts/Building/BuildingGrid.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 9f91d6c94ae8ac043bd62c0f048e31fb
+    m_importFrom: Assets/Scripts/Talent/TalentConfig.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: fb08817a282a5214bb36d1dfdab98d93
+    m_importFrom: Assets/Scripts/Building/BuildingData.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 6c1e3e4107d37594ebf12211250ffe77
+    m_importFrom: Assets/Scripts/Disaster/Mechanism/M3_SynthesisInterference.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 13a6382bd812c4f40ab8a80c619cc1c4
+    m_importFrom: Assets/Scripts/Building/BuildingSystem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: e3c1762dc78239444aee9e11695c3178
+    m_importFrom: Assets/Scripts/Skill
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: d79e7714fd1630f4b851e18d4d34f75b
+    m_importFrom: Assets/Scripts/Disaster/Mechanism/M1_BuildingCorrosion.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: ba185de8335cb4d4ca3a9493eb7d7059
+    m_importFrom: Assets/Scripts/Fragment/FragmentSystem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 6c5867ff12dbffb46a0e73e16a7037b4
+    m_importFrom: Assets/Scripts/Fragment/FragmentConfig.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: dbbafec1b484b204e97c14a0382dab37
+    m_importFrom: Assets/Scripts/Network/NetworkSystem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: aba983910dedd7446a6622ab265e1260
+    m_importFrom: Assets/AssetPackage/Data/CharacterConfig.asset
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 709d29d56cf9eba4fba1a14ad48d030b
+    m_importFrom: Assets/Scripts/Talent/TalentData.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 8f44491d1f71fc44abf40584e79550cd
+    m_importFrom: Assets/Scripts/Core/GameManager.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 3bac3329023f08b4bbfedbab212347dd
+    m_importFrom: Assets/Scripts/Disaster/Element/E5_WindBlade.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 925fbb4b727bb4d4d81dff0c55431a7d
+    m_importFrom: Assets/Scripts/Disaster/Environment/V5_Aurora.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: f2882456026b6ab4984be3f67684b601
+    m_importFrom: Assets/Scripts/Disaster/Element/E3Enhanced_ThunderStrike.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: af8faa4b0d669a64ab6b33f2ed3aa025
+    m_importFrom: Assets/Scripts/Disaster/TimeSpace/T3_GravityAnomaly.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 4003b6e586ee0364fbe6e19d56fdc45b
+    m_importFrom: Assets/Scripts/Disaster/Physics/P4_Tornado.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 3865b60cfdbc3674f9dac21dae8fc9f0
+    m_importFrom: Assets/Scripts/Synthesis/SynthesisStation.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 6ef8848589892314fb0ee2327373f536
+    m_importFrom: Assets/Scripts/Disaster/Environment/V6_AcidRain.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 4b20b7676bc885e4caca1665bc9d04c4
+    m_importFrom: Assets/Scripts/Skill/SkillConfig.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 0019f4941bf712049b53d3e35ff8350c
+    m_importFrom: Assets/Scripts/Disaster/Mechanism/M4_SkillSeal.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: cc7ded12f1bb8574c8ab6efd103dacd7
+    m_importFrom: Assets/Scripts/Synthesis
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 4af5b6d2ea8f23e41a2431c6fe3218e0
+    m_importFrom: Assets/Scripts/Disaster/Perception/S3_Deafness.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 61bddb8ce7ece0544b1afa58874c5d29
+    m_importFrom: Assets/Scripts/Shelter/ShelterEnums.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 602a27d2c83490d44a7b797925dea4eb
+    m_importFrom: Assets/Scripts/Character/CharacterStats.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: c1483572ead5ce74f95d7954f38bb6ae
+    m_importFrom: Assets/Scripts/Building/BuildingConfig.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 3a3c7dbd17e766744ac991372a6c2f46
+    m_importFrom: Assets/Scripts/UI/Views/UITest/UITestCtrl.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: b68e8f54a16a50740bac4c789244e33a
+    m_importFrom: Assets/AssetPackage/Data/TalentConfig.asset
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: bd003ea29a13eb248aa6ed70339f06ab
+    m_importFrom: Assets/Scripts/Skill/SkillEnums.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: f75337a73aeb1fb40af785546622d5f9
+    m_importFrom: Assets/Scripts/Fragment/FragmentController.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 9e0453655166ba24cb247475a142f8f3
+    m_importFrom: Assets/Scripts/Data
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 0bbd16fe53a3b0a4f90021a7b944f000
+    m_importFrom: Assets/Scripts/Building/IBuildSystem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 2a30d6682217b684c96860c967de9a4e
+    m_importFrom: Assets/Scripts/Disaster/DisasterParams.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: c3d364d0e8e8c484f89517a58995b044
+    m_importFrom: Assets/Scripts/Synthesis/MaterialType.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 35abf1d9408f1bd48beca2aa3336ccdf
+    m_importFrom: Assets/AssetPackage/Data/BuildingConfig.asset
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: e8a012d3439141c42a9dcf7d95487fd5
+    m_importFrom: Assets/Scripts/Framework/UI
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 88c7da5292318764691b1bfbcdf644b1
+    m_importFrom: Assets/Scripts/Disaster/Perception
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 967dd13b7b598184eac857ff958b766c
+    m_importFrom: Assets/Scripts/Disaster/DisasterConfig.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 0349b9d304720ae47a664d73986c79ba
+    m_importFrom: Assets/Scripts/Disaster/PhysicsDisaster.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 27093ba897803524fb4bf3c054b390e4
+    m_importFrom: Assets/Scripts/Disaster/TimeSpace/T5_TimeAccelerate.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: afb0cc9ce87ec4aef95c9b4c2261a3b2
+    m_importFrom: Assets/3rd/AssetGraph-1.7-release/Editor/System/Node/Addressables/AddressableAssetGroup.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: f914fbfd89fc5de4f8f030eefbdf32c3
+    m_importFrom: Assets/Scripts/Disaster/Element/E6_LightBeam.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 486c6ae1ba1698a4b8a9e78cea52ba3e
+    m_importFrom: Assets/Scripts/Disaster/MechanismDisaster.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 246690b475466f549ad1b07c2f2b2a59
+    m_importFrom: Assets/Scripts/Disaster/Element/E3_ThunderStrike.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: df83546f24110f14d9afbab04b84c54f
+    m_importFrom: Assets/Scripts/Disaster/Perception/S5_PerceptionTwist.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: ac03a22647d813046aa9cb6db8f42439
+    m_importFrom: Assets/Scripts/Synthesis/SynthesisRecipe.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 3f97ca3728cb0554889e930b0cb83f83
+    m_importFrom: Assets/Scripts/UI/Views/UITest/UITestModel.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 56dc9c221455be84399d4f6eab0fa470
+    m_importFrom: Assets/Scripts/Disaster/TimeSpace/T4_TimeRift.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 1d3ecd81105844246a4a641753dff68f
+    m_importFrom: Assets/Scripts/Fragment/IFragmentSystem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: bce448e51ba7a1b4f9bcbb9d0df18ced
+    m_importFrom: Assets/Scripts/Network/NetworkEnums.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: d207728fae6d5b4499a86b09cca027b3
+    m_importFrom: Assets/AssetPackage/Data/ShelterConfig.asset
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 0889a7ad241ce9344902f925e0499ed8
+    m_importFrom: Assets/Scripts/Fragment
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 369c09afe05d2c346af49faef943c773
+    m_importFrom: Packages/com.unity.ide.visualstudio/Editor/Messaging/Serializer.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 962fcfcd4d457564a97556dbcd207492
+    m_importFrom: Assets/Scripts/UI/Views/UIHome/UIHomeCtrl.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 49b1687883a19e14da1be82b61c57a53
+    m_importFrom: Assets/Scripts/Disaster/Element/E8_ElementStorm.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 7df3dcb286456a94382c7910ee134ffa
+    m_importFrom: Assets/Scripts/Fragment/FragmentDropPlan.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 397cc74f31f74f54bb7744a93842adbe
+    m_importFrom: Assets/Scripts/Data/DataManager.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: e00107432eb44af46840e97eaf726dd1
+    m_importFrom: Assets/Scripts/UI/Views/UIHome/UIHomeModel.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: ec6f742c061266445b966e34c3289929
+    m_importFrom: Assets/Scripts/Disaster/Environment/V3_Blizzard.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 85b07f8974795004ea84235cc2def1fe
+    m_importFrom: Assets/Scripts/DualEnigma.asmdef
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 129142e70a7213b4b935e93aacb59f8a
+    m_importFrom: Assets/Scripts/UI/Views/UIHome/UIHomeView.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 6fe31c2030961d84db9848c14580ec9d
+    m_importFrom: Assets/Scripts/Network/NetworkMessages.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: d0788421ab2558640b7a01fbb82b0951
+    m_importFrom: Assets/Scripts/Synthesis/SynthesisSystem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: cb8ab03bf88901e4ab0b7455ad7e54ed
+    m_importFrom: Assets/Scripts/Disaster/Physics/P3_FallingRocks.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: aa47997b07b860046ac21bcb52af31e7
+    m_importFrom: Assets/Scripts/Disaster/DisasterSystem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: c3a62f92d589c97458d3baa2e95c08af
+    m_importFrom: Assets/Scripts/Disaster/Physics
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 13b8d38fc7697aa4d9f380217ac00bd8
+    m_importFrom: Assets/Scripts/Character/ICharacterSystem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: dec1ba8062cb9c342a7e17436e491bf8
+    m_importFrom: Assets/Scripts/Skill/SkillData.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 62e4652570ae3ca449e4c9535ef3cf15
+    m_importFrom: Assets/Scripts/Disaster/Element/E4_PoisonFog.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: cb4b450bb34c04145823dac7b96caf0b
+    m_importFrom: Assets/Scripts/Framework
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: dc0ce725b9c25af4eb2e81ef07461ccd
+    m_importFrom: Assets/Scripts/UI/Views/UITest/UITestView.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: d1fd85233518e1e409ff85a2bbc16555
+    m_importFrom: Assets/Scripts/Disaster/PerceptionDisaster.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 8558299592d2e254f8dd9ec4e30a4b5d
+    m_importFrom: Assets/Scripts/Disaster/Environment
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 1dac4f378bccad74c8c83218944e56e0
+    m_importFrom: Assets/Scripts/Disaster/Mechanism/M6_Apocalypse.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 910c064fc304d374f93e168c81359be0
+    m_importFrom: Assets/Scripts/Network
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 030124bcbb63a844aad516c7e048454e
+    m_importFrom: Assets/Scripts/Disaster/Element/E7_Shadow.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 8d532dfb11925474f9ed978cf6e8913c
+    m_importFrom: Assets/Scripts/Character/CharacterController.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 30973e26b2933b745aa627470a99f900
+    m_importFrom: Assets/Scripts/Disaster/Environment/V1_VolcanoEruption.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: ba57f029886f99b42b8d79f251c185dc
+    m_importFrom: Assets/Scripts/Character
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 1cc36aa93928e4849922ad2ddfec8d52
+    m_importFrom: Assets/Scripts/Disaster/TimeSpace/T1_TimeSlow.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: a30219da605216a4caae854b2a3b892f
+    m_importFrom: Assets/Scripts/Talent/ITalentSystem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: bbb187c11c8cf5542be81b967b49ca30
+    m_importFrom: Assets/Scripts/Disaster/Element/E1_FireSpray.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 008848eae98aab5489b3daead62e7939
+    m_importFrom: Assets/Scripts/Skill/ISkillSystem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 7c46ab465298d2f4b98936f62a264c1a
+    m_importFrom: Assets/Scripts/Network/INetworkSystem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: a0f8153a9cf3af94190b54f50646b9da
+    m_importFrom: Assets/AssetPackage/Data/NetworkConfig.asset
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 87b8117384752f54bbc6b0a6b6da939b
+    m_importFrom: Assets/Scripts/Disaster/ElementDisaster.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 7c0bd1c7013857b429e99a9f0178da1b
+    m_importFrom: Assets/Scripts/Disaster/DisasterEnums.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 2184cbf6e6444924480939ac797efa56
+    m_importFrom: Assets/Scripts/Fragment/FragmentEnums.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 02aa1e0de06489c4597c834ac23d0267
+    m_importFrom: Assets/Scripts/Framework/DualEnigma.Framework.asmdef
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 1359900d9d213c641b1d44f49de5281d
+    m_importFrom: Packages/com.unity.2d.psdimporter/Editor/PSDPlugin/PsdFile/Exceptions.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: debf7eb023b2b9442b396417b50a534c
+    m_importFrom: Assets/Scripts/Framework/Core
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 314526deaf9faa74aa48a23b1641a7f1
+    m_importFrom: Assets/Scripts/Skill/SkillSystem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: d8fdac688ca6af844baa498f504a7c83
+    m_importFrom: Assets/AssetPackage/Data/SynthesisConfig.asset
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 2b30d4951d318044f98563b6d2541a43
+    m_importFrom: Assets/Scripts/Disaster/DisasterBase.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 7dbdd77a6b132424ea51c0d445a24db5
+    m_importFrom: Assets/Scripts/Disaster/Mechanism
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: c1beef32ea644f745ae7337c24cf97b7
+    m_importFrom: Assets/Scripts/Shelter/IShelterSystem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: e994f5db6239e5541aec7ae4da76e63a
+    m_importFrom: Assets/Scripts/Shelter
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 2db4dd2b9b40ee64e865a1deb9cdcf59
+    m_importFrom: Assets/Scripts/Character/CharacterEnums.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 80ab5ca548a994647926784bc5a3b423
+    m_importFrom: Assets/Scripts/Disaster/IDisasterSystem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: dcd1a1f4870bd204fae344c1cdbb5b9b
+    m_importFrom: Assets/AssetPackage/Data
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 0fd451449b1955f4f8f524ec47b7e34b
+    m_importFrom: Assets/Scripts/Disaster/Physics/P2_Earthquake.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 098d2b8a84f0f0047918b077290c5695
+    m_importFrom: Assets/Scripts/Talent/TalentSystem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 3600094ff2520d845ac74a1853d5a8e0
+    m_importFrom: Assets/Scripts/Disaster
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: b646fd00219d3994e963b97767e8d374
+    m_importFrom: Assets/AssetPackage/Data/FragmentConfig.asset
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: a1fc4683cff252e40923de76e5bedeb1
+    m_importFrom: Assets/Scripts/Talent/TalentEnums.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 55796f9e6ac6b4b938413481d8242df5
+    m_importFrom: Assets/3rd/AssetGraph-1.7-release/Editor/System/Model/AssetReference.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: a222157c228744d408d4470040998317
+    m_importFrom: Assets/Scripts/Disaster/Perception/S4_Delusion.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: ae29b2308e9593b4e810e7147754cf7e
+    m_importFrom: Assets/Scripts/Building/BuildingType.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: e72f0d725cb802c4bb3fa325941d7121
+    m_importFrom: Assets/Scripts/Talent
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 5820be5ac84108d4ab259ccde7d080bc
+    m_importFrom: Assets/Scripts/Disaster/Physics/P5_Tsunami.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 115d404be4b9b5d4a8ca86aa1508cb48
+    m_importFrom: Assets/Scripts/Disaster/TimeSpace/T2_SpaceWarp.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 30e13a5b2d65ad44e94e3627930be35e
+    m_importFrom: Assets/Scripts/Synthesis/SynthesisConfig.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 844dfb0a0080f1b4fb821bded200fc7a
+    m_importFrom: Assets/Scripts/Disaster/Element/E2_FrostRay.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: de7e9e964daa2f943ab11a39a4c7f9d8
+    m_importFrom: Assets/Scripts/Disaster/Perception/S2_Illusion.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 4d5509910449af04b912a3f43e75b32e
+    m_importFrom: Assets/Scripts/Shelter/ShelterSystem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 1dd6f4b91e82509498252a25edd70b06
+    m_importFrom: Assets/Scripts/Character/CharacterConfig.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 432b4ff622fd4454c9d9f74f4a952ee6
+    m_importFrom: Assets/AssetPackage/Data/DisasterConfig.asset
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: fcd86c668e59f124eb65b9f66f1fcc46
+    m_importFrom: Assets/Scripts/Framework/Core/Tests/DualEnigma.Tests.asmdef
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: cfe40cb9a17b748c9a22dcc2ab838fa0
+    m_importFrom: Packages/com.unity.visualscripting/Editor/VisualScripting.Core/ResourceProviders/IResourceProvider.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 1b2d36563c21eed4a8f569bed8b15f75
+    m_importFrom: Assets/Scripts/Framework/UI/UILayer.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: c1aee59ca35adff4f93afbb0a7829bae
+    m_importFrom: Assets/Scripts/Disaster/Mechanism/M2_MaterialMutation.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: cd9626bb409e03a428a60da35580a25d
+    m_importFrom: Assets/Scripts/Disaster/EnvironmentDisaster.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: f793c690925160e43b6489f5a11e9be6
+    m_importFrom: Assets/Scripts/Disaster/Environment/V2_Flood.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: c26ad53c3315b1641873ab26e2d47b96
+    m_importFrom: Assets/Scripts/Disaster/Mechanism/M5_ShelterWeaken.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: e7652e817ee326242bca06f180a367b6
+    m_importFrom: Assets/Scripts/Core/GameStateMachine.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: b2fae6c2f7f599641bec1ababfac5f97
+    m_importFrom: Assets/Scripts/Shelter/ShelterConfig.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: e76c4dafea8fb57429ea9484eaed534f
+    m_importFrom: Assets/Editor/ConfigAssetGenerator.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 399182fe520793f4f8f6104eea62881c
+    m_importFrom: Assets/Scripts/Core/GameEvents.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 81b0c7e0ef276554bbc44cca064a2ce8
+    m_importFrom: Assets/Scripts/Synthesis/ISynthesisSystem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: d010e604500028a48bdf127e028aef06
+    m_importFrom: Assets/Scripts/Disaster/Physics/P1_Meteor.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 5dd1024d91c644c6da5e1e33b7752d1e
+    m_importFrom: Packages/com.unity.visualscripting/Editor/VisualScripting.Core/Utilities/MD4.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 00000000000000004000000000000000
+    m_importFrom: ProjectSettings/ProjectSettings.asset
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: d7ee7f74928082e4b981d94e56744840
+    m_importFrom: Assets/Editor/GenerateUIHomePrefab.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: d3e46d1ebcfd1b249a95a2848c1b1611
+    m_importFrom: Assets/Editor/BuildTool.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 3fc6bc2a6174fe147bf9371b885cd37f
+    m_importFrom: Assets/StreamingAssets/AssetBundles/Windows
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: d54afa18244966e4b9de2e2e350693ce
+    m_importFrom: Assets/StreamingAssets/AssetBundles
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 9ef19e95beed7534faa2c2dc5979573b
+    m_importFrom: Assets/StreamingAssets
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: bc1995e17ef12d6409500e16bea6ad54
+    m_importFrom: Assets/StreamingAssets/AssetBundles/Windows/ui.bundle
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 8c62c54ba3828b848becafee4c05ef98
+    m_importFrom: Assets/StreamingAssets/AssetBundles/Windows/Windows.bundle
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 5f6f343f6261646448f359de5dd6d1a7
+    m_importFrom: Assets/StreamingAssets/AssetBundles/Windows/data.bundle
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: c302113b3ae0c254d8c76c8eb7d0ce8e
+    m_importFrom: Assets/Scripts/UI/Views/UIRoom/UIRoomCtrl.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: e194aa102431e5a42893038a7525838d
+    m_importFrom: Assets/Scripts/UI/Views/UIFriends/UIFriendsView.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: fbb9e099789b2a94cae9f99085e679b1
+    m_importFrom: Assets/Editor/GenerateUIRoomPrefab.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: ac4ee859f4bee3447b03b98e6feb857e
+    m_importFrom: Assets/Scripts/UI/Views/UIFriends/UIFriendsModel.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 66cef22cf81f0b045864d47ee0e87890
+    m_importFrom: Assets/Scripts/UI/Views/UIFriends
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 8e6894bf5bd079f4998b2f13a0e6f38c
+    m_importFrom: Assets/Scripts/UI/Views/UIFriends/UIFriendsCtrl.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: a7a315033284be84896f3ec02bdf02a5
+    m_importFrom: Assets/Scripts/Network/IFriendApiService.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: f58a10228d397ce4aad465d80952c48c
+    m_importFrom: Assets/Scripts/UI/Views/UIRoom/UIRoomModel.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 578d853129332af4299f86a44f86daec
+    m_importFrom: Assets/Editor/GenerateUIFriendsPrefab.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 9906c2f548ffa0e4a9b6c3e31f7fad64
+    m_importFrom: Assets/Scripts/UI/Views/UIRoom/UIRoomView.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: f8f2412b02f890846aba1f1cbded0634
+    m_importFrom: Assets/Scripts/Network/FriendApiService.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: efae6e688bc9a044b936ef790551cf30
+    m_importFrom: Assets/Scripts/UI/Views/UIRoom
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 4fa0ecab81af4cd40b4733462206a489
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIRoom
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 8651f78b00bf1444d87f79c896ae941f
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIRoom/UIRoom.prefab
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 52340ebf389e7294e862e7d1a6348782
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIFriends
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: cfa8920e38871f04083e94e0c3712c64
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIFriends/UIFriends.prefab
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 6aeeb201194274d4086e7e024d2961ef
+    m_importFrom: Assets/ArtResources/Textures/UI/UIHome_BgGradient.asset
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 029ab66b57ff06a4086c7a0889abf8db
+    m_importFrom: Assets/ArtResources/Textures/UI/UIHome_BgGradient_Sprite.asset
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 90e39c44318791341a5ecb6b51dda5d4
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIHome/UIHome.prefab
+    m_exportTo: 
+    m_variantName: 
   m_version: 2

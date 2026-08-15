@@ -25,6 +25,18 @@ namespace DualEnigma.Network
         /// <summary>是否已连接</summary>
         public bool IsConnected { get; private set; }
 
+        /// <summary>
+        /// 当前房间码。由服务器 ConnectAck 分配（WebSocket 通道接通后写入），
+        /// 好友面板读取它向好友发起邀请。
+        /// </summary>
+        public string CurrentRoomCode { get; private set; } = "";
+
+        /// <summary>设置当前房间码（收到 S2C_ConnectAck 时调用）</summary>
+        public void SetRoomCode(string roomCode)
+        {
+            CurrentRoomCode = roomCode ?? "";
+        }
+
         /// <summary>当前往返延迟（秒）</summary>
         public float RoundTripTime { get; private set; }
 
