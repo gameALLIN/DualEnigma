@@ -5,6 +5,7 @@ import com.dualenigma.network.MessageCodec;
 import com.dualenigma.server.util.IdGenerator;
 import com.dualenigma.network.protocol.s2c.S2C_ConnectAck;
 import com.dualenigma.network.protocol.s2c.S2C_GameStart;
+import com.dualenigma.network.protocol.s2c.S2C_PlayerJoined;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -83,10 +84,54 @@ public class RoomManager {
         log.info("Player joined room {} (count={})", room.getRoomCode(), room.getPlayerCount());
         sendConnectAck(session, session.getPlayerId(), room.getRoomCode());
 
-        // 满员 → 向双方广播开局（客户端收到后关闭房间 UI 进入对局）
-        if (room.getPlayerCount() == 2 && room.isGameStarted()) {
-            broadcastGameStart(room);
+        // 通知房间内全体玩家：有人进房（房主据此点亮"开始对局"按钮）
+        broadcastPlayerJoined(room, session.getPlayerId());
+    }
+
+    /**
+     * 广播玩家进房通知到房间内全部玩家.
+     */
+    private void broadcastPlayerJoined(GameRoom room, int joinedPlayerId) {
+        try {
+            S2C_PlayerJoined msg = new S2C_PlayerJoined();
+            msg.getData().setPlayerId(joinedPlayerId);
+            msg.getData().setPlayerCount(room.getPlayerCount());
+            String json = messageCodec.encode(msg);
+            for (ClientSession player : room.getPlayers()) {
+                if (player != null) {
+                    player.getWebSocketSession().sendMessage(new TextMessage(json));
+                }
+            }
+        } catch (IOException e) {
+            log.error("Failed to broadcast PlayerJoined in room {}: {}",
+                    room.getRoomCode(), e.getMessage());
         }
+    }
+
+    /**
+     * 房主请求开始对局：校验房主身份 + 满员，通过后启动并广播 GameStart.
+     */
+    public void requestStart(ClientSession session) {
+        GameRoom room = rooms.get(session.getRoomCode());
+        if (room == null) {
+            log.warn("Start request rejected: session {} room not found", session.getSessionId());
+            return;
+        }
+        if (session.getPlayerId() != 0) {
+            log.warn("Start request in room {} rejected: player {} is not host",
+                    room.getRoomCode(), session.getPlayerId());
+            return;
+        }
+        if (room.getPlayerCount() < 2) {
+            log.warn("Start request in room {} rejected: room not full", room.getRoomCode());
+            return;
+        }
+        if (room.isGameStarted()) {
+            return;
+        }
+
+        room.startGame();
+        broadcastGameStart(room);
     }
 
     /**

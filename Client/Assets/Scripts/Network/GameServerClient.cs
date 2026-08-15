@@ -67,6 +67,13 @@ namespace DualEnigma.Network
         }
 
         [Serializable]
+        private class StartGameRequest
+        {
+            public string type = "C2S_StartGame";
+            public EmptyData data = new EmptyData();
+        }
+
+        [Serializable]
         private class EmptyData { }
 
         [Serializable]
@@ -94,6 +101,16 @@ namespace DualEnigma.Network
         {
             public string type;
             public int playerId;
+        }
+
+        [Serializable]
+        private class PlayerJoinedData { public int playerId; public int playerCount; }
+
+        [Serializable]
+        private class PlayerJoinedMessage
+        {
+            public string type;
+            public PlayerJoinedData data;
         }
 
         private NetworkConfig _config;
@@ -186,6 +203,19 @@ namespace DualEnigma.Network
             _cts = null;
             _socket?.Dispose();
             _socket = null;
+        }
+
+        /// <summary>
+        /// 房主请求开始对局（服务端校验房主身份 + 满员后广播 GameStart）.
+        /// </summary>
+        public void RequestStartGame()
+        {
+            if (!IsConnected)
+            {
+                Debug.LogWarning("[GameServerClient] 未连接，无法请求开局");
+                return;
+            }
+            _ = SendJsonAsync(JsonUtility.ToJson(new StartGameRequest()));
         }
 
         /// <summary>发送一行 JSON（线程安全，同一时刻仅一个 SendAsync）</summary>
@@ -315,6 +345,17 @@ namespace DualEnigma.Network
                         chapter = msg.data?.chapter ?? 1,
                         section = msg.data?.section ?? 1,
                         round = msg.data?.round ?? 1
+                    });
+                    break;
+                }
+
+                case "S2C_PlayerJoined":
+                {
+                    PlayerJoinedMessage msg = JsonUtility.FromJson<PlayerJoinedMessage>(json);
+                    EventBus.Instance.Publish(new PlayerJoinedRoomEvent
+                    {
+                        playerId = msg.data?.playerId ?? 0,
+                        playerCount = msg.data?.playerCount ?? 1
                     });
                     break;
                 }

@@ -42,9 +42,7 @@ public class GameRoom {
         players[playerId] = session;
         playerCount++;
 
-        if (playerCount == 2) {
-            startGame();
-        }
+        // 开局由房主显式发起（C2S_StartGame），不再满员自动开始
         return true;
     }
 
@@ -78,9 +76,9 @@ public class GameRoom {
     }
 
     /**
-     * 启动游戏.
+     * 启动游戏（由 RoomManager 在房主请求开局并校验通过后调用）.
      */
-    private void startGame() {
+    public void startGame() {
         gameStarted = true;
         gameManager.start();
         log.info("Game started in room {}", roomCode);

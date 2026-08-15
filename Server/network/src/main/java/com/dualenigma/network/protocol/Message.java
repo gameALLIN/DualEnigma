@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonSubTypes({
     // C2S
     @JsonSubTypes.Type(value = com.dualenigma.network.protocol.c2s.C2S_Connect.class, name = "C2S_Connect"),
+    @JsonSubTypes.Type(value = com.dualenigma.network.protocol.c2s.C2S_StartGame.class, name = "C2S_StartGame"),
     @JsonSubTypes.Type(value = com.dualenigma.network.protocol.c2s.C2S_HighFreqState.class, name = "C2S_HighFreqState"),
     @JsonSubTypes.Type(value = com.dualenigma.network.protocol.c2s.C2S_FragmentCaught.class, name = "C2S_FragmentCaught"),
     @JsonSubTypes.Type(value = com.dualenigma.network.protocol.c2s.C2S_BuildingPlace.class, name = "C2S_BuildingPlace"),
@@ -23,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @JsonSubTypes.Type(value = com.dualenigma.network.protocol.c2s.C2S_Heartbeat.class, name = "C2S_Heartbeat"),
     // S2C
     @JsonSubTypes.Type(value = com.dualenigma.network.protocol.s2c.S2C_ConnectAck.class, name = "S2C_ConnectAck"),
+    @JsonSubTypes.Type(value = com.dualenigma.network.protocol.s2c.S2C_PlayerJoined.class, name = "S2C_PlayerJoined"),
     @JsonSubTypes.Type(value = com.dualenigma.network.protocol.s2c.S2C_GameStart.class, name = "S2C_GameStart"),
     @JsonSubTypes.Type(value = com.dualenigma.network.protocol.s2c.S2C_PhaseChange.class, name = "S2C_PhaseChange"),
     @JsonSubTypes.Type(value = com.dualenigma.network.protocol.s2c.S2C_HighFreqState.class, name = "S2C_HighFreqState"),

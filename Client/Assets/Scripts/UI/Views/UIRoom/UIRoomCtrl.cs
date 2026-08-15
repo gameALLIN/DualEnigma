@@ -41,6 +41,7 @@ namespace DualEnigma.UI
             // 网络事件挂在整个生命周期：好友面板叠在上方时（OnHide）也不能错过开局消息
             EventBus.Instance.Subscribe<RoomConnectedEvent>(OnRoomConnected);
             EventBus.Instance.Subscribe<RoomGameStartEvent>(OnGameStart);
+            EventBus.Instance.Subscribe<PlayerJoinedRoomEvent>(OnPlayerJoined);
             EventBus.Instance.Subscribe<OpponentDisconnectEvent>(OnOpponentDisconnected);
             EventBus.Instance.Subscribe<ServerDisconnectedEvent>(OnServerDisconnected);
         }
@@ -52,6 +53,7 @@ namespace DualEnigma.UI
             {
                 EventBus.Instance.Unsubscribe<RoomConnectedEvent>(OnRoomConnected);
                 EventBus.Instance.Unsubscribe<RoomGameStartEvent>(OnGameStart);
+                EventBus.Instance.Unsubscribe<PlayerJoinedRoomEvent>(OnPlayerJoined);
                 EventBus.Instance.Unsubscribe<OpponentDisconnectEvent>(OnOpponentDisconnected);
                 EventBus.Instance.Unsubscribe<ServerDisconnectedEvent>(OnServerDisconnected);
             }
@@ -71,6 +73,9 @@ namespace DualEnigma.UI
             if (_view.InviteBtn != null)
                 _view.InviteBtn.onClick.AddListener(OnInviteClicked);
 
+            if (_view.StartBtn != null)
+                _view.StartBtn.onClick.AddListener(OnStartClicked);
+
             RefreshDisplay();
             ConnectToServer();
         }
@@ -82,6 +87,9 @@ namespace DualEnigma.UI
 
             if (_view != null && _view.InviteBtn != null)
                 _view.InviteBtn.onClick.RemoveListener(OnInviteClicked);
+
+            if (_view != null && _view.StartBtn != null)
+                _view.StartBtn.onClick.RemoveListener(OnStartClicked);
         }
 
         // ============================================================
@@ -111,7 +119,12 @@ namespace DualEnigma.UI
         {
             _model.RoomCode = e.roomCode;
             RefreshDisplay();
-            SetStatus(e.playerId >= 0 ? "已加入房间，等待好友..." : "已加入房间");
+        }
+
+        private void OnPlayerJoined(PlayerJoinedRoomEvent e)
+        {
+            _model.PlayerCount = Mathf.Max(1, e.playerCount);
+            RefreshDisplay();
         }
 
         private void OnGameStart(RoomGameStartEvent e)
@@ -144,15 +157,24 @@ namespace DualEnigma.UI
                     ? "----"
                     : _model.RoomCode;
 
+            bool full = _model.PlayerCount >= 2;
+
             if (_view.StatusText != null)
-                _view.StatusText.text = _model.PlayerCount >= 2
-                    ? "好友已就位，即将开始"
-                    : (_model.IsHost ? "等待好友加入..." : "已加入房间");
+                _view.StatusText.text = _model.IsHost
+                    ? (full ? "好友已就位，可以开始对局" : "等待好友加入...")
+                    : "已加入房间，等待房主开始游戏";
 
             if (_view.TipText != null)
                 _view.TipText.text = _model.IsHost
-                    ? "点击【邀请好友】发送房间邀请，或把房间码告诉对方"
+                    ? (full ? "点击【开始对局】进入游戏" : "点击【邀请好友】发送房间邀请，或把房间码告诉对方")
                     : "等待房主开始游戏";
+
+            // 开始对局：仅房主可见，好友就位后才可点
+            if (_view.StartBtn != null)
+            {
+                _view.StartBtn.gameObject.SetActive(_model.IsHost);
+                _view.StartBtn.interactable = full;
+            }
         }
 
         private void SetStatus(string message)
@@ -166,6 +188,18 @@ namespace DualEnigma.UI
         {
             if (UIManager.Instance.GetTopPanel() is UIFriendsCtrl) return;
             UIManager.Instance.Push<UIFriendsCtrl>(UIMode.FullScreen);
+        }
+
+        /// <summary>房主开始对局：服务端校验通过后广播 GameStart，双方进入对局</summary>
+        private void OnStartClicked()
+        {
+            if (_model.PlayerCount < 2)
+            {
+                SetStatus("好友尚未加入，无法开始");
+                return;
+            }
+            SetStatus("正在开始对局...");
+            GameServerClient.Instance.RequestStartGame();
         }
 
         /// <summary>退出房间：断开连接并返回主界面</summary>

@@ -6,6 +6,7 @@ package com.dualenigma.network.protocol;
 public enum MessageType {
     // ── C2S (客户端 → 服务器) ──
     C2S_CONNECT,
+    C2S_START_GAME,
     C2S_HIGH_FREQ_STATE,
     C2S_FRAGMENT_CAUGHT,
     C2S_BUILDING_PLACE,
@@ -17,6 +18,7 @@ public enum MessageType {
 
     // ── S2C (服务器 → 客户端) ──
     S2C_CONNECT_ACK,
+    S2C_PLAYER_JOINED,
     S2C_GAME_START,
     S2C_PHASE_CHANGE,
     S2C_HIGH_FREQ_STATE,

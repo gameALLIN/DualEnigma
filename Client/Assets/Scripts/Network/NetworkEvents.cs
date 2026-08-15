@@ -35,6 +35,16 @@ namespace DualEnigma.Network
         public int playerId;
     }
 
+    /// <summary>有玩家加入房间（收到 S2C_PlayerJoined，房间内广播）</summary>
+    public struct PlayerJoinedRoomEvent : IEventData
+    {
+        /// <summary>新加入的玩家 ID</summary>
+        public int playerId;
+
+        /// <summary>当前房间人数</summary>
+        public int playerCount;
+    }
+
     /// <summary>与 game-server 的连接断开</summary>
     public struct ServerDisconnectedEvent : IEventData
     {

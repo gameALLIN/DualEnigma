@@ -18,6 +18,7 @@ namespace DualEnigma.UI
         [SerializeField] private Text m_StatusText;
         [SerializeField] private Text m_TipText;
         [SerializeField] private Button m_InviteBtn;
+        [SerializeField] private Button m_StartBtn;
         [SerializeField] private Button m_LeaveBtn;
         // ===== Auto Bind End =====
 
@@ -25,6 +26,7 @@ namespace DualEnigma.UI
         public Text StatusText => m_StatusText;
         public Text TipText => m_TipText;
         public Button InviteBtn => m_InviteBtn;
+        public Button StartBtn => m_StartBtn;
         public Button LeaveBtn => m_LeaveBtn;
     }
 }
