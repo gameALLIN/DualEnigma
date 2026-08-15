@@ -1,10 +1,21 @@
 # Mac Linux 虚拟机测试环境：MariaDB + GameServer + AccountServer
+# 部署: git pull && docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# 镜像内含 Maven 构建阶段，无需本地安装 JDK/Maven
+
+# 公共配置：日志轮转，防止虚拟机磁盘被日志撑爆
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "50m"
+    max-file: "3"
 
 services:
   mariadb:
     image: mariadb:11.4
     container_name: dualenigma-db
     restart: unless-stopped
+    mem_limit: 512m
+    logging: *default-logging
     environment:
       MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MARIADB_DATABASE: ${DB_NAME}
@@ -31,6 +42,8 @@ services:
       dockerfile: game-server/Dockerfile
     container_name: dualenigma-game-server
     restart: unless-stopped
+    mem_limit: 768m
+    logging: *default-logging
     depends_on:
       mariadb:
         condition: service_healthy
@@ -53,6 +66,8 @@ services:
       dockerfile: account-server/Dockerfile
     container_name: dualenigma-account-server
     restart: unless-stopped
+    mem_limit: 768m
+    logging: *default-logging
     depends_on:
       mariadb:
         condition: service_healthy

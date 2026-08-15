@@ -1,0 +1,15 @@
+# 构建上下文排除清单（context = Server/ 目录）
+# jar 在容器内编译，本地产物不进上下文；.env 含密钥严禁进镜像
+**/target/
+target/
+logs/
+**/logs/
+.env
+.env.*
+!.env.example
+.idea/
+**/.idea/
+**/*.iml
+**/*.log
+.DS_Store
+Thumbs.db
