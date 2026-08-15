@@ -46,16 +46,26 @@ namespace DualEnigma.Framework.UI
         protected override void OnSingletonInitialized()
         {
             LoadGlobalCanvas();
-            CreateLayerRoots();
+            if (m_RootCanvas != null)
+            {
+                CreateLayerRoots();
+            }
         }
 
         /// <summary>从预制体加载全局 Canvas</summary>
         private void LoadGlobalCanvas()
         {
-            m_RootCanvas = GameObject.Find("MainCanvas").GetComponent<Canvas>();
+            GameObject canvasObj = GameObject.Find("MainCanvas");
+            if (canvasObj == null)
+            {
+                Debug.LogError("[UIManager] 场景中未找到 MainCanvas，请确认 Canvas 预制体已放入场景");
+                return;
+            }
+
+            m_RootCanvas = canvasObj.GetComponent<Canvas>();
             if (m_RootCanvas == null)
             {
-                Debug.LogError("[UIManager] Canvas 预制体上未找到 Canvas 组件");
+                Debug.LogError("[UIManager] MainCanvas 上未找到 Canvas 组件");
             }
         }
 

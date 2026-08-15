@@ -84,17 +84,28 @@ namespace DualEnigma.Framework.Core
 
         /// <summary>
         /// 发布事件，触发所有订阅者。
+        /// 逐个调用订阅者并隔离异常：单个订阅者抛错只记录日志，不中断其余订阅者。
         /// </summary>
         /// <typeparam name="T">事件类型（struct, IEventData）</typeparam>
         /// <param name="eventData">事件数据</param>
         public void Publish<T>(T eventData) where T : struct, IEventData
         {
             Type key = typeof(T);
-            if (_handlers.TryGetValue(key, out Delegate existing))
+            if (!_handlers.TryGetValue(key, out Delegate existing))
+                return;
+
+            if (existing is not Action<T> handler)
+                return;
+
+            foreach (Delegate subscriber in handler.GetInvocationList())
             {
-                if (existing is Action<T> handler)
+                try
                 {
-                    handler.Invoke(eventData);
+                    ((Action<T>)subscriber).Invoke(eventData);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[EventBus] {key.Name} 事件订阅者抛出异常: {e.GetType().Name}: {e.Message}\n{e.StackTrace}");
                 }
             }
         }
