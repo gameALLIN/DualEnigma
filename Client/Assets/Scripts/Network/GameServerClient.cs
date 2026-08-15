@@ -129,10 +129,10 @@ namespace DualEnigma.Network
         [Serializable]
         private class Vec2Data { public float x; public float y; }
 
+        /// <summary>发送侧数据（不含 playerId——服务端 HighFreqData 无此字段，多余字段曾导致解码失败）</summary>
         [Serializable]
-        private class HighFreqData
+        private class HighFreqSendData
         {
-            public int playerId;   // 发送侧置 0（服务端按会话覆写）；接收侧读对方 ID
             public Vec2Data position;
             public Vec2Data velocity;
             public string animState;
@@ -145,7 +145,20 @@ namespace DualEnigma.Network
         private class HighFreqRequest
         {
             public string type = "C2S_HighFreqState";
-            public HighFreqData data;
+            public HighFreqSendData data;
+        }
+
+        /// <summary>接收侧数据（服务端转发的 data 含 playerId）</summary>
+        [Serializable]
+        private class HighFreqData
+        {
+            public int playerId;
+            public Vec2Data position;
+            public Vec2Data velocity;
+            public string animState;
+            public bool facing;
+            public int hp;
+            public float shelterEnergy;
         }
 
         [Serializable]
@@ -310,9 +323,8 @@ namespace DualEnigma.Network
             if (!IsConnected) return;
             _ = SendJsonAsync(JsonUtility.ToJson(new HighFreqRequest
             {
-                data = new HighFreqData
+                data = new HighFreqSendData
                 {
-                    playerId = 0,
                     position = new Vec2Data { x = position.x, y = position.y },
                     velocity = new Vec2Data { x = velocity.x, y = velocity.y },
                     animState = animState,
