@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1
 # account-server Dockerfile — 多阶段构建：容器内 Maven 编译，最终镜像仅含 JRE + jar
 # Build context: Server/ (父目录)
 # 部署: git pull 后直接 docker compose up -d --build，无需本地安装 Maven/JDK
