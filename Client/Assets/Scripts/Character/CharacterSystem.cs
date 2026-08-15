@@ -100,7 +100,11 @@ namespace DualEnigma.Character
 
             if (isLocal)
             {
-                go.AddComponent<CharacterInputController>();          // 单机：双角色本地输入
+                CharacterInputController input = go.AddComponent<CharacterInputController>();
+                // 联机：本地角色一律 WASD+Space（各自键盘）；单机：水人 WASD / 火人方向键
+                input.SetScheme(networked
+                    ? InputScheme.WASD
+                    : (playerId == 0 ? InputScheme.WASD : InputScheme.Arrows));
                 if (networked)
                     go.AddComponent<NetworkCharacterReporter>();       // 联机：本地角色上报
             }
