@@ -1,10 +1,17 @@
 package com.dualenigma.server.game;
 
 import com.dualenigma.network.ClientSession;
+import com.dualenigma.network.MessageCodec;
 import com.dualenigma.network.protocol.Message;
 import com.dualenigma.network.protocol.c2s.C2S_HighFreqState;
+import com.dualenigma.network.protocol.s2c.S2C_FragmentResult;
+import com.dualenigma.network.protocol.s2c.S2C_HighFreqState;
+import com.dualenigma.server.logic.FragmentPlanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.socket.TextMessage;
+
+import java.io.IOException;
 
 /**
  * 房间管理（2 人匹配 + 会话持有）.
@@ -17,6 +24,8 @@ public class GameRoom {
     private final String roomCode;
     private final ClientSession[] players = new ClientSession[2];
     private final GameManager gameManager;
+    private final MessageCodec messageCodec;
+    private final FragmentPlanner fragmentPlanner;
     private final long createdAt = System.currentTimeMillis();
     private int playerCount = 0;
     private boolean gameStarted = false;
@@ -24,9 +33,27 @@ public class GameRoom {
     /** 未开局房间的最大存活时间（毫秒），超时由 RoomManager 回收 */
     private static final long LOBBY_TIMEOUT_MS = 10 * 60 * 1000L;
 
-    public GameRoom(String roomCode) {
+    public GameRoom(String roomCode, MessageCodec messageCodec, FragmentPlanner fragmentPlanner) {
         this.roomCode = roomCode;
-        this.gameManager = new GameManager(this);
+        this.messageCodec = messageCodec;
+        this.fragmentPlanner = fragmentPlanner;
+        this.gameManager = new GameManager(this, fragmentPlanner);
+    }
+
+    /**
+     * 向房间内全部在线玩家广播消息.
+     */
+    public void broadcastToAll(Message msg) {
+        try {
+            String json = messageCodec.encode(msg);
+            for (ClientSession player : players) {
+                if (player != null) {
+                    player.getWebSocketSession().sendMessage(new TextMessage(json));
+                }
+            }
+        } catch (IOException e) {
+            log.error("Failed to broadcast in room {}: {}", roomCode, e.getMessage());
+        }
     }
 
     /**
@@ -87,11 +114,44 @@ public class GameRoom {
     // --- 事件代理方法 ---
 
     public void forwardHighFreqState(int playerId, C2S_HighFreqState state) {
-        // TODO: 转发 S2C_HighFreqState 给对方 (opponentId = 1 - playerId)
+        if (playerId < 0 || playerId > 1) return;
+        ClientSession target = players[1 - playerId];
+        if (target == null) return;
+
+        // 入库权威快照（供 10Hz 中频广播与重连快照使用）
+        gameManager.updatePlayerHighFreq(playerId, state);
+
+        try {
+            S2C_HighFreqState fwd = new S2C_HighFreqState();
+            fwd.setTimestamp(System.currentTimeMillis());
+            fwd.getData().setPlayerId(playerId);
+            fwd.getData().setPosition(state.getData().getPosition());
+            fwd.getData().setVelocity(state.getData().getVelocity());
+            fwd.getData().setAnimState(state.getData().getAnimState());
+            fwd.getData().setFacing(state.getData().isFacing());
+            fwd.getData().setHp(state.getData().getHp());
+            fwd.getData().setShelterEnergy(state.getData().getShelterEnergy());
+            String json = messageCodec.encode(fwd);
+            target.getWebSocketSession().sendMessage(new TextMessage(json));
+        } catch (IOException e) {
+            log.warn("Failed to forward high-freq state in room {}: {}", roomCode, e.getMessage());
+        }
     }
 
     public void onFragmentCaught(int playerId, int fragmentId) {
-        // TODO: ConflictResolver.onCatch()
+        // MVP：透传判定结果给双方（权威计分/同接判定/倍率归 M5）
+        try {
+            S2C_FragmentResult result = new S2C_FragmentResult();
+            result.setTimestamp(System.currentTimeMillis());
+            result.getData().setFragmentId(fragmentId);
+            result.getData().setPlayerId(playerId);
+            result.getData().setMultiplier(1);
+            result.getData().setSimultaneous(false);
+            broadcastToAll(result);
+            log.info("Fragment {} caught by player {} in room {}", fragmentId, playerId, roomCode);
+        } catch (Exception e) {
+            log.warn("Failed to broadcast fragment result: {}", e.getMessage());
+        }
     }
 
     public void onBuildingPlace(int playerId, int buildingType, int material, int gridX, int gridY) {

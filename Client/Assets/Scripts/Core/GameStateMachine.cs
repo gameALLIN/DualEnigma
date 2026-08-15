@@ -65,6 +65,9 @@ namespace DualEnigma.Core
         /// <summary>状态机是否正在运行</summary>
         public bool IsRunning { get; private set; }
 
+        /// <summary>是否由服务器驱动阶段（联机模式为 true，本地计时停用）</summary>
+        public bool IsNetworkDriven { get; private set; }
+
         protected override void OnSingletonInitialized()
         {
             Debug.Log("[GameStateMachine] 游戏状态机初始化完成");
@@ -74,6 +77,8 @@ namespace DualEnigma.Core
         {
             if (!IsRunning || IsPaused)
                 return;
+
+            if (IsNetworkDriven) return; // 联机模式阶段只由 S2C_PhaseChange 驱动
 
             PhaseRemainingTime -= Time.deltaTime;
 
@@ -117,6 +122,29 @@ namespace DualEnigma.Core
         public void Stop()
         {
             IsRunning = false;
+        }
+
+        /// <summary>
+        /// 切换网络驱动模式（联机开局 true / 结束 false）。
+        /// </summary>
+        public void SetNetworkDriven(bool enabled)
+        {
+            IsNetworkDriven = enabled;
+            IsRunning = enabled;
+            if (!enabled) IsPaused = false;
+        }
+
+        /// <summary>
+        /// 应用服务器下发的阶段（剩余时长已按服务器时钟差值折算）。
+        /// </summary>
+        public void ApplyServerPhase(GamePhase phase, float remainingSeconds)
+        {
+            CurrentPhase = phase;
+            PhaseRemainingTime = Mathf.Max(0.5f, remainingSeconds);
+
+            EventBus.Instance.Publish(new PhaseChangedEvent { phase = phase });
+
+            Debug.Log($"[GameStateMachine] 服务器阶段 → {phase} (剩余 {PhaseRemainingTime:F1}s)");
         }
 
         /// <summary>

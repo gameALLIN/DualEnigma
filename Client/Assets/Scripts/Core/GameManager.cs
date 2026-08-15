@@ -8,6 +8,8 @@
 
 using UnityEngine;
 using DualEnigma.Framework.Core;
+using DualEnigma.Network;
+using DualEnigma.Character;
 using DualEnigma.Shelter;
 using DualEnigma.Synthesis;
 using DualEnigma.Skill;
@@ -137,7 +139,19 @@ namespace DualEnigma.Core
             State.IsPaused = false;
             ShelterSystem.Instance.ResetHP();
 
-            GameStateMachine.Instance.StartNewRound();
+            if (NetworkSystem.HasInstance && NetworkSystem.Instance.IsConnected)
+            {
+                // 联机模式：角色按 本地/远程 重建，阶段由服务器权威驱动
+                State.IsHost = NetworkSystem.Instance.LocalPlayerId == 0;
+                CharacterSystem.Instance.RebuildForNetwork();
+                _ = NetworkGameSync.Instance;
+                GameStateMachine.Instance.SetNetworkDriven(true);
+            }
+            else
+            {
+                GameStateMachine.Instance.StartNewRound();
+            }
+
             EventBus.Instance.Publish(new GameStartEvent());
 
             Debug.Log("[GameManager] 游戏开始");
@@ -153,6 +167,7 @@ namespace DualEnigma.Core
                 return;
 
             State.IsGameOver = true;
+            GameStateMachine.Instance.SetNetworkDriven(false);
             GameStateMachine.Instance.Stop();
             EventBus.Instance.Publish(new GameEndEvent { isVictory = isVictory });
 

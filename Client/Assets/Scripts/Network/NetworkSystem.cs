@@ -31,10 +31,35 @@ namespace DualEnigma.Network
         /// </summary>
         public string CurrentRoomCode { get; private set; } = "";
 
+        /// <summary>本地玩家 ID（ConnectAck 分配，0=Aqua / 1=Ignis）</summary>
+        public byte LocalPlayerId { get; private set; }
+
+        /// <summary>对手玩家 ID</summary>
+        public byte OpponentId => (byte)(1 - LocalPlayerId);
+
+        /// <summary>对手 HP（服务器 10Hz 快照，HUD 后续接入）</summary>
+        public int OpponentHP { get; private set; } = 100;
+
+        /// <summary>对手庇护能量（0-100）</summary>
+        public float OpponentShelterEnergy { get; private set; } = 100f;
+
         /// <summary>设置当前房间码（收到 S2C_ConnectAck 时调用）</summary>
         public void SetRoomCode(string roomCode)
         {
             CurrentRoomCode = roomCode ?? "";
+        }
+
+        /// <summary>设置本地玩家 ID（GameServerClient 收到 ConnectAck 时调用）</summary>
+        public void SetLocalPlayerId(int playerId)
+        {
+            LocalPlayerId = (byte)Mathf.Clamp(playerId, 0, 1);
+        }
+
+        /// <summary>记录对手状态快照（GameServerClient 收到 S2C_MidFreqState 时调用）</summary>
+        public void SetOpponentStats(int hp, float shelterEnergy)
+        {
+            OpponentHP = hp;
+            OpponentShelterEnergy = shelterEnergy;
         }
 
         /// <summary>更新连接状态（GameServerClient 在连接/断开时调用）</summary>
@@ -66,9 +91,9 @@ namespace DualEnigma.Network
         }
 
         /// <summary>
-        /// 发送高频状态。
+        /// 发送高频状态（20Hz 限频，本地角色经服务器转发给对方）。
         /// </summary>
-        public void SendHighFrequencyState(byte playerId, Vector2 position, Vector2 velocity, AnimState animState, bool facing)
+        public void SendHighFrequencyState(byte playerId, Vector2 position, Vector2 velocity, AnimState animState, bool facing, int hp, float shelterEnergy)
         {
             if (!IsConnected) return;
 
@@ -79,6 +104,8 @@ namespace DualEnigma.Network
                 return;
 
             _highFreqTimer = 0f;
+
+            GameServerClient.Instance.SendHighFreqState(position, velocity, animState.ToString(), facing, hp, shelterEnergy);
         }
 
         /// <summary>

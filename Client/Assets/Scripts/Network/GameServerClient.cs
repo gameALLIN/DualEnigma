@@ -11,12 +11,14 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using DualEnigma.Framework.Core;
+using DualEnigma.Core;
 using DualEnigma.Data;
 
 namespace DualEnigma.Network
@@ -112,6 +114,90 @@ namespace DualEnigma.Network
             public string type;
             public PlayerJoinedData data;
         }
+
+        [Serializable]
+        private class PhaseChangeData { public string phase; public int durationMs; public long phaseEndTime; }
+
+        [Serializable]
+        private class PhaseChangeMessage
+        {
+            public string type;
+            public long timestamp;
+            public PhaseChangeData data;
+        }
+
+        [Serializable]
+        private class Vec2Data { public float x; public float y; }
+
+        [Serializable]
+        private class HighFreqData
+        {
+            public int playerId;   // 发送侧置 0（服务端按会话覆写）；接收侧读对方 ID
+            public Vec2Data position;
+            public Vec2Data velocity;
+            public string animState;
+            public bool facing;
+            public int hp;
+            public float shelterEnergy;
+        }
+
+        [Serializable]
+        private class HighFreqRequest
+        {
+            public string type = "C2S_HighFreqState";
+            public HighFreqData data;
+        }
+
+        [Serializable]
+        private class HighFreqMessage
+        {
+            public string type;
+            public HighFreqData data;
+        }
+
+        [Serializable]
+        private class PlayerMidFreqData { public int playerId; public int hp; public int shelterEnergy; public int[] carriedFragments; }
+
+        [Serializable]
+        private class MidFreqData { public List<PlayerMidFreqData> players; }
+
+        [Serializable]
+        private class MidFreqMessage { public string type; public MidFreqData data; }
+
+        [Serializable]
+        private class DropPlanVec2 { public float x; public float y; }
+
+        [Serializable]
+        private class DropPlanItem
+        {
+            public int fragmentId;
+            public int type;
+            public DropPlanVec2 position;
+            public float dropTime;
+            public long seed;
+        }
+
+        [Serializable]
+        private class DropPlanData { public List<DropPlanItem> plan; }
+
+        [Serializable]
+        private class FragmentDropPlanMessage { public string type; public DropPlanData data; }
+
+        [Serializable]
+        private class FragmentCaughtData { public int fragmentId; }
+
+        [Serializable]
+        private class FragmentCaughtRequest
+        {
+            public string type = "C2S_FragmentCaught";
+            public FragmentCaughtData data = new FragmentCaughtData();
+        }
+
+        [Serializable]
+        private class FragmentResultData { public int fragmentId; public int playerId; public int multiplier; public bool isSimultaneous; }
+
+        [Serializable]
+        private class FragmentResultMessage { public string type; public FragmentResultData data; }
 
         private NetworkConfig _config;
 
@@ -216,6 +302,32 @@ namespace DualEnigma.Network
                 return;
             }
             _ = SendJsonAsync(JsonUtility.ToJson(new StartGameRequest()));
+        }
+
+        /// <summary>上报本地角色高频状态（限频由 NetworkSystem 内部 20Hz 节流）</summary>
+        public void SendHighFreqState(Vector2 position, Vector2 velocity, string animState, bool facing, int hp, float shelterEnergy)
+        {
+            if (!IsConnected) return;
+            _ = SendJsonAsync(JsonUtility.ToJson(new HighFreqRequest
+            {
+                data = new HighFreqData
+                {
+                    playerId = 0,
+                    position = new Vec2Data { x = position.x, y = position.y },
+                    velocity = new Vec2Data { x = velocity.x, y = velocity.y },
+                    animState = animState,
+                    facing = facing,
+                    hp = hp,
+                    shelterEnergy = shelterEnergy
+                }
+            }));
+        }
+
+        /// <summary>上报碎片接住（本地收集完成时由 NetworkGameSync 调用）</summary>
+        public void SendFragmentCaught(int fragmentId)
+        {
+            if (!IsConnected) return;
+            _ = SendJsonAsync(JsonUtility.ToJson(new FragmentCaughtRequest { data = new FragmentCaughtData { fragmentId = fragmentId } }));
         }
 
         /// <summary>发送一行 JSON（线程安全，同一时刻仅一个 SendAsync）</summary>
@@ -324,6 +436,19 @@ namespace DualEnigma.Network
 
             switch (envelope.type)
             {
+                case "S2C_PhaseChange":
+                {
+                    PhaseChangeMessage msg = JsonUtility.FromJson<PhaseChangeMessage>(json);
+                    if (msg?.data == null) break;
+                    if (Enum.TryParse(msg.data.phase, out GamePhase phase))
+                    {
+                        // 双端时钟不可信：剩余时长 = 消息内 phaseEndTime - timestamp（同为服务器时钟）
+                        float remaining = (msg.data.phaseEndTime - msg.timestamp) / 1000f;
+                        GameStateMachine.Instance.ApplyServerPhase(phase, remaining);
+                    }
+                    break;
+                }
+
                 case "S2C_ConnectAck":
                 {
                     ConnectAckMessage msg = JsonUtility.FromJson<ConnectAckMessage>(json);
@@ -331,6 +456,7 @@ namespace DualEnigma.Network
                     int playerId = msg.data != null ? msg.data.playerId : 0;
 
                     NetworkSystem.Instance.SetRoomCode(roomCode);
+                    NetworkSystem.Instance.SetLocalPlayerId(playerId);
                     NetworkSystem.Instance.SetConnected(true);
                     Debug.Log($"[GameServerClient] 已加入房间 {roomCode} (playerId={playerId})");
                     EventBus.Instance.Publish(new RoomConnectedEvent { playerId = playerId, roomCode = roomCode });
@@ -360,10 +486,80 @@ namespace DualEnigma.Network
                     break;
                 }
 
+                case "S2C_HighFreqState":
+                {
+                    HighFreqMessage msg = JsonUtility.FromJson<HighFreqMessage>(json);
+                    if (msg?.data == null) break;
+                    EventBus.Instance.Publish(new HighFreqStateReceivedEvent
+                    {
+                        playerId = (byte)msg.data.playerId,
+                        position = msg.data.position != null
+                            ? new Vector2(msg.data.position.x, msg.data.position.y) : Vector2.zero,
+                        velocity = msg.data.velocity != null
+                            ? new Vector2(msg.data.velocity.x, msg.data.velocity.y) : Vector2.zero,
+                        animState = msg.data.animState,
+                        facing = msg.data.facing
+                    });
+                    break;
+                }
+
+                case "S2C_MidFreqState":
+                {
+                    MidFreqMessage msg = JsonUtility.FromJson<MidFreqMessage>(json);
+                    if (msg?.data?.players == null) break;
+                    byte opponent = NetworkSystem.Instance.OpponentId;
+                    foreach (PlayerMidFreqData p in msg.data.players)
+                    {
+                        if (p.playerId == opponent)
+                            NetworkSystem.Instance.SetOpponentStats(p.hp, p.shelterEnergy);
+                    }
+                    break;
+                }
+
                 case "S2C_OpponentDisconnect":
                 {
                     OpponentDisconnectMessage msg = JsonUtility.FromJson<OpponentDisconnectMessage>(json);
                     EventBus.Instance.Publish(new OpponentDisconnectEvent { playerId = msg.playerId });
+                    break;
+                }
+
+                case "S2C_FragmentDropPlan":
+                {
+                    FragmentDropPlanMessage msg = JsonUtility.FromJson<FragmentDropPlanMessage>(json);
+                    if (msg?.data?.plan == null || msg.data.plan.Count == 0) break;
+
+                    var plan = new List<DualEnigma.Fragment.FragmentDropPlan>(msg.data.plan.Count);
+                    foreach (DropPlanItem item in msg.data.plan)
+                    {
+                        plan.Add(new DualEnigma.Fragment.FragmentDropPlan
+                        {
+                            FragmentId = item.fragmentId,
+                            Type = (DualEnigma.Fragment.FragmentType)item.type, // 0/1/2 顺序已核对一致
+                            Position = item.position != null
+                                ? new Vector2(item.position.x, item.position.y) : Vector2.zero,
+                            DropTime = item.dropTime,
+                            Seed = unchecked((uint)item.seed) // long→uint 截断，两端一致即可保证确定性
+                        });
+                    }
+
+                    if (DualEnigma.Fragment.FragmentSystem.HasInstance)
+                        DualEnigma.Fragment.FragmentSystem.Instance.ExecuteDropPlan(plan);
+                    break;
+                }
+
+                case "S2C_FragmentResult":
+                {
+                    FragmentResultMessage msg = JsonUtility.FromJson<FragmentResultMessage>(json);
+                    if (msg?.data == null) break;
+
+                    // 只处理对方接住：自己接住的本地已完成（上报发生在收集完成之后）
+                    // 对方接住走 OnFragmentCollected → 100ms 同接窗口超时后完成移除（M5 改服务器权威判定）
+                    if (msg.data.playerId != NetworkSystem.Instance.LocalPlayerId
+                        && DualEnigma.Fragment.FragmentSystem.HasInstance)
+                    {
+                        DualEnigma.Fragment.FragmentSystem.Instance.OnFragmentCollected(
+                            msg.data.fragmentId, (byte)msg.data.playerId, false);
+                    }
                     break;
                 }
 

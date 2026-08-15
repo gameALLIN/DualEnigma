@@ -17,6 +17,11 @@ public class GameStateMachine {
     private GamePhase currentPhase = GamePhase.Preview;
     private long phaseEndTime;
     private boolean running = false;
+    private final GameRoom room;
+
+    public GameStateMachine(GameRoom room) {
+        this.room = room;
+    }
 
     /**
      * 启动状态机.
@@ -68,7 +73,7 @@ public class GameStateMachine {
         change.getData().setDurationMs((int) Constants.getPhaseDurationMs(phase));
         change.getData().setPhaseEndTime(phaseEndTime);
 
-        // TODO: 通过 GameRoom 广播
+        room.broadcastToAll(change);
         log.info("Phase changed to: {} (duration={}ms)", phase, Constants.getPhaseDurationMs(phase));
     }
 

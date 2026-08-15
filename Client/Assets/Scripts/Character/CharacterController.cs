@@ -41,6 +41,9 @@ namespace DualEnigma.Character
         /// <summary>动画状态</summary>
         public AnimState CurrentAnimState { get; private set; } = AnimState.Idle;
 
+        /// <summary>是否由网络驱动（远程角色：跳过本地动画推导/地面检测）</summary>
+        public bool IsRemoteControlled { get; set; }
+
         private Rigidbody2D _rb;
         private SpriteRenderer _spriteRenderer;
         private Collider2D _collider;
@@ -76,8 +79,23 @@ namespace DualEnigma.Character
 
         private void FixedUpdate()
         {
+            if (IsRemoteControlled) return; // 远程角色：动画/朝向/位置均由网络驱动
+
             CheckGrounded();
             UpdateAnimState();
+        }
+
+        /// <summary>网络下发动画状态（远程角色专用，RemoteCharacterDriver 调用）</summary>
+        public void SetNetworkAnimState(AnimState state)
+        {
+            CurrentAnimState = state;
+        }
+
+        /// <summary>网络下发朝向（复用本地翻转逻辑，RemoteCharacterDriver 调用）</summary>
+        public void SetNetworkFacing(bool facingRight)
+        {
+            if (facingRight != FacingRight)
+                Flip();
         }
 
         /// <summary>

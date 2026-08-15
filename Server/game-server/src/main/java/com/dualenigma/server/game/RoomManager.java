@@ -2,6 +2,7 @@ package com.dualenigma.server.game;
 
 import com.dualenigma.network.ClientSession;
 import com.dualenigma.network.MessageCodec;
+import com.dualenigma.server.logic.FragmentPlanner;
 import com.dualenigma.server.util.IdGenerator;
 import com.dualenigma.network.protocol.s2c.S2C_ConnectAck;
 import com.dualenigma.network.protocol.s2c.S2C_GameStart;
@@ -31,9 +32,11 @@ public class RoomManager {
     private final ConcurrentMap<String, GameRoom> rooms = new ConcurrentHashMap<>();
     private final Queue<GameRoom> waitingQueue = new ConcurrentLinkedQueue<>();
     private final MessageCodec messageCodec;
+    private final FragmentPlanner fragmentPlanner;
 
-    public RoomManager(MessageCodec messageCodec) {
+    public RoomManager(MessageCodec messageCodec, FragmentPlanner fragmentPlanner) {
         this.messageCodec = messageCodec;
+        this.fragmentPlanner = fragmentPlanner;
     }
 
     /**
@@ -68,7 +71,7 @@ public class RoomManager {
             while (rooms.containsKey(newCode)) {
                 newCode = IdGenerator.nextRoomCode();
             }
-            GameRoom newRoom = new GameRoom(newCode);
+            GameRoom newRoom = new GameRoom(newCode, messageCodec, fragmentPlanner);
             rooms.put(newCode, newRoom);
             addPlayerToRoom(newRoom, session);
             waitingQueue.add(newRoom);

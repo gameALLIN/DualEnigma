@@ -6,6 +6,7 @@
 ///       UIRoom / 全局弹窗等 UI 订阅。
 /// ============================================================
 
+using UnityEngine;
 using DualEnigma.Framework.Core;
 
 namespace DualEnigma.Network
@@ -50,5 +51,15 @@ namespace DualEnigma.Network
     {
         /// <summary>断开原因（连接失败/网络中断等）</summary>
         public string reason;
+    }
+
+    /// <summary>收到对方高频状态（20Hz，GameServerClient 发布）</summary>
+    public struct HighFreqStateReceivedEvent : IEventData
+    {
+        public byte playerId;
+        public Vector2 position;
+        public Vector2 velocity;
+        public string animState;
+        public bool facing;
     }
 }

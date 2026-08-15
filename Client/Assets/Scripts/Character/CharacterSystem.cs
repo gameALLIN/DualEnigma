@@ -9,6 +9,7 @@ using UnityEngine;
 using DualEnigma.Core;
 using DualEnigma.Framework.Core;
 using DualEnigma.Art;
+using DualEnigma.Network;
 
 namespace DualEnigma.Character
 {
@@ -93,10 +94,39 @@ namespace DualEnigma.Character
 
             controller.Initialize(stats, playerId);
 
-            // 挂载输入控制器（本地测试用）
-            go.AddComponent<CharacterInputController>();
+            // 网络模式下按 本地/远程 区分挂载：本地=输入+上报，远程=插值驱动
+            bool networked = NetworkSystem.HasInstance && NetworkSystem.Instance.IsConnected;
+            bool isLocal = !networked || playerId == NetworkSystem.Instance.LocalPlayerId;
+
+            if (isLocal)
+            {
+                go.AddComponent<CharacterInputController>();          // 单机：双角色本地输入
+                if (networked)
+                    go.AddComponent<NetworkCharacterReporter>();       // 联机：本地角色上报
+            }
+            else
+            {
+                controller.IsRemoteControlled = true;
+                rb.bodyType = RigidbodyType2D.Kinematic;              // 远程角色不参与本地物理模拟
+                go.AddComponent<RemoteCharacterDriver>();
+            }
 
             return controller;
+        }
+
+        /// <summary>
+        /// 联机开局时重建角色：GameLaunch 启动时已按单机模式创建（双本地输入），
+        /// 进入联机对局后需按 本地/远程 角色重新生成。
+        /// </summary>
+        public void RebuildForNetwork()
+        {
+            if (Aqua != null) Destroy(Aqua.gameObject);
+            if (Ignis != null) Destroy(Ignis.gameObject);
+            Aqua = null;
+            Ignis = null;
+            _isInitialized = false;
+
+            Initialize();
         }
 
         /// <summary>

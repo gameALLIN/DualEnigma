@@ -27,6 +27,8 @@ public class C2S_HighFreqState extends Message {
         private Vec2 velocity;
         private String animState;
         private boolean facing;
+        private int hp;
+        private float shelterEnergy;
 
         public Vec2 getPosition() { return position; }
         public void setPosition(Vec2 position) { this.position = position; }
@@ -36,6 +38,10 @@ public class C2S_HighFreqState extends Message {
         public void setAnimState(String animState) { this.animState = animState; }
         public boolean isFacing() { return facing; }
         public void setFacing(boolean facing) { this.facing = facing; }
+        public int getHp() { return hp; }
+        public void setHp(int hp) { this.hp = hp; }
+        public float getShelterEnergy() { return shelterEnergy; }
+        public void setShelterEnergy(float shelterEnergy) { this.shelterEnergy = shelterEnergy; }
     }
 
     public HighFreqData getData() { return data; }

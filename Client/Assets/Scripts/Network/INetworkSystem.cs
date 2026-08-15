@@ -25,8 +25,8 @@ namespace DualEnigma.Network
         /// <summary>当前往返延迟（秒）</summary>
         float RoundTripTime { get; }
 
-        /// <summary>发送高频状态</summary>
-        void SendHighFrequencyState(byte playerId, Vector2 position, Vector2 velocity, AnimState animState, bool facing);
+        /// <summary>发送高频状态（hp/能量随高频搭载上报，服务器 10Hz 快照回发）</summary>
+        void SendHighFrequencyState(byte playerId, Vector2 position, Vector2 velocity, AnimState animState, bool facing, int hp, float shelterEnergy);
 
         /// <summary>发送中频状态</summary>
         void SendMidFrequencyState(byte playerId, int hp, float shelterEnergy);
