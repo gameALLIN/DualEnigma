@@ -9,9 +9,6 @@ import com.dualenigma.network.protocol.s2c.S2C_HighFreqState;
 import com.dualenigma.server.logic.FragmentPlanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.socket.TextMessage;
-
-import java.io.IOException;
 
 /**
  * 房间管理（2 人匹配 + 会话持有）.
@@ -44,15 +41,17 @@ public class GameRoom {
      * 向房间内全部在线玩家广播消息.
      */
     public void broadcastToAll(Message msg) {
+        String json;
         try {
-            String json = messageCodec.encode(msg);
-            for (ClientSession player : players) {
-                if (player != null) {
-                    player.getWebSocketSession().sendMessage(new TextMessage(json));
-                }
+            json = messageCodec.encode(msg);
+        } catch (Exception e) {
+            log.error("Failed to encode broadcast message in room {}: {}", roomCode, e.getMessage());
+            return;
+        }
+        for (ClientSession player : players) {
+            if (player != null) {
+                player.send(json);
             }
-        } catch (IOException e) {
-            log.error("Failed to broadcast in room {}: {}", roomCode, e.getMessage());
         }
     }
 
@@ -131,9 +130,8 @@ public class GameRoom {
             fwd.getData().setFacing(state.getData().isFacing());
             fwd.getData().setHp(state.getData().getHp());
             fwd.getData().setShelterEnergy(state.getData().getShelterEnergy());
-            String json = messageCodec.encode(fwd);
-            target.getWebSocketSession().sendMessage(new TextMessage(json));
-        } catch (IOException e) {
+            target.send(messageCodec.encode(fwd));
+        } catch (Exception e) {
             log.warn("Failed to forward high-freq state in room {}: {}", roomCode, e.getMessage());
         }
     }

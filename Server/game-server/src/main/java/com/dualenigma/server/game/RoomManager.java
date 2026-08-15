@@ -11,9 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.TextMessage;
 
-import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -102,10 +100,10 @@ public class RoomManager {
             String json = messageCodec.encode(msg);
             for (ClientSession player : room.getPlayers()) {
                 if (player != null) {
-                    player.getWebSocketSession().sendMessage(new TextMessage(json));
+                    player.send(json);
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Failed to broadcast PlayerJoined in room {}: {}",
                     room.getRoomCode(), e.getMessage());
         }
@@ -149,11 +147,11 @@ public class RoomManager {
             String json = messageCodec.encode(msg);
             for (ClientSession player : room.getPlayers()) {
                 if (player != null) {
-                    player.getWebSocketSession().sendMessage(new TextMessage(json));
+                    player.send(json);
                 }
             }
             log.info("Room {} full → GameStart broadcast to both players", room.getRoomCode());
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Failed to broadcast GameStart in room {}: {}",
                     room.getRoomCode(), e.getMessage());
         }
@@ -167,9 +165,8 @@ public class RoomManager {
             S2C_ConnectAck ack = new S2C_ConnectAck();
             ack.getData().setPlayerId(playerId);
             ack.getData().setRoomCode(roomCode);
-            String json = messageCodec.encode(ack);
-            session.getWebSocketSession().sendMessage(new TextMessage(json));
-        } catch (IOException e) {
+            session.send(messageCodec.encode(ack));
+        } catch (Exception e) {
             log.error("Failed to send ConnectAck to session {}: {}",
                     session.getSessionId(), e.getMessage());
         }
