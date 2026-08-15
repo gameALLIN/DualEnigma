@@ -21,6 +21,7 @@ namespace DualEnigma.UI
 
         [Header("按钮")]
         [SerializeField] private Button m_StartBtn;
+        [SerializeField] private Button m_RoomBtn;
         [SerializeField] private Button m_FriendsBtn;
         [SerializeField] private Button m_LogoutBtn;
 
@@ -32,6 +33,7 @@ namespace DualEnigma.UI
         public Text DisplayNameText => m_DisplayNameText;
         public Text AccountIdText => m_AccountIdText;
         public Button StartBtn => m_StartBtn;
+        public Button RoomBtn => m_RoomBtn;
         public Button FriendsBtn => m_FriendsBtn;
         public Button LogoutBtn => m_LogoutBtn;
         public Text VersionText => m_VersionText;

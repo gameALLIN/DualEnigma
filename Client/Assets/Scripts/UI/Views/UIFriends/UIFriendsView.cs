@@ -11,44 +11,6 @@ using DualEnigma.Framework.UI;
 
 namespace DualEnigma.UI
 {
-    /// <summary>好友列表行（模板克隆）</summary>
-    public class FriendRowView : MonoBehaviour
-    {
-        [SerializeField] private Text m_NameText;
-        [SerializeField] private Text m_IdText;
-        [SerializeField] private Button m_InviteBtn;
-        [SerializeField] private Button m_DeleteBtn;
-
-        public Text NameText => m_NameText;
-        public Text IdText => m_IdText;
-        public Button InviteBtn => m_InviteBtn;
-        public Button DeleteBtn => m_DeleteBtn;
-    }
-
-    /// <summary>好友申请行（模板克隆）</summary>
-    public class RequestRowView : MonoBehaviour
-    {
-        [SerializeField] private Text m_FromText;
-        [SerializeField] private Button m_AcceptBtn;
-        [SerializeField] private Button m_RejectBtn;
-
-        public Text FromText => m_FromText;
-        public Button AcceptBtn => m_AcceptBtn;
-        public Button RejectBtn => m_RejectBtn;
-    }
-
-    /// <summary>房间邀请行（模板克隆）</summary>
-    public class InviteRowView : MonoBehaviour
-    {
-        [SerializeField] private Text m_FromText;
-        [SerializeField] private Button m_AcceptBtn;
-        [SerializeField] private Button m_RejectBtn;
-
-        public Text FromText => m_FromText;
-        public Button AcceptBtn => m_AcceptBtn;
-        public Button RejectBtn => m_RejectBtn;
-    }
-
     /// <summary>
     /// 好友面板视图。
     /// </summary>

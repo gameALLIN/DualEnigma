@@ -29,6 +29,10 @@ namespace DualEnigma.UI
 
             BindEvents();
 
+            // 登录进入主界面后：启动全局社交通知轮询，并确保全局邀请弹窗常驻（均幂等）
+            _ = SocialNotifyService.Instance;
+            UIInvitePopupCtrl.Ensure();
+
             // 填充账号信息（从 AuthService 读取登录结果）
             if (AuthService.HasInstance)
             {
@@ -52,6 +56,9 @@ namespace DualEnigma.UI
             if (_view.StartBtn != null)
                 _view.StartBtn.onClick.AddListener(OnStartGameClicked);
 
+            if (_view.RoomBtn != null)
+                _view.RoomBtn.onClick.AddListener(OnRoomClicked);
+
             if (_view.FriendsBtn != null)
                 _view.FriendsBtn.onClick.AddListener(OnFriendsClicked);
 
@@ -66,6 +73,9 @@ namespace DualEnigma.UI
             if (_view.StartBtn != null)
                 _view.StartBtn.onClick.RemoveListener(OnStartGameClicked);
 
+            if (_view.RoomBtn != null)
+                _view.RoomBtn.onClick.RemoveListener(OnRoomClicked);
+
             if (_view.FriendsBtn != null)
                 _view.FriendsBtn.onClick.RemoveListener(OnFriendsClicked);
 
@@ -79,6 +89,13 @@ namespace DualEnigma.UI
             UIManager.Instance.Pop();   // 关闭 UIHome（会恢复显示下方的 UILogin）
             UIManager.Instance.Pop();   // 关闭 UILogin
             GameManager.Instance.StartGame();
+        }
+
+        /// <summary>联机开房：连接 game-server 创建房间（房主身份），进入房间等待面板</summary>
+        private void OnRoomClicked()
+        {
+            UIRoomCtrl.Prepare("", true);
+            UIManager.Instance.Push<UIRoomCtrl>(UIMode.FullScreen);
         }
 
         /// <summary>打开好友面板（好友列表/申请/房间邀请）</summary>

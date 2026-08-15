@@ -4,7 +4,7 @@
 /// 作者: DualEnigma
 /// 描述: UIHome 预制体生成器 Editor 工具。自动创建主界面的完整 UGUI
 ///       层级结构（渐变背景 + 标题区 + 冰火双色装饰条 + 玩家信息卡 +
-///       开始/退出按钮 + 版本号），挂载 UIHomeView、UIHomeCtrl、UIAutoBinder
+///       开始/联机开房/好友/退出按钮 + 版本号），挂载 UIHomeView、UIHomeCtrl、UIAutoBinder
 ///       组件，并通过 SerializedObject 自动绑定 View 字段。
 ///       菜单：DualEnigma/UI/生成 UIHome 预制体。
 /// 引用：UIHomeView.cs, UIHomeCtrl.cs, UIAutoBinder.cs
@@ -65,6 +65,9 @@ namespace DualEnigma.Editor
 
         /// <summary>开始按钮色（水蓝）</summary>
         private static readonly Color32 START_BTN_COLOR = new Color32(0x4F, 0xC3, 0xF7, 0xFF);
+
+        /// <summary>联机开房按钮色（熔岩橙，与开始按钮冰火呼应）</summary>
+        private static readonly Color32 ROOM_BTN_COLOR = new Color32(0xFF, 0x6F, 0x00, 0xFF);
 
         /// <summary>退出按钮色（深灰蓝）</summary>
         private static readonly Color32 LOGOUT_BTN_COLOR = new Color32(0x37, 0x47, 0x4F, 0xFF);
@@ -199,14 +202,19 @@ namespace DualEnigma.Editor
                 new Vector2(0.5f, 0.5f), new Vector2(0f, -90f),
                 new Vector2(260f, 56f), 24, "Text");
 
+            // RoomBtn（联机开房，连接 game-server 创建房间）
+            CreateButton("RoomBtn", "联机开房", ROOM_BTN_COLOR, root.transform, font,
+                new Vector2(0.5f, 0.5f), new Vector2(0f, -158f),
+                new Vector2(260f, 44f), 17, "Text");
+
             // FriendsBtn（好友入口）
             CreateButton("FriendsBtn", "好友", LOGOUT_BTN_COLOR, root.transform, font,
-                new Vector2(0.5f, 0.5f), new Vector2(0f, -158f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, -212f),
                 new Vector2(260f, 44f), 17, "Text");
 
             // LogoutBtn（次按钮）
             CreateButton("LogoutBtn", "退出登录", LOGOUT_BTN_COLOR, root.transform, font,
-                new Vector2(0.5f, 0.5f), new Vector2(0f, -212f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, -266f),
                 new Vector2(200f, 36f), 16, "Text");
 
             // ---- 版本号（右下角）----
@@ -240,6 +248,8 @@ namespace DualEnigma.Editor
             // ---- 按钮 ----
             so.FindProperty("m_StartBtn").objectReferenceValue =
                 FindDeepChild(root.transform, "StartBtn")?.GetComponent<Button>();
+            so.FindProperty("m_RoomBtn").objectReferenceValue =
+                FindDeepChild(root.transform, "RoomBtn")?.GetComponent<Button>();
             so.FindProperty("m_FriendsBtn").objectReferenceValue =
                 FindDeepChild(root.transform, "FriendsBtn")?.GetComponent<Button>();
             so.FindProperty("m_LogoutBtn").objectReferenceValue =

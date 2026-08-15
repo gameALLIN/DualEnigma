@@ -17,12 +17,14 @@ namespace DualEnigma.UI
         [SerializeField] private Text m_RoomCodeText;
         [SerializeField] private Text m_StatusText;
         [SerializeField] private Text m_TipText;
+        [SerializeField] private Button m_InviteBtn;
         [SerializeField] private Button m_LeaveBtn;
         // ===== Auto Bind End =====
 
         public Text RoomCodeText => m_RoomCodeText;
         public Text StatusText => m_StatusText;
         public Text TipText => m_TipText;
+        public Button InviteBtn => m_InviteBtn;
         public Button LeaveBtn => m_LeaveBtn;
     }
 }

@@ -3,7 +3,7 @@
 /// 创建时间: 2026-08-15
 /// 作者: DualEnigma
 /// 描述: UIRoom 预制体生成器 Editor 工具。
-///       层级：标题 / 房间码大字 / 状态文案 / 提示文案 / 退出按钮。
+///       层级：标题 / 房间码大字 / 状态文案 / 提示文案 / 邀请+退出按钮。
 ///       菜单：DualEnigma/UI/生成 UIRoom 预制体。
 /// 引用：UIRoomView.cs, UIRoomCtrl.cs
 /// ============================================================
@@ -26,6 +26,7 @@ namespace DualEnigma.Editor
         private static readonly Color32 CODE_BG_COLOR = new Color32(0x37, 0x47, 0x4F, 0xFF);
         private static readonly Color32 BTN_COLOR = new Color32(0x4F, 0xC3, 0xF7, 0xFF);
         private static readonly Color32 LEAVE_BTN_COLOR = new Color32(0x37, 0x47, 0x4F, 0xFF);
+        private static readonly Color32 INVITE_BTN_COLOR = new Color32(0xFF, 0x6F, 0x00, 0xFF);
         private static readonly Color32 LABEL_COLOR = new Color32(0xB0, 0xBE, 0xC5, 0xFF);
         private static readonly Color32 CODE_COLOR = new Color32(0x4F, 0xC3, 0xF7, 0xFF);
 
@@ -97,12 +98,16 @@ namespace DualEnigma.Editor
                 new Vector2(0.5f, 0.5f), new Vector2(0f, -40f), new Vector2(400f, 30f), Color.white);
 
             // 提示文案
-            CreateText("TipText", "把房间码告诉好友，或打开好友列表直接邀请", 14, panel.transform, font,
-                new Vector2(0.5f, 0.5f), new Vector2(0f, -70f), new Vector2(420f, 24f), LABEL_COLOR);
+            CreateText("TipText", "点击【邀请好友】发送房间邀请，或把房间码告诉对方", 14, panel.transform, font,
+                new Vector2(0.5f, 0.5f), new Vector2(0f, -70f), new Vector2(440f, 24f), LABEL_COLOR);
+
+            // 邀请好友（主操作，叠加打开好友面板，不断开连接）
+            CreateButton("InviteBtn", "邀请好友", INVITE_BTN_COLOR, panel.transform, font,
+                new Vector2(0.5f, 0f), new Vector2(-100f, 42f), new Vector2(180f, 40f), 16, "Text");
 
             // 退出按钮
             CreateButton("LeaveBtn", "退出房间", LEAVE_BTN_COLOR, panel.transform, font,
-                new Vector2(0.5f, 0f), new Vector2(0f, 42f), new Vector2(180f, 40f), 16, "Text");
+                new Vector2(0.5f, 0f), new Vector2(100f, 42f), new Vector2(180f, 40f), 16, "Text");
 
             return root;
         }
@@ -118,6 +123,8 @@ namespace DualEnigma.Editor
                 FindDeepChild(root.transform, "StatusText")?.GetComponent<Text>();
             so.FindProperty("m_TipText").objectReferenceValue =
                 FindDeepChild(root.transform, "TipText")?.GetComponent<Text>();
+            so.FindProperty("m_InviteBtn").objectReferenceValue =
+                FindDeepChild(root.transform, "InviteBtn")?.GetComponent<Button>();
             so.FindProperty("m_LeaveBtn").objectReferenceValue =
                 FindDeepChild(root.transform, "LeaveBtn")?.GetComponent<Button>();
 

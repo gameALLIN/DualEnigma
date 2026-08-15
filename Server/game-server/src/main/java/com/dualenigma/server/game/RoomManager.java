@@ -4,6 +4,7 @@ import com.dualenigma.network.ClientSession;
 import com.dualenigma.network.MessageCodec;
 import com.dualenigma.server.util.IdGenerator;
 import com.dualenigma.network.protocol.s2c.S2C_ConnectAck;
+import com.dualenigma.network.protocol.s2c.S2C_GameStart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -61,8 +62,11 @@ public class RoomManager {
         if (waitingRoom != null) {
             addPlayerToRoom(waitingRoom, session);
         } else {
-            // 创建新房间
+            // 创建新房间（随机码，撞码重试）
             String newCode = IdGenerator.nextRoomCode();
+            while (rooms.containsKey(newCode)) {
+                newCode = IdGenerator.nextRoomCode();
+            }
             GameRoom newRoom = new GameRoom(newCode);
             rooms.put(newCode, newRoom);
             addPlayerToRoom(newRoom, session);
@@ -78,6 +82,33 @@ public class RoomManager {
 
         log.info("Player joined room {} (count={})", room.getRoomCode(), room.getPlayerCount());
         sendConnectAck(session, session.getPlayerId(), room.getRoomCode());
+
+        // 满员 → 向双方广播开局（客户端收到后关闭房间 UI 进入对局）
+        if (room.getPlayerCount() == 2 && room.isGameStarted()) {
+            broadcastGameStart(room);
+        }
+    }
+
+    /**
+     * 广播开局消息到房间内全部玩家（第 1-1-1 轮起）.
+     */
+    private void broadcastGameStart(GameRoom room) {
+        try {
+            S2C_GameStart msg = new S2C_GameStart();
+            msg.getData().setChapter(1);
+            msg.getData().setSection(1);
+            msg.getData().setRound(1);
+            String json = messageCodec.encode(msg);
+            for (ClientSession player : room.getPlayers()) {
+                if (player != null) {
+                    player.getWebSocketSession().sendMessage(new TextMessage(json));
+                }
+            }
+            log.info("Room {} full → GameStart broadcast to both players", room.getRoomCode());
+        } catch (IOException e) {
+            log.error("Failed to broadcast GameStart in room {}: {}",
+                    room.getRoomCode(), e.getMessage());
+        }
     }
 
     /**

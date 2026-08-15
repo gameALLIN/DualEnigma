@@ -44,6 +44,9 @@ namespace DualEnigma.Network
         [Header("账号服 REST API")]
         [SerializeField] private string _accountServerUrl = "http://localhost:8081";
 
+        [Header("游戏服 WebSocket")]
+        [SerializeField] private string _gameServerWsUrl = "ws://localhost:8080/game";
+
         public float HighFrequencyRate => _highFrequencyRate;
         public float MidFrequencyRate => _midFrequencyRate;
         public float InterpolationBuffer => _interpolationBuffer;
@@ -60,5 +63,6 @@ namespace DualEnigma.Network
         public int UdpPort => _udpPort;
         public string DefaultHostAddress => _defaultHostAddress;
         public string AccountServerUrl => _accountServerUrl;
+        public string GameServerWsUrl => _gameServerWsUrl;
     }
 }

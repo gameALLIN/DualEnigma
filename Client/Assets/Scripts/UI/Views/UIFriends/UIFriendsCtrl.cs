@@ -2,8 +2,9 @@
 /// 文件名: UIFriendsCtrl.cs
 /// 创建时间: 2026-08-15
 /// 作者: DualEnigma
-/// 描述: 好友面板控制器。拉取/渲染好友、申请、邀请；
-///       搜索添加好友；接受邀请 → 打开 UIRoom（携带 roomCode）。
+/// 描述: 好友面板控制器。拉取/渲染好友、搜索添加好友；
+///       好友申请列表读取 SocialNotifyService（全局轮询）；
+///       房间邀请已移交全局弹窗 UIInvitePopup 处理。
 /// ============================================================
 
 using System.Collections.Generic;
@@ -45,13 +46,16 @@ namespace DualEnigma.UI
             if (_view == null) return;
 
             BindEvents();
+            EventBus.Instance.Subscribe<SocialNotifyChangedEvent>(OnSocialNotifyChanged);
             _refreshTimer = REFRESH_INTERVAL; // 立即触发首次刷新
             RefreshAll();
+            RenderRequests();
         }
 
         protected override void OnHide()
         {
             UnbindEvents();
+            EventBus.Instance.Unsubscribe<SocialNotifyChangedEvent>(OnSocialNotifyChanged);
         }
 
         private void BindEvents()
@@ -96,13 +100,13 @@ namespace DualEnigma.UI
                 friends => { _model.SetFriends(friends); RenderFriends(); _refreshing = false; },
                 error => { _view.SetStatus(error); _refreshing = false; });
 
-            _api.GetFriendRequests(
-                requests => { _model.SetRequests(requests); RenderRequests(); },
-                _ => { });
+            // 申请/邀请由 SocialNotifyService 全局轮询，本面板通过事件刷新
+        }
 
-            _api.GetInvites(
-                invites => { _model.SetInvites(invites); RenderInvites(); },
-                _ => { });
+        /// <summary>全局社交通知变化（申请被处理/新增）→ 刷新申请区</summary>
+        private void OnSocialNotifyChanged(SocialNotifyChangedEvent e)
+        {
+            RenderRequests();
         }
 
         // ============================================================
@@ -113,6 +117,9 @@ namespace DualEnigma.UI
         {
             for (int i = content.childCount - 1; i >= 0; i--)
             {
+                // 隐藏的子物体是行模板（挂在 Content 下），跳过避免模板被销毁导致后续 Instantiate null
+                if (!content.GetChild(i).gameObject.activeSelf)
+                    continue;
                 Destroy(content.GetChild(i).gameObject);
             }
         }
@@ -146,9 +153,15 @@ namespace DualEnigma.UI
         {
             if (_view.RequestListContent == null || _view.RequestSection == null) return;
             ClearChildren(_view.RequestListContent);
-            _view.RequestSection.SetActive(_model.Requests.Count > 0);
 
-            foreach (FriendRequestData request in _model.Requests)
+            // 申请数据来自全局轮询服务（单一数据源）
+            IReadOnlyList<FriendRequestData> requests = SocialNotifyService.HasInstance
+                ? SocialNotifyService.Instance.PendingRequests
+                : null;
+            _view.RequestSection.SetActive(requests != null && requests.Count > 0);
+            if (requests == null) return;
+
+            foreach (FriendRequestData request in requests)
             {
                 FriendRequestData captured = request;
                 RequestRowView row = Instantiate(_view.RequestRowTemplate, _view.RequestListContent);
@@ -163,30 +176,6 @@ namespace DualEnigma.UI
 
                 if (row.RejectBtn != null)
                     row.RejectBtn.onClick.AddListener(() => OnRejectRequestClicked(captured));
-            }
-        }
-
-        private void RenderInvites()
-        {
-            if (_view.InviteListContent == null || _view.InviteSection == null) return;
-            ClearChildren(_view.InviteListContent);
-            _view.InviteSection.SetActive(_model.Invites.Count > 0);
-
-            foreach (InviteData invite in _model.Invites)
-            {
-                InviteData captured = invite;
-                InviteRowView row = Instantiate(_view.InviteRowTemplate, _view.InviteListContent);
-                row.gameObject.SetActive(true);
-                row.name = "InviteRow_" + captured.inviteId;
-
-                if (row.FromText != null)
-                    row.FromText.text = $"{captured.fromDisplayName} 邀请你进入房间 {captured.roomCode}";
-
-                if (row.AcceptBtn != null)
-                    row.AcceptBtn.onClick.AddListener(() => OnAcceptInviteClicked(captured));
-
-                if (row.RejectBtn != null)
-                    row.RejectBtn.onClick.AddListener(() => OnRejectInviteClicked(captured));
             }
         }
 
@@ -257,12 +246,16 @@ namespace DualEnigma.UI
 
         private void OnAcceptRequestClicked(FriendRequestData request)
         {
-            _api?.AcceptFriendRequest(request.requestId, RefreshAll, error => _view.SetStatus(error));
+            _api?.AcceptFriendRequest(request.requestId,
+                () => SocialNotifyService.Instance.ForcePoll(),
+                error => _view.SetStatus(error));
         }
 
         private void OnRejectRequestClicked(FriendRequestData request)
         {
-            _api?.RejectFriendRequest(request.requestId, RefreshAll, error => _view.SetStatus(error));
+            _api?.RejectFriendRequest(request.requestId,
+                () => SocialNotifyService.Instance.ForcePoll(),
+                error => _view.SetStatus(error));
         }
 
         private void OnInviteFriendClicked(FriendData friend)
@@ -272,7 +265,7 @@ namespace DualEnigma.UI
 
             if (string.IsNullOrEmpty(roomCode))
             {
-                _view.SetStatus("尚未创建房间（需要先进入联机大厅，WebSocket 通道开发中）");
+                _view.SetStatus("尚未进入房间：请先回到主界面点击【联机开房】，看到房间码后再来邀请好友");
                 return;
             }
 
@@ -280,24 +273,6 @@ namespace DualEnigma.UI
             _api.CreateInvite(friend.accountId, roomCode,
                 _ => _view.SetStatus($"已邀请 {friend.displayName}，等待对方接受..."),
                 error => _view.SetStatus(error));
-        }
-
-        private void OnAcceptInviteClicked(InviteData invite)
-        {
-            _api?.AcceptInvite(invite.inviteId,
-                roomCode =>
-                {
-                    // 接受邀请 → 关闭好友面板，进入房间等待界面（携带 roomCode）
-                    UIManager.Instance.Pop();
-                    UIRoomCtrl.Prepare(roomCode);
-                    UIManager.Instance.Push<UIRoomCtrl>(UIMode.FullScreen);
-                },
-                error => _view.SetStatus(error));
-        }
-
-        private void OnRejectInviteClicked(InviteData invite)
-        {
-            _api?.DeclineInvite(invite.inviteId, RefreshAll, error => _view.SetStatus(error));
         }
 
         private void OnDeleteFriendClicked(FriendData friend)

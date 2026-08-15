@@ -56,6 +56,11 @@ public class GameRoom {
         // TODO: 通知对方 → 启动重连计时器 → 30s 后 AI 接管 → 120s 超时
     }
 
+    /** 房间内两名玩家的会话（元素可能为 null，供满员广播使用） */
+    public ClientSession[] getPlayers() {
+        return players;
+    }
+
     /**
      * 玩家重连.
      */

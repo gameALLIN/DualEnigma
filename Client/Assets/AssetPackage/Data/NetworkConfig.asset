@@ -28,3 +28,4 @@ MonoBehaviour:
   _udpPort: 7778
   _defaultHostAddress: 100.94.170.43
   _accountServerUrl: http://100.94.170.43:8081
+  _gameServerWsUrl: ws://100.94.170.43:8080/game

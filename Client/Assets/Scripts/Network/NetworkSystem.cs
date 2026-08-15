@@ -37,6 +37,14 @@ namespace DualEnigma.Network
             CurrentRoomCode = roomCode ?? "";
         }
 
+        /// <summary>更新连接状态（GameServerClient 在连接/断开时调用）</summary>
+        public void SetConnected(bool connected)
+        {
+            IsConnected = connected;
+            if (!connected)
+                Debug.Log("[NetworkSystem] 连接已断开");
+        }
+
         /// <summary>当前往返延迟（秒）</summary>
         public float RoundTripTime { get; private set; }
 

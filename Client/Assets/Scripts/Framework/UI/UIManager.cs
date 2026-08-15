@@ -90,6 +90,12 @@ namespace DualEnigma.Framework.UI
             }
         }
 
+        /// <summary>获取指定层级根节点（常驻悬浮层等非面板栈 UI 挂载用）</summary>
+        public RectTransform GetLayerRoot(UILayer layer)
+        {
+            return m_LayerRoots.TryGetValue(layer, out RectTransform root) ? root : null;
+        }
+
         /// <summary>将 UIMode 映射到对应的 UILayer</summary>
         private static UILayer GetLayerByMode(UIMode mode)
         {
