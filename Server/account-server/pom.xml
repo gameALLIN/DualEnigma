@@ -41,6 +41,12 @@
             <artifactId>mariadb-java-client</artifactId>
         </dependency>
 
+        <!-- JSON 序列化 (Jackson 2，GameServerPresenceClient 显式使用 ObjectMapper) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
         <!-- Spring Security Crypto (BCryptPasswordEncoder, 无需完整 Security 过滤链) -->
         <dependency>
             <groupId>org.springframework.security</groupId>
