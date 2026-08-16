@@ -224,6 +224,10 @@ namespace DualEnigma.Editor
                 FindDeepChild(root.transform, "StatusText")?.GetComponent<Text>();
             so.FindProperty("m_CloseBtn").objectReferenceValue =
                 FindDeepChild(root.transform, "CloseBtn")?.GetComponent<Button>();
+            so.FindProperty("m_FriendSectionTitle").objectReferenceValue =
+                FindDeepChild(root.transform, "FriendSectionTitle")?.GetComponent<RectTransform>();
+            so.FindProperty("m_FriendScroll").objectReferenceValue =
+                FindDeepChild(root.transform, "FriendScroll")?.GetComponent<RectTransform>();
 
             // 行组件字段
             BindRowView<InviteRowView>(root, "InviteRowTemplate");

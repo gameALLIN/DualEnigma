@@ -36,6 +36,8 @@ namespace DualEnigma.UI
         [Header("其他")]
         [SerializeField] private Text m_StatusText;
         [SerializeField] private Button m_CloseBtn;
+        [SerializeField] private RectTransform m_FriendSectionTitle;
+        [SerializeField] private RectTransform m_FriendScroll;
         // ===== Auto Bind End =====
 
         public GameObject InviteSection => m_InviteSection;
@@ -50,6 +52,8 @@ namespace DualEnigma.UI
         public Button SearchBtn => m_SearchBtn;
         public Text StatusText => m_StatusText;
         public Button CloseBtn => m_CloseBtn;
+        public RectTransform FriendSectionTitle => m_FriendSectionTitle;
+        public RectTransform FriendScroll => m_FriendScroll;
 
         /// <summary>显示状态提示（搜索结果/操作反馈），空串隐藏</summary>
         public void SetStatus(string message)

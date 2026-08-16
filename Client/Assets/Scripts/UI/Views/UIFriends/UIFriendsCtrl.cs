@@ -50,6 +50,7 @@ namespace DualEnigma.UI
             _refreshTimer = REFRESH_INTERVAL; // 立即触发首次刷新
             RefreshAll();
             RenderRequests();
+            RefreshLayout(); // 初始收拢（无申请时好友列表顶置）
         }
 
         protected override void OnHide()
@@ -167,7 +168,7 @@ namespace DualEnigma.UI
                 ? SocialNotifyService.Instance.PendingRequests
                 : null;
             _view.RequestSection.SetActive(requests != null && requests.Count > 0);
-            if (requests == null) return;
+            if (requests == null) { RefreshLayout(); return; }
 
             foreach (FriendRequestData request in requests)
             {
@@ -185,6 +186,60 @@ namespace DualEnigma.UI
                 if (row.RejectBtn != null)
                     row.RejectBtn.onClick.AddListener(() => OnRejectRequestClicked(captured));
             }
+
+            RefreshLayout();
+        }
+
+        // ============================================================
+        //  布局联动（修复申请区被好友列表遮挡）
+        // ============================================================
+
+        /// <summary>动态区块高度（与生成器 RequestSection/InviteSection 一致）</summary>
+        private const float SECTION_HEIGHT = 70f;
+
+        /// <summary>区块间距</summary>
+        private const float SECTION_GAP = 8f;
+
+        /// <summary>好友列表标题基准 Y（与生成器一致，两区块全显示时）</summary>
+        private const float TITLE_BASE_Y = -228f;
+
+        /// <summary>好友滚动区基准 Y（与生成器一致，两区块全显示时）</summary>
+        private const float SCROLL_BASE_Y = -246f;
+
+        /// <summary>面板顶部区块起点 Y（与生成器 InviteSection 一致）</summary>
+        private const float SECTION_TOP_Y = -64f;
+
+        /// <summary>
+        /// 按邀请/申请区显隐联动布局：隐藏的区块收拢，好友列表上移，
+        /// 消除固定锚点导致的遮挡（FriendScroll 覆盖 RequestSection）。
+        /// </summary>
+        private void RefreshLayout()
+        {
+            bool inviteVisible = _view.InviteSection != null && _view.InviteSection.activeSelf;
+            bool requestVisible = _view.RequestSection != null && _view.RequestSection.activeSelf;
+
+            // 申请区紧跟邀请区之后（无邀请区则顶到面板首行）
+            if (_view.RequestSection != null)
+            {
+                RectTransform rt = _view.RequestSection.transform as RectTransform;
+                if (rt != null)
+                {
+                    float y = SECTION_TOP_Y - (inviteVisible ? SECTION_HEIGHT + SECTION_GAP : 0f);
+                    rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, y);
+                }
+            }
+
+            // 好友列表标题与滚动区按隐藏区块数上移
+            float shift = (inviteVisible ? 0f : SECTION_HEIGHT + SECTION_GAP)
+                        + (requestVisible ? 0f : SECTION_HEIGHT + SECTION_GAP);
+
+            if (_view.FriendSectionTitle != null)
+                _view.FriendSectionTitle.anchoredPosition =
+                    new Vector2(_view.FriendSectionTitle.anchoredPosition.x, TITLE_BASE_Y + shift);
+
+            if (_view.FriendScroll != null)
+                _view.FriendScroll.anchoredPosition =
+                    new Vector2(_view.FriendScroll.anchoredPosition.x, SCROLL_BASE_Y + shift);
         }
 
         // ============================================================
