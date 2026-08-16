@@ -961,16 +961,72 @@ MonoBehaviour:
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UIRoom
     m_exportTo: 
     m_variantName: 
-  - m_assetDatabaseId: 8651f78b00bf1444d87f79c896ae941f
-    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIRoom/UIRoom.prefab
-    m_exportTo: 
-    m_variantName: 
   - m_assetDatabaseId: 52340ebf389e7294e862e7d1a6348782
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UIFriends
     m_exportTo: 
     m_variantName: 
+  - m_assetDatabaseId: 22f3af9db63589a488b483804d6dd590
+    m_importFrom: Assets/Scripts/UI/Views/UIFriends/FriendRowView.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 1cf0a92f5d7304c42af5b6417a3e53ed
+    m_importFrom: Assets/Scripts/UI/Views/UIFriends/RequestRowView.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 6b0344bfe8f9a194bbadc451648dfe94
+    m_importFrom: Assets/Scripts/UI/Views/UIFriends/InviteRowView.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 82e5d2b3ab696bf488f44e105ce8ab24
+    m_importFrom: Assets/Editor/GenerateUIInvitePopupPrefab.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 3909cc28c95a6434a85edcbe2a857313
+    m_importFrom: Assets/Scripts/UI/Views/UIInvitePopup/RequestCardView.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: fe74a374b9864094ea2e7c9ce5e506dc
+    m_importFrom: Assets/Scripts/UI/Views/UIInvitePopup/UIInvitePopupCtrl.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 0240949831ba19b43a3198f3b71b91ab
+    m_importFrom: Assets/Scripts/Network/SocialEvents.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 73a70ebbaa779dc49a3af50bdc640c54
+    m_importFrom: Assets/Scripts/Network/SocialNotifyService.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 0cf20d9a8f69f1c4ba13a2465d310af8
+    m_importFrom: Assets/Scripts/UI/Views/UIInvitePopup/UIInvitePopupView.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 7cae7ef2b3766aa488acae9ea43d9d7e
+    m_importFrom: Assets/Scripts/UI/Views/UIInvitePopup/InviteCardView.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 3b4d03377076c5e4bb10a1ec5c244033
+    m_importFrom: Assets/Scripts/UI/Views/UIInvitePopup
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: d56a7a972b0cd594cae2ca850d225e40
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIInvitePopup
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 0d9e713078908334ea996a7bb8df43ae
+    m_importFrom: Assets/Scripts/Network/NetworkEvents.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: fa38fbd53a9896948b0e46212c86fbd9
+    m_importFrom: Assets/Scripts/Network/GameServerClient.cs
+    m_exportTo: 
+    m_variantName: 
   - m_assetDatabaseId: cfa8920e38871f04083e94e0c3712c64
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UIFriends/UIFriends.prefab
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 93665bc8017042441b29d48ba214f5f3
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIInvitePopup/UIInvitePopup.prefab
     m_exportTo: 
     m_variantName: 
   - m_assetDatabaseId: 6aeeb201194274d4086e7e024d2961ef
@@ -983,6 +1039,22 @@ MonoBehaviour:
     m_variantName: 
   - m_assetDatabaseId: 90e39c44318791341a5ecb6b51dda5d4
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UIHome/UIHome.prefab
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 67c23702a871a1448addc0203907cbd9
+    m_importFrom: Assets/Scripts/Character/RemoteCharacterDriver.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: a7d554e74d44f7349ab0c81113b75877
+    m_importFrom: Assets/Scripts/Network/NetworkGameSync.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: c475d74ec4a1cca4383e2604114fdfa8
+    m_importFrom: Assets/Scripts/Character/NetworkCharacterReporter.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 8651f78b00bf1444d87f79c896ae941f
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIRoom/UIRoom.prefab
     m_exportTo: 
     m_variantName: 
   m_version: 2
