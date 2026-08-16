@@ -18,6 +18,9 @@ namespace DualEnigma.Network
         public string username;
         public string displayName;
         public bool online;
+
+        /// <summary>四态：offline 离线 / online 在线 / teaming 组队中 / ingame 游戏中（搜索结果无此字段为 null）</summary>
+        public string status;
     }
 
     /// <summary>好友申请信息</summary>

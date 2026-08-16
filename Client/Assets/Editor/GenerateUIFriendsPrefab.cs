@@ -172,9 +172,11 @@ namespace DualEnigma.Editor
             friendRow.SetActive(false);
             friendRow.AddComponent<FriendRowView>();
             CreateText("NameText", "昵称 (用户名)", 15, friendRow.transform, font,
-                new Vector2(0f, 0.5f), new Vector2(12f, 0f), new Vector2(320f, 26f), Color.white).alignment = TextAnchor.MiddleLeft;
+                new Vector2(0f, 0.5f), new Vector2(12f, 0f), new Vector2(250f, 26f), Color.white).alignment = TextAnchor.MiddleLeft;
+            CreateText("StatusText", "离线", 13, friendRow.transform, font,
+                new Vector2(0f, 0.5f), new Vector2(270f, 0f), new Vector2(120f, 24f), LABEL_COLOR).alignment = TextAnchor.MiddleLeft;
             CreateText("IdText", "ID: 0", 13, friendRow.transform, font,
-                new Vector2(1f, 0.5f), new Vector2(-232f, 0f), new Vector2(130f, 24f), LABEL_COLOR).alignment = TextAnchor.MiddleRight;
+                new Vector2(1f, 0.5f), new Vector2(-192f, 0f), new Vector2(120f, 24f), LABEL_COLOR).alignment = TextAnchor.MiddleRight;
             CreateButton("InviteBtn", "邀请", BTN_COLOR, friendRow.transform, font,
                 new Vector2(1f, 0.5f), new Vector2(-80f, 0f), new Vector2(64f, 26f), 13, "Text");
             CreateButton("DeleteBtn", "删除", WARN_BTN_COLOR, friendRow.transform, font,
@@ -255,6 +257,8 @@ namespace DualEnigma.Editor
             SerializedObject so = new SerializedObject(row.GetComponent<FriendRowView>());
             so.FindProperty("m_NameText").objectReferenceValue =
                 FindDeepChild(row, "NameText")?.GetComponent<Text>();
+            so.FindProperty("m_StatusText").objectReferenceValue =
+                FindDeepChild(row, "StatusText")?.GetComponent<Text>();
             so.FindProperty("m_IdText").objectReferenceValue =
                 FindDeepChild(row, "IdText")?.GetComponent<Text>();
             so.FindProperty("m_InviteBtn").objectReferenceValue =

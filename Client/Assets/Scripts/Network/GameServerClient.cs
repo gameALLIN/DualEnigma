@@ -52,7 +52,7 @@ namespace DualEnigma.Network
         private class MessageEnvelope { public string type; }
 
         [Serializable]
-        private class ConnectData { public string roomCode = ""; }
+        private class ConnectData { public string roomCode = ""; public string token = ""; }
 
         [Serializable]
         private class ConnectRequest
@@ -259,8 +259,13 @@ namespace DualEnigma.Network
 
                 IsConnected = true;
 
-                // 连接建立 → 发送进房请求
-                await SendJsonAsync(JsonUtility.ToJson(new ConnectRequest { data = new ConnectData { roomCode = roomCode ?? "" } }));
+                // 连接建立 → 发送进房请求（携带登录 Token，服务端校验后注册在线状态）
+                string token = AuthService.HasInstance && AuthService.Instance.IsLoggedIn
+                    ? AuthService.Instance.Token : "";
+                await SendJsonAsync(JsonUtility.ToJson(new ConnectRequest
+                {
+                    data = new ConnectData { roomCode = roomCode ?? "", token = token }
+                }));
 
                 _ = ReceiveLoopAsync(_cts.Token);
             }

@@ -14,11 +14,13 @@ namespace DualEnigma.UI
     {
         [SerializeField] private Text m_NameText;
         [SerializeField] private Text m_IdText;
+        [SerializeField] private Text m_StatusText;
         [SerializeField] private Button m_InviteBtn;
         [SerializeField] private Button m_DeleteBtn;
 
         public Text NameText => m_NameText;
         public Text IdText => m_IdText;
+        public Text StatusText => m_StatusText;
         public Button InviteBtn => m_InviteBtn;
         public Button DeleteBtn => m_DeleteBtn;
     }

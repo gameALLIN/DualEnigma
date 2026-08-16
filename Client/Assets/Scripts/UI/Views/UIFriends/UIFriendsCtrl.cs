@@ -141,8 +141,14 @@ namespace DualEnigma.UI
                 if (row.IdText != null)
                     row.IdText.text = "ID: " + captured.accountId;
 
+                ApplyStatus(row, captured.status);
+
                 if (row.InviteBtn != null)
+                {
+                    // 游戏中无法接受邀请，置灰
+                    row.InviteBtn.interactable = captured.status != "ingame";
                     row.InviteBtn.onClick.AddListener(() => OnInviteFriendClicked(captured));
+                }
 
                 if (row.DeleteBtn != null)
                     row.DeleteBtn.onClick.AddListener(() => OnDeleteFriendClicked(captured));
@@ -206,6 +212,32 @@ namespace DualEnigma.UI
                 error => _view.SetStatus(error));
         }
 
+        /// <summary>渲染好友在线状态（四态，颜色区分）</summary>
+        private void ApplyStatus(FriendRowView row, string status)
+        {
+            if (row.StatusText == null) return;
+
+            switch (status)
+            {
+                case "online":
+                    row.StatusText.text = "在线";
+                    row.StatusText.color = new Color32(0x66, 0xBB, 0x6A, 0xFF);
+                    break;
+                case "teaming":
+                    row.StatusText.text = "组队中";
+                    row.StatusText.color = new Color32(0x4F, 0xC3, 0xF7, 0xFF);
+                    break;
+                case "ingame":
+                    row.StatusText.text = "游戏中";
+                    row.StatusText.color = new Color32(0xFF, 0x6F, 0x00, 0xFF);
+                    break;
+                default:
+                    row.StatusText.text = "离线";
+                    row.StatusText.color = new Color32(0x78, 0x90, 0x9C, 0xFF);
+                    break;
+            }
+        }
+
         /// <summary>搜索结果渲染为可点击的添加行（复用好友行模板：邀请/删除按钮语义映射为 添加/忽略）</summary>
         private void RenderSearchResults()
         {
@@ -223,6 +255,10 @@ namespace DualEnigma.UI
                     row.NameText.text = $"{captured.displayName} ({captured.username})";
                 if (row.IdText != null)
                     row.IdText.text = "ID: " + captured.accountId;
+
+                // 搜索结果无状态信息，隐藏状态列
+                if (row.StatusText != null)
+                    row.StatusText.gameObject.SetActive(false);
 
                 if (row.InviteBtn != null)
                 {
