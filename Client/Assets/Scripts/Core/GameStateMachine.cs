@@ -78,7 +78,13 @@ namespace DualEnigma.Core
             if (!IsRunning || IsPaused)
                 return;
 
-            if (IsNetworkDriven) return; // 联机模式阶段只由 S2C_PhaseChange 驱动
+            if (IsNetworkDriven)
+            {
+                // 联机模式：阶段切换只由服务器 S2C_PhaseChange 驱动，
+                // 本地仅递减剩余时间供 HUD 倒计时显示（到 0 钳制，等待服务器下发下一阶段）
+                PhaseRemainingTime = Mathf.Max(0f, PhaseRemainingTime - Time.deltaTime);
+                return;
+            }
 
             PhaseRemainingTime -= Time.deltaTime;
 
