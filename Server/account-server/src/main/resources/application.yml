@@ -24,6 +24,8 @@ dualenigma:
   jwt:
     secret: dualenigma_default_secret_key_change_in_production_2026
     expiration-hours: 24
+  # game-server 地址（好友在线状态查询用；Docker 内网为 http://gameserver:8080）
+  game-server-url: http://localhost:8080
 
 logging:
   level:

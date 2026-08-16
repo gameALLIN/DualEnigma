@@ -8,8 +8,10 @@ import org.springframework.web.socket.PingMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 心跳 + 断线检测管理器.
@@ -27,12 +29,32 @@ public class HeartbeatManager {
 
     private final Map<String, ClientSession> sessions = new ConcurrentHashMap<>();
 
+    /** 会话断开监听（业务模块挂载：如 game-server 在线注册表注销） */
+    public interface DisconnectListener {
+        void onDisconnect(ClientSession session);
+    }
+
+    private final List<DisconnectListener> disconnectListeners = new CopyOnWriteArrayList<>();
+
+    public void addDisconnectListener(DisconnectListener listener) {
+        disconnectListeners.add(listener);
+    }
+
     public void register(WebSocketSession session) {
         sessions.put(session.getId(), new ClientSession(session));
     }
 
     public void unregister(WebSocketSession session) {
-        sessions.remove(session.getId());
+        ClientSession removed = sessions.remove(session.getId());
+        if (removed != null) {
+            for (DisconnectListener listener : disconnectListeners) {
+                try {
+                    listener.onDisconnect(removed);
+                } catch (Exception e) {
+                    log.warn("Disconnect listener failed: {}", e.getMessage());
+                }
+            }
+        }
     }
 
     public ClientSession getClientSession(String sessionId) {

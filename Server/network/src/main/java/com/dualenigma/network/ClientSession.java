@@ -19,6 +19,7 @@ public class ClientSession {
     private int playerId = -1;       // -1 = 未分配
     private String roomCode;
     private long lastActiveTime;
+    private Long accountId;          // 账号 ID（C2S_Connect 携带 token 经 account-server 校验后填入；null = 匿名）
 
     public ClientSession(WebSocketSession webSocketSession) {
         this.webSocketSession = webSocketSession;
@@ -46,6 +47,9 @@ public class ClientSession {
 
     public int getPlayerId() { return playerId; }
     public void setPlayerId(int playerId) { this.playerId = playerId; }
+
+    public Long getAccountId() { return accountId; }
+    public void setAccountId(Long accountId) { this.accountId = accountId; }
 
     public String getRoomCode() { return roomCode; }
     public void setRoomCode(String roomCode) { this.roomCode = roomCode; }

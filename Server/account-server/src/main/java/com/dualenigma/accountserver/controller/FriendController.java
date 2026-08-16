@@ -5,6 +5,7 @@ import com.dualenigma.accountserver.dto.FriendRequestInfo;
 import com.dualenigma.accountserver.dto.InviteInfo;
 import com.dualenigma.accountserver.service.AuthService;
 import com.dualenigma.accountserver.service.FriendService;
+import com.dualenigma.accountserver.service.PresenceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,10 +37,13 @@ public class FriendController {
 
     private final FriendService friendService;
     private final AuthService authService;
+    private final PresenceService presenceService;
 
-    public FriendController(FriendService friendService, AuthService authService) {
+    public FriendController(FriendService friendService, AuthService authService,
+                            PresenceService presenceService) {
         this.friendService = friendService;
         this.authService = authService;
+        this.presenceService = presenceService;
     }
 
     // ============================================================
@@ -253,12 +257,16 @@ public class FriendController {
     //  内部方法
     // ============================================================
 
-    /** 从 Authorization Header 提取 accountId，无效返回 null */
+    /** 从 Authorization Header 提取 accountId，无效返回 null；成功即触碰在线活跃时间 */
     private Long extractAccountId(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return null;
         }
-        return authService.validateToken(authHeader.substring(7));
+        Long accountId = authService.validateToken(authHeader.substring(7));
+        if (accountId != null) {
+            presenceService.touch(accountId);
+        }
+        return accountId;
     }
 
     private ResponseEntity<?> unauthorized() {

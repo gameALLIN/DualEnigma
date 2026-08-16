@@ -31,10 +31,13 @@ public class RoomManager {
     private final Queue<GameRoom> waitingQueue = new ConcurrentLinkedQueue<>();
     private final MessageCodec messageCodec;
     private final FragmentPlanner fragmentPlanner;
+    private final OnlineRegistry onlineRegistry;
 
-    public RoomManager(MessageCodec messageCodec, FragmentPlanner fragmentPlanner) {
+    public RoomManager(MessageCodec messageCodec, FragmentPlanner fragmentPlanner,
+                       OnlineRegistry onlineRegistry) {
         this.messageCodec = messageCodec;
         this.fragmentPlanner = fragmentPlanner;
+        this.onlineRegistry = onlineRegistry;
     }
 
     /**
@@ -80,6 +83,11 @@ public class RoomManager {
         if (!room.addPlayer(session)) {
             log.warn("Room {} is full, reject session {}", room.getRoomCode(), session.getSessionId());
             return;
+        }
+
+        // 已识别身份的玩家注册在线状态（组队中）
+        if (session.getAccountId() != null) {
+            onlineRegistry.register(session.getAccountId(), room.getRoomCode());
         }
 
         log.info("Player joined room {} (count={})", room.getRoomCode(), room.getPlayerCount());
@@ -132,6 +140,7 @@ public class RoomManager {
         }
 
         room.startGame();
+        onlineRegistry.markInGame(OnlineRegistry.collectAccountIds(room.getPlayers()));
         broadcastGameStart(room);
     }
 

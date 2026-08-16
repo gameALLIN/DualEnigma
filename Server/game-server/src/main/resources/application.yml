@@ -24,6 +24,8 @@ spring:
 
 # 游戏服务器自定义配置
 dualenigma:
+  # account-server 地址（token 校验用；Docker 内网为 http://accountserver:8081）
+  account-server-url: http://localhost:8081
   game:
     tick-rate: 20
     tick-interval-ms: 50

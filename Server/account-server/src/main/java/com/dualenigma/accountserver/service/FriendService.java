@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -30,13 +31,19 @@ public class FriendService {
     private final FriendshipRepository friendshipRepository;
     private final RoomInviteRepository roomInviteRepository;
     private final PlayerAccountRepository accountRepository;
+    private final PresenceService presenceService;
+    private final GameServerPresenceClient gameServerPresenceClient;
 
     public FriendService(FriendshipRepository friendshipRepository,
                          RoomInviteRepository roomInviteRepository,
-                         PlayerAccountRepository accountRepository) {
+                         PlayerAccountRepository accountRepository,
+                         PresenceService presenceService,
+                         GameServerPresenceClient gameServerPresenceClient) {
         this.friendshipRepository = friendshipRepository;
         this.roomInviteRepository = roomInviteRepository;
         this.accountRepository = accountRepository;
+        this.presenceService = presenceService;
+        this.gameServerPresenceClient = gameServerPresenceClient;
     }
 
     // ============================================================
@@ -134,11 +141,44 @@ public class FriendService {
                 info.setAccountId(account.getId());
                 info.setUsername(account.getUsername());
                 info.setDisplayName(account.getDisplayName());
-                info.setOnline(false); // TODO: 在线状态待接入 game-server 心跳查询
                 result.add(info);
             });
         }
+        applyPresence(result);
         return result;
+    }
+
+    /**
+     * 合并好友在线状态.
+     * 优先级：游戏中 > 组队中 > 在线 > 离线.
+     *   ingame  — game-server 会话所在房间已开局
+     *   teaming — game-server 会话存在（房间等待中）
+     *   online  — 无 WS 会话，但 REST 活跃窗口内（主界面空闲）
+     *   offline — 其余
+     */
+    private void applyPresence(List<FriendInfo> friends) {
+        if (friends.isEmpty()) {
+            return;
+        }
+
+        List<Long> ids = friends.stream().map(FriendInfo::getAccountId).toList();
+        Map<Long, Map<String, Object>> presence = gameServerPresenceClient.queryPresence(ids);
+
+        for (FriendInfo info : friends) {
+            Map<String, Object> p = presence.get(info.getAccountId());
+            String status;
+            if (p != null && Boolean.TRUE.equals(p.get("inGame"))) {
+                status = "ingame";
+            } else if (p != null && Boolean.TRUE.equals(p.get("online"))) {
+                status = "teaming";
+            } else if (presenceService.isOnline(info.getAccountId())) {
+                status = "online";
+            } else {
+                status = "offline";
+            }
+            info.setStatus(status);
+            info.setOnline(!"offline".equals(status));
+        }
     }
 
     /**

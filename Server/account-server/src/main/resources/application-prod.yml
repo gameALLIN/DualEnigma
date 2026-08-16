@@ -13,6 +13,10 @@ spring:
       ddl-auto: validate
     show-sql: false
 
+# game-server 地址（Docker compose 服务名）
+dualenigma:
+  game-server-url: http://gameserver:8080
+
 logging:
   level:
     com.dualenigma.accountserver: INFO
