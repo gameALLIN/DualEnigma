@@ -1113,4 +1113,32 @@ MonoBehaviour:
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UISettings/UISettings.prefab
     m_exportTo: 
     m_variantName: 
+  - m_assetDatabaseId: 3700caf15d9b81c4b88d85970ae5834c
+    m_importFrom: Assets/Scripts/UI/Views/UIGameOver/UIGameOverModel.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 47c043bc17ae1e24eace189ac49583df
+    m_importFrom: Assets/Scripts/UI/Views/UIGameOver
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 284bdb4d7afb322499e7ee0613a8b192
+    m_importFrom: Assets/Scripts/UI/Views/UIGameOver/UIGameOverView.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 8e91f4ba624982c48be0e31f34d2d0a8
+    m_importFrom: Assets/Scripts/UI/Views/UIGameOver/UIGameOverCtrl.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 176b36902f3970c49b889d87208b35b0
+    m_importFrom: Assets/Editor/GenerateUIGameOverPrefab.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 7aebf2d5cddf4424ea28ffb88274d8fc
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIGameOver
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 7a0bd9d3113bdd1418ce3f7ae1437a01
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIGameOver/UIGameOver.prefab
+    m_exportTo: 
+    m_variantName: 
   m_version: 2
