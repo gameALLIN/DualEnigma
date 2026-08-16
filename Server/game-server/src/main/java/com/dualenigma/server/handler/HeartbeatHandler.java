@@ -40,10 +40,14 @@ public class HeartbeatHandler implements MessageHandler {
         heartbeatManager.onHeartbeat(session);
 
         // 回复心跳确认（客户端据此计算应用层 RTT，HUD 显示 PING）
-        S2C_HeartbeatAck ack = new S2C_HeartbeatAck();
-        ack.setPlayerId(-1);
-        ack.setTimestamp(System.currentTimeMillis());
-        ack.getData().setServerTimestamp(System.currentTimeMillis());
-        session.send(messageCodec.encode(ack));
+        try {
+            S2C_HeartbeatAck ack = new S2C_HeartbeatAck();
+            ack.setPlayerId(-1);
+            ack.setTimestamp(System.currentTimeMillis());
+            ack.getData().setServerTimestamp(System.currentTimeMillis());
+            session.send(messageCodec.encode(ack));
+        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+            // 心跳序列化失败不影响连接，仅记录
+        }
     }
 }
