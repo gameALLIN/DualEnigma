@@ -44,6 +44,12 @@ namespace DualEnigma.Network
         public bool IsConnected { get; private set; }
 
         private float _heartbeatTimer;
+
+        /// <summary>最近一次心跳往返延迟（毫秒）；-1 = 未知（未联机/尚无样本）</summary>
+        public float RttMs { get; private set; } = -1f;
+
+        /// <summary>心跳发送时刻（Time.realtimeSinceStartup，收到 Ack 时求差得 RTT）</summary>
+        private float _lastHeartbeatSendTime = -1f;
         private bool _disconnectPublished;
 
         // ── JSON 结构（与服务端 Message 子类字段一一对应）──
@@ -302,6 +308,8 @@ namespace DualEnigma.Network
         private void Cleanup()
         {
             IsConnected = false;
+            RttMs = -1f;
+            _lastHeartbeatSendTime = -1f;
             _cts?.Cancel();
             _cts?.Dispose();
             _cts = null;
@@ -433,6 +441,7 @@ namespace DualEnigma.Network
                 if (_heartbeatTimer >= HEARTBEAT_INTERVAL)
                 {
                     _heartbeatTimer = 0f;
+                    _lastHeartbeatSendTime = Time.realtimeSinceStartup;
                     _ = SendJsonAsync(JsonUtility.ToJson(new HeartbeatRequest()));
                 }
             }
@@ -581,7 +590,15 @@ namespace DualEnigma.Network
                 }
 
                 case "S2C_HeartbeatAck":
-                    break; // 心跳回复，无需处理
+                {
+                    // 应用层 RTT：发送心跳 → 收到 Ack 的实时时钟差（含序列化+网络往返）
+                    if (_lastHeartbeatSendTime > 0f)
+                    {
+                        RttMs = (Time.realtimeSinceStartup - _lastHeartbeatSendTime) * 1000f;
+                        _lastHeartbeatSendTime = -1f;
+                    }
+                    break;
+                }
 
                 default:
                     // 对局中的高阶消息（状态同步/建造/灾害等）后续接入

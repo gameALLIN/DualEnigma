@@ -32,6 +32,12 @@ namespace DualEnigma.UI
         /// <summary>低血量阈值（比例），低于后血条变红</summary>
         private const float LOW_HP_RATIO = 0.3f;
 
+        /// <summary>性能信息开关的 PlayerPrefs 键（UISettings 弹窗写入）</summary>
+        private const string PERF_PREF_KEY = "SettingsShowPerf";
+
+        /// <summary>性能信息刷新窗口（秒），FPS 取窗口内平均</summary>
+        private const float PERF_INTERVAL = 0.5f;
+
         private static UIGameHudCtrl s_Instance;
 
         private static readonly Color32 AQUA_HP_COLOR = new Color32(0x4F, 0xC3, 0xF7, 0xFF);
@@ -44,6 +50,10 @@ namespace DualEnigma.UI
 
         private float _refreshTimer;
         private bool _exitScheduled;
+
+        // 性能统计：FPS 窗口累计
+        private int _frameCounter;
+        private float _perfTimer;
 
         /// <summary>确保 HUD 常驻实例存在（GameLaunch 启动时调用，幂等）</summary>
         public static void Ensure()
@@ -84,6 +94,7 @@ namespace DualEnigma.UI
         {
             _model = new UIGameHudModel();
             _view = GetComponent<UIGameHudView>();
+            RefreshPerfVisibility();
 
             // 常驻面板：订阅挂在 OnCreate，销毁时注销
             EventBus.Instance.Subscribe<GameStartEvent>(OnGameStart);
@@ -189,12 +200,51 @@ namespace DualEnigma.UI
             // 倒计时文本与进度条每帧更新（数值轮询节流）
             RefreshPhaseTexts();
 
+            // 性能信息：FPS 窗口累计 + RTT 读取（0.5s 更新一次文本）
+            UpdatePerf();
+
             _refreshTimer += Time.deltaTime;
             if (_refreshTimer >= REFRESH_INTERVAL)
             {
                 _refreshTimer = 0f;
                 RefreshAll();
             }
+        }
+
+        // ============================================================
+        //  性能信息（FPS / 网络延迟）
+        // ============================================================
+
+        /// <summary>设置弹窗开关性能信息显示（静态供 UISettingsCtrl 调用）</summary>
+        public static void RefreshPerfVisibility()
+        {
+            if (s_Instance == null || s_Instance._view == null || s_Instance._view.PerfText == null) return;
+            bool show = PlayerPrefs.GetInt(PERF_PREF_KEY, 1) == 1;
+            s_Instance._view.PerfText.gameObject.SetActive(show);
+        }
+
+        private void UpdatePerf()
+        {
+            if (_view == null || _view.PerfText == null) return;
+
+            _frameCounter++;
+            _perfTimer += Time.unscaledDeltaTime;
+            if (_perfTimer < PERF_INTERVAL) return;
+
+            int fps = _frameCounter > 0 ? Mathf.RoundToInt(_frameCounter / _perfTimer) : 0;
+            _frameCounter = 0;
+            _perfTimer = 0f;
+
+            string text = $"FPS {fps}";
+
+            // 联机时附带应用层 RTT（心跳往返，1Hz 更新）
+            if (NetworkSystem.HasInstance && NetworkSystem.Instance.IsConnected
+                && GameServerClient.HasInstance && GameServerClient.Instance.RttMs > 0f)
+            {
+                text += $"  PING {Mathf.RoundToInt(GameServerClient.Instance.RttMs)}ms";
+            }
+
+            _view.PerfText.text = text;
         }
 
         private void RefreshAll()

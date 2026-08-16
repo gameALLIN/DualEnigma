@@ -113,6 +113,11 @@ namespace DualEnigma.Editor
                 new Vector2(0, 0), new Vector2(16, 16), new Vector2(320f, 22f), LABEL_COLOR);
             fragmentText.alignment = TextAnchor.MiddleLeft;
 
+            // ---- 右下：性能信息（FPS/延迟，设置弹窗可开关） ----
+            Text perfText = CreateText("PerfText", "FPS 60", 13, root.transform, font,
+                new Vector2(1, 0), new Vector2(-16, 16), new Vector2(240f, 20f), LABEL_COLOR);
+            perfText.alignment = TextAnchor.MiddleRight;
+
             return root;
         }
 
@@ -196,6 +201,7 @@ namespace DualEnigma.Editor
             BindText(so, root, "m_FragmentCountText", "FragmentCountText");
             so.FindProperty("m_SettingsBtn").objectReferenceValue =
                 FindDeepChild(root.transform, "SettingsBtn")?.GetComponent<Button>();
+            BindText(so, root, "m_PerfText", "PerfText");
 
             so.ApplyModifiedProperties();
             EditorUtility.SetDirty(view);

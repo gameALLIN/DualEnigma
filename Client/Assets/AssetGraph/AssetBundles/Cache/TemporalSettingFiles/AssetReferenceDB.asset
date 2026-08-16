@@ -1021,10 +1021,6 @@ MonoBehaviour:
     m_importFrom: Assets/Scripts/Network/GameServerClient.cs
     m_exportTo: 
     m_variantName: 
-  - m_assetDatabaseId: cfa8920e38871f04083e94e0c3712c64
-    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIFriends/UIFriends.prefab
-    m_exportTo: 
-    m_variantName: 
   - m_assetDatabaseId: 93665bc8017042441b29d48ba214f5f3
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UIInvitePopup/UIInvitePopup.prefab
     m_exportTo: 
@@ -1111,6 +1107,10 @@ MonoBehaviour:
     m_variantName: 
   - m_assetDatabaseId: 4249823a5ffdb5f4e96ef05c680ac9ee
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UISettings/UISettings.prefab
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: cfa8920e38871f04083e94e0c3712c64
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIFriends/UIFriends.prefab
     m_exportTo: 
     m_variantName: 
   m_version: 2

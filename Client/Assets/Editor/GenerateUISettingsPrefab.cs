@@ -95,15 +95,64 @@ namespace DualEnigma.Editor
             CreateText("VolumeValueText", "80%", 14, panel.transform, font,
                 new Vector2(1, 0.5f), new Vector2(-24f, 40f), new Vector2(48f, 22f), SLIDER_FILL_COLOR);
 
+            // ---- 性能信息显示开关 ----
+            BuildPerfToggle(panel.transform, font);
+
             // ---- 继续游戏 ----
             CreateButton("ContinueBtn", "继续游戏", CONTINUE_BTN_COLOR, panel.transform, font,
-                new Vector2(0.5f, 0.5f), new Vector2(0f, -28f), new Vector2(260f, 40f), 16, "Text");
+                new Vector2(0.5f, 0.5f), new Vector2(0f, -46f), new Vector2(260f, 40f), 16, "Text");
 
             // ---- 退出对局 ----
             CreateButton("ExitBtn", "退出对局", EXIT_BTN_COLOR, panel.transform, font,
-                new Vector2(0.5f, 0.5f), new Vector2(0f, -82f), new Vector2(260f, 40f), 16, "Text");
+                new Vector2(0.5f, 0.5f), new Vector2(0f, -100f), new Vector2(260f, 40f), 16, "Text");
 
             return root;
+        }
+
+        /// <summary>构建性能信息显示开关（Background + Checkmark + Label）</summary>
+        private static void BuildPerfToggle(Transform parent, Font font)
+        {
+            GameObject toggleObj = CreateUIObject("PerfToggle", parent);
+            Toggle toggle = toggleObj.AddComponent<Toggle>();
+            toggle.isOn = true;
+
+            RectTransform toggleRT = toggleObj.GetComponent<RectTransform>();
+            toggleRT.anchorMin = toggleRT.anchorMax = new Vector2(0.5f, 0.5f);
+            toggleRT.anchoredPosition = new Vector2(0f, 10f);
+            toggleRT.sizeDelta = new Vector2(260f, 24f);
+
+            // 勾选框背景
+            GameObject bg = CreateImage("Background", toggleObj.transform, SLIDER_BG_COLOR);
+            bg.GetComponent<Image>().raycastTarget = true;
+            RectTransform bgRT = bg.GetComponent<RectTransform>();
+            bgRT.anchorMin = bgRT.anchorMax = new Vector2(0, 0.5f);
+            bgRT.anchoredPosition = new Vector2(18f, 0f);
+            bgRT.sizeDelta = new Vector2(20f, 20f);
+
+            // 勾选标记
+            GameObject check = CreateImage("Checkmark", bg.transform, SLIDER_FILL_COLOR);
+            check.GetComponent<Image>().raycastTarget = false;
+            RectTransform checkRT = check.GetComponent<RectTransform>();
+            SetStretch(checkRT);
+            checkRT.offsetMin = new Vector2(4f, 4f);
+            checkRT.offsetMax = new Vector2(-4f, -4f);
+
+            // 标签
+            GameObject labelObj = CreateUIObject("Label", toggleObj.transform);
+            Text label = labelObj.AddComponent<Text>();
+            label.text = "显示性能信息（FPS / 延迟）";
+            label.font = font;
+            label.fontSize = 14;
+            label.color = Color.white;
+            label.alignment = TextAnchor.MiddleLeft;
+            label.raycastTarget = false;
+            RectTransform labelRT = labelObj.GetComponent<RectTransform>();
+            labelRT.anchorMin = labelRT.anchorMax = new Vector2(0, 0.5f);
+            labelRT.anchoredPosition = new Vector2(140f, 0f);
+            labelRT.sizeDelta = new Vector2(220f, 22f);
+
+            toggle.targetGraphic = bg.GetComponent<Image>();
+            toggle.graphic = check.GetComponent<Image>();
         }
 
         /// <summary>构建音量滑条（标准 Slider 层级：FillArea/Fill + HandleArea/Handle）</summary>
@@ -162,6 +211,8 @@ namespace DualEnigma.Editor
                 FindDeepChild(root.transform, "VolumeSlider")?.GetComponent<Slider>();
             so.FindProperty("m_VolumeValueText").objectReferenceValue =
                 FindDeepChild(root.transform, "VolumeValueText")?.GetComponent<Text>();
+            so.FindProperty("m_PerfToggle").objectReferenceValue =
+                FindDeepChild(root.transform, "PerfToggle")?.GetComponent<Toggle>();
             so.FindProperty("m_ContinueBtn").objectReferenceValue =
                 FindDeepChild(root.transform, "ContinueBtn")?.GetComponent<Button>();
             so.FindProperty("m_ExitBtn").objectReferenceValue =

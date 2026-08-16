@@ -16,12 +16,14 @@ namespace DualEnigma.UI
         // ===== Auto Bind Fields（自动绑定，请勿手动修改）=====
         [SerializeField] private Slider m_VolumeSlider;
         [SerializeField] private Text m_VolumeValueText;
+        [SerializeField] private Toggle m_PerfToggle;
         [SerializeField] private Button m_ContinueBtn;
         [SerializeField] private Button m_ExitBtn;
         // ===== Auto Bind End =====
 
         public Slider VolumeSlider => m_VolumeSlider;
         public Text VolumeValueText => m_VolumeValueText;
+        public Toggle PerfToggle => m_PerfToggle;
         public Button ContinueBtn => m_ContinueBtn;
         public Button ExitBtn => m_ExitBtn;
     }

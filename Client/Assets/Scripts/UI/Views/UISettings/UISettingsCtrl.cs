@@ -28,6 +28,9 @@ namespace DualEnigma.UI
         /// <summary>默认音量</summary>
         private const float DEFAULT_VOLUME = 0.8f;
 
+        /// <summary>性能信息显示开关持久化键（UIGameHudCtrl 读取同键）</summary>
+        private const string PERF_PREF_KEY = "SettingsShowPerf";
+
         private static UISettingsCtrl s_Instance;
 
         private UISettingsModel _model;
@@ -137,6 +140,12 @@ namespace DualEnigma.UI
                 _view.VolumeSlider.SetValueWithoutNotify(_model.Volume);
             }
 
+            if (_view.PerfToggle != null)
+            {
+                _view.PerfToggle.onValueChanged.AddListener(OnPerfToggleChanged);
+                _view.PerfToggle.SetIsOnWithoutNotify(PlayerPrefs.GetInt(PERF_PREF_KEY, 1) == 1);
+            }
+
             RefreshVolumeText();
         }
 
@@ -152,6 +161,9 @@ namespace DualEnigma.UI
 
             if (_view.VolumeSlider != null)
                 _view.VolumeSlider.onValueChanged.RemoveListener(OnVolumeChanged);
+
+            if (_view.PerfToggle != null)
+                _view.PerfToggle.onValueChanged.RemoveListener(OnPerfToggleChanged);
         }
 
         protected override void OnDestroy()
@@ -192,6 +204,14 @@ namespace DualEnigma.UI
             PlayerPrefs.SetFloat(VOLUME_PREF_KEY, value);
             PlayerPrefs.Save();
             RefreshVolumeText();
+        }
+
+        /// <summary>性能信息开关：持久化并即时作用于 HUD</summary>
+        private void OnPerfToggleChanged(bool value)
+        {
+            PlayerPrefs.SetInt(PERF_PREF_KEY, value ? 1 : 0);
+            PlayerPrefs.Save();
+            UIGameHudCtrl.RefreshPerfVisibility();
         }
 
         private void RefreshVolumeText()
