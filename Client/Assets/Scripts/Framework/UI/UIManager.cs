@@ -244,6 +244,19 @@ namespace DualEnigma.Framework.UI
             return m_PanelStack.Peek().Panel;
         }
 
+        /// <summary>
+        /// 批量设置当前面板栈内全部面板的可见性（不触发 OnShow/OnHide 生命周期）。
+        /// 用于对局开始时整体隐藏主界面、对局结束后整体恢复——面板栈结构与状态保持不变。
+        /// </summary>
+        public void SetPanelsVisible(bool visible)
+        {
+            foreach (PanelStackEntry entry in m_PanelStack)
+            {
+                if (entry.Panel != null && entry.Panel.gameObject.activeSelf != visible)
+                    entry.Panel.gameObject.SetActive(visible);
+            }
+        }
+
         /// <summary>面板栈条目</summary>
         private struct PanelStackEntry
         {

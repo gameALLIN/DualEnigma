@@ -8,6 +8,7 @@
 
 using UnityEngine;
 using DualEnigma.Framework.Core;
+using DualEnigma.Framework.UI;
 using DualEnigma.Network;
 using DualEnigma.Character;
 using DualEnigma.Shelter;
@@ -15,6 +16,7 @@ using DualEnigma.Synthesis;
 using DualEnigma.Skill;
 using DualEnigma.Disaster;
 using DualEnigma.Fragment;
+using DualEnigma.UI;
 
 namespace DualEnigma.Core
 {
@@ -87,6 +89,9 @@ namespace DualEnigma.Core
         /// <summary>全局游戏状态</summary>
         public GameState State { get; } = new GameState();
 
+        /// <summary>退出对局流程是否已执行（防止 GameEndEvent 延迟协程与手动退出重复触发）</summary>
+        private bool _exitToHomeInvoked;
+
         /// <summary>水人 HP（从 ShelterSystem 读取，ShelterSystem 为HP唯一权威）</summary>
         public int AquaHP => ShelterSystem.HasInstance ? ShelterSystem.Instance.AquaHP : 0;
 
@@ -137,6 +142,7 @@ namespace DualEnigma.Core
         {
             State.IsGameOver = false;
             State.IsPaused = false;
+            _exitToHomeInvoked = false;
             ShelterSystem.Instance.ResetHP();
 
             if (NetworkSystem.HasInstance && NetworkSystem.Instance.IsConnected)
@@ -172,6 +178,39 @@ namespace DualEnigma.Core
             EventBus.Instance.Publish(new GameEndEvent { isVictory = isVictory });
 
             Debug.Log($"[GameManager] 游戏结束 — {(isVictory ? "胜利" : "失败")}");
+        }
+
+        /// <summary>
+        /// 退出对局并恢复主界面。对局内设置面板【退出对局】与对局自然结束（延迟）统一走此出口。
+        /// 联机模式：断开服务器连接并弹出房间面板；单机：直接恢复栈内被隐藏的主界面面板。
+        /// 幂等：重复调用（事件重入/协程重放）只执行一次，StartGame 时复位。
+        /// </summary>
+        public void ExitToHome()
+        {
+            if (_exitToHomeInvoked)
+                return;
+            _exitToHomeInvoked = true;
+
+            State.IsPaused = false;
+            State.IsGameOver = true;
+
+            GameStateMachine.Instance.SetNetworkDriven(false);
+            GameStateMachine.Instance.Stop();
+
+            // 联机：断开连接，弹出房间面板恢复 UIHome 为栈顶
+            if (NetworkSystem.HasInstance && NetworkSystem.Instance.IsConnected)
+            {
+                if (GameServerClient.HasInstance)
+                    GameServerClient.Instance.Disconnect();
+                UIManager.Instance.PopTo<UIHomeCtrl>();
+            }
+
+            // 恢复栈内被 SetPanelsVisible(false) 隐藏的主界面面板
+            UIManager.Instance.SetPanelsVisible(true);
+
+            EventBus.Instance.Publish(new GameEndEvent { isVictory = false });
+
+            Debug.Log("[GameManager] 退出对局，返回主界面");
         }
 
         /// <summary>

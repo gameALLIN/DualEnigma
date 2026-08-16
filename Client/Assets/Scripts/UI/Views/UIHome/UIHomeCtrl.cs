@@ -83,11 +83,10 @@ namespace DualEnigma.UI
                 _view.LogoutBtn.onClick.RemoveListener(OnLogoutClicked);
         }
 
-        /// <summary>开始游戏：关闭全部 UI 面板并启动本地单局（联机版后续改为房间匹配流程）</summary>
+        /// <summary>开始游戏：隐藏栈内全部面板（保留栈结构，对局结束后恢复）并启动本地单局</summary>
         private void OnStartGameClicked()
         {
-            UIManager.Instance.Pop();   // 关闭 UIHome（会恢复显示下方的 UILogin）
-            UIManager.Instance.Pop();   // 关闭 UILogin
+            UIManager.Instance.SetPanelsVisible(false);
             GameManager.Instance.StartGame();
         }
 

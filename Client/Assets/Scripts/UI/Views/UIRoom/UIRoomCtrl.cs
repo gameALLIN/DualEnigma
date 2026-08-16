@@ -129,10 +129,8 @@ namespace DualEnigma.UI
 
         private void OnGameStart(RoomGameStartEvent e)
         {
-            // 两人满员 → 关闭全部 UI 面板并开始对局
-            while (UIManager.Instance.GetTopPanel() != null)
-                UIManager.Instance.Pop();
-
+            // 两人满员 → 隐藏栈内全部面板（保留栈结构，对局结束后恢复）并开始对局
+            UIManager.Instance.SetPanelsVisible(false);
             GameManager.Instance.StartGame();
         }
 
