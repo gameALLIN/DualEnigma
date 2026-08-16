@@ -112,9 +112,9 @@ namespace DualEnigma.Editor
             CreateButton("RejectBtn", "拒绝", TOGGLE_BTN_COLOR, inviteRow.transform, font,
                 new Vector2(1f, 0.5f), new Vector2(-66f, 0f), new Vector2(56f, 24f), 13, "Text");
 
-            // ---- 好友申请区（默认隐藏）----
+            // ---- 好友申请区（默认隐藏；显示时固定顶部 T68..138，好友列表让位）----
             GameObject requestSection = CreateImage("RequestSection", panel.transform, null, SECTION_COLOR);
-            SetTop(requestSection.GetComponent<RectTransform>(), new Vector2(680f, 70f), new Vector2(0f, -142f));
+            SetTop(requestSection.GetComponent<RectTransform>(), new Vector2(680f, 70f), new Vector2(0f, -103f));
             requestSection.SetActive(false);
             CreateText("RequestSectionTitle", "好友申请", 16, requestSection.transform, font,
                 new Vector2(0f, 1f), new Vector2(16f, -14f), new Vector2(200f, 20f), LABEL_COLOR).alignment = TextAnchor.MiddleLeft;
@@ -134,12 +134,14 @@ namespace DualEnigma.Editor
                 new Vector2(1f, 0.5f), new Vector2(-66f, 0f), new Vector2(56f, 24f), 13, "Text");
 
             // ---- 好友列表（滚动）----
+            // 标题默认位置 = 无申请时（T66..86）；有申请时由 Ctrl 下移至 -160
             CreateText("FriendSectionTitle", "好友列表", 16, panel.transform, font,
-                new Vector2(0f, 1f), new Vector2(24f, -228f), new Vector2(200f, 20f), LABEL_COLOR).alignment = TextAnchor.MiddleLeft;
+                new Vector2(0f, 1f), new Vector2(24f, -76f), new Vector2(200f, 20f), LABEL_COLOR).alignment = TextAnchor.MiddleLeft;
 
             GameObject scroll = CreateUIObject("FriendScroll", panel.transform);
             RectTransform scrollRT = scroll.GetComponent<RectTransform>();
-            SetTop(scrollRT, new Vector2(672f, 260f), new Vector2(0f, -246f));
+            // 默认（无申请）T96..564：中心 -330 高 468；有申请时由 Ctrl 改为 T180..564
+            SetTop(scrollRT, new Vector2(672f, 468f), new Vector2(0f, -330f));
 
             Image scrollBg = scroll.AddComponent<Image>();
             scrollBg.color = ROW_COLOR;

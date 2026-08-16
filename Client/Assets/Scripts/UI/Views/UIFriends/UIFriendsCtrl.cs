@@ -191,55 +191,56 @@ namespace DualEnigma.UI
         }
 
         // ============================================================
-        //  布局联动（修复申请区被好友列表遮挡）
+        //  布局联动（申请区与好友列表固定分区，彻底消除遮挡）
+        //  坐标语义：anchor top 的 anchoredPosition.y 为矩形中心到面板顶的距离（负值），
+        //  T 值 = 距顶距离（0..640），矩形占位 [T_center - h/2, T_center + h/2]。
         // ============================================================
 
-        /// <summary>动态区块高度（与生成器 RequestSection/InviteSection 一致）</summary>
-        private const float SECTION_HEIGHT = 70f;
+        /// <summary>申请区固定中心：T103（占 T68..138，紧跟标题栏）</summary>
+        private const float REQUEST_CENTER_Y = -103f;
 
-        /// <summary>区块间距</summary>
-        private const float SECTION_GAP = 8f;
+        /// <summary>列表标题中心：有申请 T160（占 T150..170）/ 无申请 T76（占 T66..86）</summary>
+        private const float TITLE_WITH_REQUEST_Y = -160f;
+        private const float TITLE_NO_REQUEST_Y = -76f;
 
-        /// <summary>好友列表标题基准 Y（与生成器一致，两区块全显示时）</summary>
-        private const float TITLE_BASE_Y = -228f;
+        /// <summary>滚动区顶边 T：有申请 180 / 无申请 96</summary>
+        private const float SCROLL_TOP_WITH_REQUEST = 180f;
+        private const float SCROLL_TOP_NO_REQUEST = 96f;
 
-        /// <summary>好友滚动区基准 Y（与生成器一致，两区块全显示时）</summary>
-        private const float SCROLL_BASE_Y = -246f;
-
-        /// <summary>面板顶部区块起点 Y（与生成器 InviteSection 一致）</summary>
-        private const float SECTION_TOP_Y = -64f;
+        /// <summary>滚动区底边 T：固定 564（搜索区 T578 上方留 14px）</summary>
+        private const float SCROLL_BOTTOM = 564f;
 
         /// <summary>
-        /// 按邀请/申请区显隐联动布局：隐藏的区块收拢，好友列表上移，
-        /// 消除固定锚点导致的遮挡（FriendScroll 覆盖 RequestSection）。
+        /// 按申请区显隐联动好友列表：申请显示时列表整体下移并压缩高度，
+        /// 隐藏时列表扩展占满（高度动态变化，顶/底分区永不相交）。
         /// </summary>
         private void RefreshLayout()
         {
-            bool inviteVisible = _view.InviteSection != null && _view.InviteSection.activeSelf;
             bool requestVisible = _view.RequestSection != null && _view.RequestSection.activeSelf;
 
-            // 申请区紧跟邀请区之后（无邀请区则顶到面板首行）
+            // 申请区：固定顶部（不依赖其他区块；邀请区已移交全局弹窗 UIInvitePopup，恒隐藏）
             if (_view.RequestSection != null)
             {
                 RectTransform rt = _view.RequestSection.transform as RectTransform;
                 if (rt != null)
-                {
-                    float y = SECTION_TOP_Y - (inviteVisible ? SECTION_HEIGHT + SECTION_GAP : 0f);
-                    rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, y);
-                }
+                    rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, REQUEST_CENTER_Y);
             }
 
-            // 好友列表标题与滚动区按隐藏区块数上移
-            float shift = (inviteVisible ? 0f : SECTION_HEIGHT + SECTION_GAP)
-                        + (requestVisible ? 0f : SECTION_HEIGHT + SECTION_GAP);
-
+            // 列表标题跟随
             if (_view.FriendSectionTitle != null)
-                _view.FriendSectionTitle.anchoredPosition =
-                    new Vector2(_view.FriendSectionTitle.anchoredPosition.x, TITLE_BASE_Y + shift);
+                _view.FriendSectionTitle.anchoredPosition = new Vector2(
+                    _view.FriendSectionTitle.anchoredPosition.x,
+                    requestVisible ? TITLE_WITH_REQUEST_Y : TITLE_NO_REQUEST_Y);
 
+            // 滚动区：顶边跟随、底边固定、高度动态
             if (_view.FriendScroll != null)
-                _view.FriendScroll.anchoredPosition =
-                    new Vector2(_view.FriendScroll.anchoredPosition.x, SCROLL_BASE_Y + shift);
+            {
+                float top = requestVisible ? SCROLL_TOP_WITH_REQUEST : SCROLL_TOP_NO_REQUEST;
+                _view.FriendScroll.sizeDelta = new Vector2(_view.FriendScroll.sizeDelta.x, SCROLL_BOTTOM - top);
+                _view.FriendScroll.anchoredPosition = new Vector2(
+                    _view.FriendScroll.anchoredPosition.x,
+                    -(top + SCROLL_BOTTOM) / 2f);
+            }
         }
 
         // ============================================================
