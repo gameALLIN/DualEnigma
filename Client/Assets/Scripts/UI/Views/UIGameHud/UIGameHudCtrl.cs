@@ -8,7 +8,6 @@
 ///       ESC 或设置按钮开关设置弹窗（单机伴随暂停）。
 /// ============================================================
 
-using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using DualEnigma.Framework.UI;
@@ -49,7 +48,6 @@ namespace DualEnigma.UI
         private UIGameHudView _view;
 
         private float _refreshTimer;
-        private bool _exitScheduled;
 
         // 性能统计：FPS 窗口累计
         private int _frameCounter;
@@ -141,7 +139,6 @@ namespace DualEnigma.UI
         private void OnGameStart(GameStartEvent e)
         {
             _model.IsInGame = true;
-            _exitScheduled = false;
             gameObject.SetActive(true);
             ((IUIPanel)this).OnShow();
             RefreshAll();
@@ -152,20 +149,7 @@ namespace DualEnigma.UI
             _model.IsInGame = false;
             ((IUIPanel)this).OnHide();
             gameObject.SetActive(false);
-
-            // 对局自然结束（死亡/通关/对局内退出）→ 延迟返回主界面，避免画面突兀。
-            // 协程挂到常驻的 GameManager 上（本物体已停用，自身协程会中断）。
-            if (!_exitScheduled && GameManager.HasInstance)
-            {
-                _exitScheduled = true;
-                GameManager.Instance.StartCoroutine(DelayedExitToHome());
-            }
-        }
-
-        private IEnumerator DelayedExitToHome()
-        {
-            yield return new WaitForSeconds(3f);
-            GameManager.Instance.ExitToHome();
+            // 返回主界面的出口由 UIGameOver 结算面板接管（死亡/通关弹结算，手动退出直接回主界面）
         }
 
         private void OnPhaseChanged(PhaseChangedEvent e)

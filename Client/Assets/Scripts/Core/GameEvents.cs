@@ -113,10 +113,11 @@ namespace DualEnigma.Core
         public int count;
     }
 
-    /// <summary>单局结束事件（由 GameManager 发布）</summary>
+    /// <summary>单局结束事件（由 GameManager 发布）。isManualExit = 玩家主动退出（不弹结算面板）</summary>
     public struct GameEndEvent : IEventData
     {
         public bool isVictory;
+        public bool isManualExit;
     }
 
     /// <summary>游戏暂停事件（由 GameManager 发布）</summary>

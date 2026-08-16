@@ -175,7 +175,7 @@ namespace DualEnigma.Core
             State.IsGameOver = true;
             GameStateMachine.Instance.SetNetworkDriven(false);
             GameStateMachine.Instance.Stop();
-            EventBus.Instance.Publish(new GameEndEvent { isVictory = isVictory });
+            EventBus.Instance.Publish(new GameEndEvent { isVictory = isVictory, isManualExit = false });
 
             Debug.Log($"[GameManager] 游戏结束 — {(isVictory ? "胜利" : "失败")}");
         }
@@ -208,7 +208,8 @@ namespace DualEnigma.Core
             // 恢复栈内被 SetPanelsVisible(false) 隐藏的主界面面板
             UIManager.Instance.SetPanelsVisible(true);
 
-            EventBus.Instance.Publish(new GameEndEvent { isVictory = false });
+            // 手动退出标记：结算面板据此跳过弹窗（玩家已主动选择离开）
+            EventBus.Instance.Publish(new GameEndEvent { isVictory = false, isManualExit = true });
 
             Debug.Log("[GameManager] 退出对局，返回主界面");
         }

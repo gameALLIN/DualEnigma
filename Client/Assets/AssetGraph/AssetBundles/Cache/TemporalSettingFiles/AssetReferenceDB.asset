@@ -1097,20 +1097,20 @@ MonoBehaviour:
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UIGameHud
     m_exportTo: 
     m_variantName: 
-  - m_assetDatabaseId: 2a69ab1b2c0ff094a9570008e00ca7c5
-    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIGameHud/UIGameHud.prefab
-    m_exportTo: 
-    m_variantName: 
   - m_assetDatabaseId: 68d4feb94ca85434896ba8f655338ab8
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UISettings
     m_exportTo: 
     m_variantName: 
-  - m_assetDatabaseId: 4249823a5ffdb5f4e96ef05c680ac9ee
-    m_importFrom: Assets/AssetPackage/Prefabs/UI/UISettings/UISettings.prefab
-    m_exportTo: 
-    m_variantName: 
   - m_assetDatabaseId: cfa8920e38871f04083e94e0c3712c64
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UIFriends/UIFriends.prefab
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 2a69ab1b2c0ff094a9570008e00ca7c5
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIGameHud/UIGameHud.prefab
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 4249823a5ffdb5f4e96ef05c680ac9ee
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UISettings/UISettings.prefab
     m_exportTo: 
     m_variantName: 
   m_version: 2

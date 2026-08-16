@@ -103,9 +103,10 @@ namespace DualEnigma.Core
             _ = NetworkSystem.Instance;
             _ = AuthService.Instance;
 
-            // 局内常驻 UI（HUD/设置弹窗，仿 UIInvitePopup 常驻模式，默认隐藏）
+            // 局内常驻 UI（HUD/设置弹窗/结算面板，仿 UIInvitePopup 常驻模式，默认隐藏）
             UIGameHudCtrl.Ensure();
             UISettingsCtrl.Ensure();
+            UIGameOverCtrl.Ensure();
 
             Debug.Log("[GameLaunch] 全系统初始化完成（Core + 9个业务系统 + UI）");
         }
