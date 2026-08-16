@@ -55,7 +55,9 @@ namespace DualEnigma.UI
         protected override void OnHide()
         {
             UnbindEvents();
-            EventBus.Instance.Unsubscribe<SocialNotifyChangedEvent>(OnSocialNotifyChanged);
+            // 场景卸载时 EventBus 单例可能已先被销毁，避免 NRE
+            if (EventBus.HasInstance)
+                EventBus.Instance.Unsubscribe<SocialNotifyChangedEvent>(OnSocialNotifyChanged);
         }
 
         private void BindEvents()

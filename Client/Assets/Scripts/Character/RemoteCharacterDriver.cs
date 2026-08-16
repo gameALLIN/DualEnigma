@@ -42,12 +42,15 @@ namespace DualEnigma.Character
 
         private void OnEnable()
         {
-            EventBus.Instance.Subscribe<HighFreqStateReceivedEvent>(OnStateReceived);
+            if (EventBus.HasInstance)
+                EventBus.Instance.Subscribe<HighFreqStateReceivedEvent>(OnStateReceived);
         }
 
         private void OnDisable()
         {
-            EventBus.Instance.Unsubscribe<HighFreqStateReceivedEvent>(OnStateReceived);
+            // 场景卸载/重建角色时 EventBus 单例可能已销毁（Instance getter 会 NRE）
+            if (EventBus.HasInstance)
+                EventBus.Instance.Unsubscribe<HighFreqStateReceivedEvent>(OnStateReceived);
         }
 
         private void OnStateReceived(HighFreqStateReceivedEvent e)
