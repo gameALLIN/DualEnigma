@@ -85,10 +85,8 @@ public class RoomManager {
             return;
         }
 
-        // 已识别身份的玩家注册在线状态（组队中）
-        if (session.getAccountId() != null) {
-            onlineRegistry.register(session.getAccountId(), room.getRoomCode());
-        }
+        // 已识别身份的玩家注册在线状态（组队中；匿名会话内部忽略）
+        onlineRegistry.register(session);
 
         log.info("Player joined room {} (count={})", room.getRoomCode(), room.getPlayerCount());
         sendConnectAck(session, session.getPlayerId(), room.getRoomCode());

@@ -39,11 +39,16 @@ public class OnlineRegistry implements HeartbeatManager.DisconnectListener {
         heartbeatManager.addDisconnectListener(this);
     }
 
-    /** 会话断开 → 注销在线（HeartbeatManager 回调） */
+    /** 会话断开 → 注销在线（HeartbeatManager 回调；sessionId 比对防误删重连后的新注册） */
     @Override
     public void onDisconnect(ClientSession session) {
-        if (session.getAccountId() != null) {
-            remove(session.getAccountId());
+        Long accountId = session.getAccountId();
+        if (accountId == null) return;
+
+        Presence p = online.get(accountId);
+        if (p != null && p.getSessionId().equals(session.getSessionId())) {
+            online.remove(accountId);
+            log.debug("Presence remove: accountId={}", accountId);
         }
     }
 
@@ -51,25 +56,31 @@ public class OnlineRegistry implements HeartbeatManager.DisconnectListener {
     public static class Presence {
         private final long accountId;
         private final String roomCode;
+        private final String sessionId;
         private volatile boolean inGame;
 
-        public Presence(long accountId, String roomCode) {
+        public Presence(long accountId, String roomCode, String sessionId) {
             this.accountId = accountId;
             this.roomCode = roomCode;
+            this.sessionId = sessionId;
         }
 
         public long getAccountId() { return accountId; }
         public String getRoomCode() { return roomCode; }
+        public String getSessionId() { return sessionId; }
         public boolean isInGame() { return inGame; }
         public void setInGame(boolean inGame) { this.inGame = inGame; }
     }
 
     private final Map<Long, Presence> online = new ConcurrentHashMap<>();
 
-    /** 进房：注册在线（组队中） */
-    public void register(long accountId, String roomCode) {
-        online.put(accountId, new Presence(accountId, roomCode));
-        log.debug("Presence register: accountId={}, room={}", accountId, roomCode);
+    /** 进房：注册在线（组队中）。匿名会话（accountId 未识别）不注册 */
+    public void register(ClientSession session) {
+        Long accountId = session.getAccountId();
+        if (accountId == null) return;
+
+        online.put(accountId, new Presence(accountId, session.getRoomCode(), session.getSessionId()));
+        log.debug("Presence register: accountId={}, room={}", accountId, session.getRoomCode());
     }
 
     /** 房间开局：房间内全部已识别账号标记游戏中 */

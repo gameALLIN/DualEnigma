@@ -45,15 +45,9 @@ public class HeartbeatManager {
     }
 
     public void unregister(WebSocketSession session) {
-        ClientSession removed = sessions.remove(session.getId());
-        if (removed != null) {
-            for (DisconnectListener listener : disconnectListeners) {
-                try {
-                    listener.onDisconnect(removed);
-                } catch (Exception e) {
-                    log.warn("Disconnect listener failed: {}", e.getMessage());
-                }
-            }
+        ClientSession clientSession = sessions.get(session.getId());
+        if (clientSession != null) {
+            removeSession(clientSession);
         }
     }
 
@@ -85,7 +79,9 @@ public class HeartbeatManager {
         for (Map.Entry<String, ClientSession> entry : sessions.entrySet()) {
             ClientSession session = entry.getValue();
             if (!session.isOpen()) {
-                sessions.remove(entry.getKey());
+                // 兜底清扫（afterConnectionClosed 竞态遗漏时）：同样必须通知监听器，
+                // 否则在线注册表残留（玩家永远显示"组队中/游戏中"）
+                removeSession(session);
                 continue;
             }
 
@@ -97,6 +93,20 @@ public class HeartbeatManager {
             }
 
             // TODO: 检查应用层心跳超时（5s），触发断线处理
+        }
+    }
+
+    /** 移除会话并通知断线监听器（unregister 与超时清扫共用） */
+    private void removeSession(ClientSession session) {
+        ClientSession removed = sessions.remove(session.getSessionId());
+        if (removed != null) {
+            for (DisconnectListener listener : disconnectListeners) {
+                try {
+                    listener.onDisconnect(removed);
+                } catch (Exception e) {
+                    log.warn("Disconnect listener failed: {}", e.getMessage());
+                }
+            }
         }
     }
 }
