@@ -5,6 +5,7 @@
 /// 描述: 局内设置弹窗视图。音量滑条 + 继续游戏 + 退出对局。
 /// ============================================================
 
+using UnityEngine;
 using UnityEngine.UI;
 using DualEnigma.Framework.UI;
 
