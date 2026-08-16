@@ -1057,4 +1057,60 @@ MonoBehaviour:
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UIRoom/UIRoom.prefab
     m_exportTo: 
     m_variantName: 
+  - m_assetDatabaseId: bcb3a4786f469434f9dcc31d3cc045af
+    m_importFrom: Assets/Editor/GenerateUISettingsPrefab.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 2254d773b7e9dd446bc65491660577fc
+    m_importFrom: Assets/Scripts/UI/Views/UIGameHud
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: aaed78ffdc99eac40ad57670d50067f7
+    m_importFrom: Assets/Scripts/UI/Views/UISettings/UISettingsModel.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 85c24efec0bebdc48ac6d6a692414973
+    m_importFrom: Assets/Scripts/UI/Views/UIGameHud/UIGameHudCtrl.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: b87ec950441a9e942afc56c5fee108a7
+    m_importFrom: Assets/Scripts/UI/Views/UISettings/UISettingsView.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: fadec0c3cd0a79445b9cdc91dfe8e14a
+    m_importFrom: Assets/Scripts/UI/Views/UIGameHud/UIGameHudModel.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 3623b9148b2a58a48bff6ae8dc17c877
+    m_importFrom: Assets/Editor/GenerateUIGameHudPrefab.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 3581fa27f0c08dc4b8a02cb2fdfb8dc5
+    m_importFrom: Assets/Scripts/UI/Views/UISettings/UISettingsCtrl.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: e80f18a4109d0d0498ea26b9dee1e0cc
+    m_importFrom: Assets/Scripts/UI/Views/UIGameHud/UIGameHudView.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 71b2234b0e2f163468672fb47fd18131
+    m_importFrom: Assets/Scripts/UI/Views/UISettings
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 902c11bee834b1941bfdc40e591919e8
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIGameHud
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 2a69ab1b2c0ff094a9570008e00ca7c5
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIGameHud/UIGameHud.prefab
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 68d4feb94ca85434896ba8f655338ab8
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UISettings
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 4249823a5ffdb5f4e96ef05c680ac9ee
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UISettings/UISettings.prefab
+    m_exportTo: 
+    m_variantName: 
   m_version: 2
