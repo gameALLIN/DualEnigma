@@ -100,6 +100,11 @@ namespace DualEnigma.UI
             EventBus.Instance.Subscribe<PhaseChangedEvent>(OnPhaseChanged);
             EventBus.Instance.Subscribe<PlayerDamagedEvent>(OnPlayerDamaged);
             EventBus.Instance.Subscribe<PlayerHealedEvent>(OnPlayerHealed);
+            EventBus.Instance.Subscribe<OpponentDisconnectEvent>(OnOpponentDisconnected);
+            EventBus.Instance.Subscribe<HighFreqStateReceivedEvent>(OnHighFreqStateReceived);
+
+            if (_view != null && _view.DisconnectBannerText != null)
+                _view.DisconnectBannerText.gameObject.SetActive(false);
         }
 
         protected override void OnShow()
@@ -127,6 +132,8 @@ namespace DualEnigma.UI
                 EventBus.Instance.Unsubscribe<PhaseChangedEvent>(OnPhaseChanged);
                 EventBus.Instance.Unsubscribe<PlayerDamagedEvent>(OnPlayerDamaged);
                 EventBus.Instance.Unsubscribe<PlayerHealedEvent>(OnPlayerHealed);
+                EventBus.Instance.Unsubscribe<OpponentDisconnectEvent>(OnOpponentDisconnected);
+                EventBus.Instance.Unsubscribe<HighFreqStateReceivedEvent>(OnHighFreqStateReceived);
             }
             if (s_Instance == this) s_Instance = null;
             base.OnDestroy();
@@ -141,6 +148,11 @@ namespace DualEnigma.UI
             _model.IsInGame = true;
             gameObject.SetActive(true);
             ((IUIPanel)this).OnShow();
+
+            // 新局重置断线横幅（上局对方掉线残留）
+            if (_view != null && _view.DisconnectBannerText != null)
+                _view.DisconnectBannerText.gameObject.SetActive(false);
+
             RefreshAll();
         }
 
@@ -167,6 +179,22 @@ namespace DualEnigma.UI
         private void OnPlayerHealed(PlayerHealedEvent e)
         {
             RefreshVitals();
+        }
+
+        private void OnOpponentDisconnected(OpponentDisconnectEvent e)
+        {
+            // 局内断线提示：顶部横幅，直到对方高频包恢复流动才隐藏
+            if (!_model.IsInGame) return;
+            if (_view != null && _view.DisconnectBannerText != null)
+                _view.DisconnectBannerText.gameObject.SetActive(true);
+        }
+
+        private void OnHighFreqStateReceived(HighFreqStateReceivedEvent e)
+        {
+            // S2C 高频包仅由对方状态转发触发：收到即代表对方包流恢复（含重连）
+            if (_view == null || _view.DisconnectBannerText == null) return;
+            if (_view.DisconnectBannerText.gameObject.activeSelf)
+                _view.DisconnectBannerText.gameObject.SetActive(false);
         }
 
         // ============================================================

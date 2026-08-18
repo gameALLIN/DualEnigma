@@ -26,6 +26,16 @@ namespace DualEnigma.Network
         [SerializeField] private int _predictionCacheFrames = 10;
         [SerializeField] private float _maxPredictionDistance = 2f;
 
+        [Header("断线外推与失联")]
+        [Tooltip("远程角色停滞阈值（秒）：超过该时长未收到新高频包进入外推模式，默认 0.5s")]
+        [SerializeField] private float _stallThreshold = 0.5f;
+        [Tooltip("外推上限（秒）：用最后速度外推的最大时长，超过即进入失联态，默认 0.1s（同步策略.md §2.3）")]
+        [SerializeField] private float _maxExtrapolationTime = 0.1f;
+        [Tooltip("失联态角色透明度（0-1），默认 0.5")]
+        [SerializeField, Range(0f, 1f)] private float _disconnectedAlpha = 0.5f;
+        [Tooltip("重连吸附时长（秒）：恢复收包后从当前渲染位置平滑过渡到权威位置，默认 0.2s")]
+        [SerializeField] private float _resnapDuration = 0.2f;
+
         [Header("心跳与超时")]
         [SerializeField] private float _heartbeatInterval = 1f;
         [SerializeField] private float _heartbeatTimeout = 5f;
@@ -53,6 +63,10 @@ namespace DualEnigma.Network
         public float CorrectionThreshold => _correctionThreshold;
         public int PredictionCacheFrames => _predictionCacheFrames;
         public float MaxPredictionDistance => _maxPredictionDistance;
+        public float StallThreshold => _stallThreshold;
+        public float MaxExtrapolationTime => _maxExtrapolationTime;
+        public float DisconnectedAlpha => _disconnectedAlpha;
+        public float ResnapDuration => _resnapDuration;
         public float HeartbeatInterval => _heartbeatInterval;
         public float HeartbeatTimeout => _heartbeatTimeout;
         public float ReconnectWindow => _reconnectWindow;

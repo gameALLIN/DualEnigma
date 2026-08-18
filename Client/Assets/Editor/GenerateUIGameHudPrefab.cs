@@ -30,6 +30,7 @@ namespace DualEnigma.Editor
         private static readonly Color32 ENERGY_COLOR = new Color32(0x26, 0xA6, 0x9A, 0xFF);
         private static readonly Color32 SETTINGS_BTN_COLOR = new Color32(0x37, 0x47, 0x4F, 0xFF);
         private static readonly Color32 LABEL_COLOR = new Color32(0xB0, 0xBE, 0xC5, 0xFF);
+        private static readonly Color32 DISCONNECT_BANNER_COLOR = new Color32(0xE5, 0x39, 0x35, 0xFF);
 
         [MenuItem("DualEnigma/UI/生成 UIGameHUD 预制体")]
         public static void Generate()
@@ -95,6 +96,11 @@ namespace DualEnigma.Editor
 
             CreateText("PhaseTimerText", "5.0s", 14, root.transform, font,
                 new Vector2(0.5f, 1f), new Vector2(0f, -64f), new Vector2(120f, 20f), PHASE_FILL_COLOR);
+
+            // ---- 顶部中央：对方断线横幅（默认隐藏，OpponentDisconnectEvent 显示，高频包恢复隐藏）----
+            Text bannerText = CreateText("DisconnectBannerText", "对方断线，等待重连…", 16, root.transform, font,
+                new Vector2(0.5f, 1f), new Vector2(0f, -88f), new Vector2(360f, 24f), DISCONNECT_BANNER_COLOR);
+            bannerText.gameObject.SetActive(false);
 
             // ---- 左上：水人血条/能量条（关卡信息下方）----
             BuildVitalsPanel("AquaPanel", root.transform, font,
@@ -202,6 +208,7 @@ namespace DualEnigma.Editor
             so.FindProperty("m_SettingsBtn").objectReferenceValue =
                 FindDeepChild(root.transform, "SettingsBtn")?.GetComponent<Button>();
             BindText(so, root, "m_PerfText", "PerfText");
+            BindText(so, root, "m_DisconnectBannerText", "DisconnectBannerText");
 
             so.ApplyModifiedProperties();
             EditorUtility.SetDirty(view);

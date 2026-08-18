@@ -32,6 +32,7 @@ namespace DualEnigma.UI
         [SerializeField] private Text m_FragmentCountText;
         [SerializeField] private Button m_SettingsBtn;
         [SerializeField] private Text m_PerfText;
+        [SerializeField] private Text m_DisconnectBannerText;
         // ===== Auto Bind End =====
 
         public Text LevelInfoText => m_LevelInfoText;
@@ -51,5 +52,6 @@ namespace DualEnigma.UI
         public Text FragmentCountText => m_FragmentCountText;
         public Button SettingsBtn => m_SettingsBtn;
         public Text PerfText => m_PerfText;
+        public Text DisconnectBannerText => m_DisconnectBannerText;
     }
 }
