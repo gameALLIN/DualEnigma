@@ -30,7 +30,7 @@ namespace DualEnigma.Editor
         private static readonly Color32 SLIDER_HANDLE_COLOR = new Color32(0xE1, 0xF5, 0xFE, 0xFF);
 
         private const float PANEL_W = 360f;
-        private const float PANEL_H = 300f;
+        private const float PANEL_H = 360f;
 
         [MenuItem("DualEnigma/UI/生成 UISettings 预制体")]
         public static void Generate()
@@ -102,9 +102,13 @@ namespace DualEnigma.Editor
             CreateButton("ContinueBtn", "继续游戏", CONTINUE_BTN_COLOR, panel.transform, font,
                 new Vector2(0.5f, 0.5f), new Vector2(0f, -46f), new Vector2(260f, 40f), 16, "Text");
 
-            // ---- 退出对局 ----
+            // ---- 退出对局（仅局内显示，主界面打开时由 Ctrl 隐藏）----
             CreateButton("ExitBtn", "退出对局", EXIT_BTN_COLOR, panel.transform, font,
                 new Vector2(0.5f, 0.5f), new Vector2(0f, -100f), new Vector2(260f, 40f), 16, "Text");
+
+            // ---- 退出登录（仅主界面打开时显示，局内隐藏）----
+            CreateButton("LogoutBtn", "退出登录", EXIT_BTN_COLOR, panel.transform, font,
+                new Vector2(0.5f, 0.5f), new Vector2(0f, -154f), new Vector2(260f, 40f), 16, "Text");
 
             return root;
         }
@@ -217,6 +221,8 @@ namespace DualEnigma.Editor
                 FindDeepChild(root.transform, "ContinueBtn")?.GetComponent<Button>();
             so.FindProperty("m_ExitBtn").objectReferenceValue =
                 FindDeepChild(root.transform, "ExitBtn")?.GetComponent<Button>();
+            so.FindProperty("m_LogoutBtn").objectReferenceValue =
+                FindDeepChild(root.transform, "LogoutBtn")?.GetComponent<Button>();
 
             so.ApplyModifiedProperties();
             EditorUtility.SetDirty(view);

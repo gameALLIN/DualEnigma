@@ -1,0 +1,674 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>UISettings · 页面设计稿</title><style>
+body{background:#1a2226;font-family:"Microsoft YaHei",Consolas,monospace;color:#B0BEC5;margin:20px}
+h1{color:#ECEFF1;font-size:20px}h1 small{color:#78909C;font-size:12px;font-weight:normal;margin-left:12px}
+a{color:#4FC3F7}
+.wrap{display:flex;gap:24px;align-items:flex-start}
+.page{position:relative;width:640px;height:360px;background:#263238;border:1px solid #546E7A;overflow:hidden;flex:none}
+.box{position:absolute;border:1px solid rgba(120,144,156,.45);box-sizing:border-box}
+.btn{position:absolute;border:1.5px solid rgba(120,144,156,.8);box-sizing:border-box;display:flex;align-items:center;justify-content:center;color:#ECEFF1;font-size:12px;overflow:hidden;white-space:nowrap}
+.t{position:absolute;display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;text-align:center;font-weight:600}
+.tree{background:#202a30;border:1px solid #546E7A;padding:12px;font-size:12px;line-height:1.5;max-height:720px;overflow:auto;flex:1}
+.legend{margin-top:8px;font-size:12px;color:#78909C}
+</style></head><body>
+<h1>UISettings <small>Client/Assets/AssetPackage/Prefabs/UI/UISettings/UISettings.prefab · 19 节点 · UISettingsView.cs, UISettingsCtrl.cs, UIAutoBinder.cs · <a href="index.html">← 索引</a></small></h1>
+<div class="wrap"><div><div class="page"><div class="box" style="left:0px;top:0px;width:640px;height:360px;background:#000000"></div><div class="box" style="left:230px;top:105px;width:180px;height:150px;background:#263238"></div><div class="t" style="left:270px;top:115px;width:100px;height:16px;font-size:12px;color:#FFFFFF">设置</div><div class="t" style="left:230px;top:154px;width:24px;height:11px;font-size:8px;color:#FFFFFF">音量</div><div class="box" style="left:269px;top:155px;width:90px;height:10px;background:#37474F"></div><div class="box" style="left:266px;top:160px;width:7px;height:11px;background:#E1F5FE"></div><div class="t" style="left:386px;top:154px;width:24px;height:11px;font-size:8px;color:#4FC3F7">VolumeValueText</div><div class="box" style="left:259px;top:170px;width:10px;height:10px;background:#37474F"></div><div class="box" style="left:261px;top:172px;width:6px;height:6px;background:#4FC3F7"></div><div class="t" style="left:270px;top:170px;width:110px;height:11px;font-size:8px;color:#FFFFFF">显示性能信息（FPS / 延迟）</div><div class="btn" style="left:255px;top:193px;width:130px;height:20px;background:#4FC3F7"><span>ContinueBtn</span></div><div class="t" style="left:255px;top:193px;width:130px;height:20px;font-size:14px;color:#FFFFFF">继续游戏</div><div class="btn" style="left:255px;top:220px;width:130px;height:20px;background:#BF360C"><span>ExitBtn</span></div><div class="t" style="left:255px;top:220px;width:130px;height:20px;font-size:14px;color:#FFFFFF">退出对局</div></div>
+<div class="legend">按预制体锚点精确换算（比例 0.5）· 文字/颜色/内容取自设计稿 · ✕隐藏节点不渲染</div></div>
+<pre class="tree">UISettings  [UISettingsView.cs, UISettingsCtrl.cs, UIAutoBinder.cs]  ·尺寸0×0
+├─ Dim  [CanvasRenderer, Image]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0
+└─ Panel  [CanvasRenderer, Image]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,0) 尺寸360×300
+   ├─ TitleText  [CanvasRenderer, Text]  ·锚(0.5,1.0)~(0.5,1.0) 偏(0,-36) 尺寸200×32
+   ├─ VolumeLabel  [CanvasRenderer, Text]  ·锚(0.0,0.5)~(0.0,0.5) 偏(24,40) 尺寸48×22
+   ├─ VolumeSlider  [CanvasRenderer, Image, Slider]  ·锚(0.5,0.5)~(0.5,0.5) 偏(-12,40) 尺寸180×20
+   │  ├─ FillArea  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸-4×-4
+   │  │  └─ Fill  [CanvasRenderer, Image]  ·锚(0.0,0.0)~(0.0,0.0) 偏(0,0) 尺寸0×0
+   │  └─ HandleArea  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0
+   │     └─ Handle  [CanvasRenderer, Image]  ·锚(0.0,0.0)~(0.0,0.0) 偏(0,0) 尺寸14×22
+   ├─ VolumeValueText  [CanvasRenderer, Text]  ·锚(1.0,0.5)~(1.0,0.5) 偏(-24,40) 尺寸48×22
+   ├─ PerfToggle  [Toggle]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,10) 尺寸260×24
+   │  ├─ Background  [CanvasRenderer, Image]  ·锚(0.0,0.5)~(0.0,0.5) 偏(18,0) 尺寸20×20
+   │  │  └─ Checkmark  [CanvasRenderer, Image]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸-8×-8
+   │  └─ Label  [CanvasRenderer, Text]  ·锚(0.0,0.5)~(0.0,0.5) 偏(140,0) 尺寸220×22
+   ├─ ContinueBtn  [CanvasRenderer, Image, Button]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,-46) 尺寸260×40
+   │  └─ Text  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0
+   └─ ExitBtn  [CanvasRenderer, Image, Button]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,-100) 尺寸260×40
+      └─ Text  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0</pre></div>
+<script type="application/json" id="ui-spec">{
+ "name": "UISettings",
+ "active": true,
+ "components": [
+  "RectTransform",
+  "UISettingsView.cs",
+  "UISettingsCtrl.cs",
+  "UIAutoBinder.cs"
+ ],
+ "anchors": {
+  "min": [
+   0.0,
+   0.0
+  ],
+  "max": [
+   1.0,
+   1.0
+  ]
+ },
+ "pivot": [
+  0.5,
+  0.5
+ ],
+ "position": [
+  0.0,
+  0.0
+ ],
+ "size": [
+  0.0,
+  0.0
+ ],
+ "children": [
+  {
+   "name": "Dim",
+   "active": true,
+   "components": [
+    "RectTransform",
+    "CanvasRenderer",
+    "Image"
+   ],
+   "anchors": {
+    "min": [
+     0.0,
+     0.0
+    ],
+    "max": [
+     1.0,
+     1.0
+    ]
+   },
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "position": [
+    0.0,
+    0.0
+   ],
+   "size": [
+    0.0,
+    0.0
+   ],
+   "background": "#000000"
+  },
+  {
+   "name": "Panel",
+   "active": true,
+   "components": [
+    "RectTransform",
+    "CanvasRenderer",
+    "Image"
+   ],
+   "anchors": {
+    "min": [
+     0.5,
+     0.5
+    ],
+    "max": [
+     0.5,
+     0.5
+    ]
+   },
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "position": [
+    0.0,
+    0.0
+   ],
+   "size": [
+    360.0,
+    300.0
+   ],
+   "background": "#263238",
+   "children": [
+    {
+     "name": "TitleText",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Text"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       1.0
+      ],
+      "max": [
+       0.5,
+       1.0
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      -36.0
+     ],
+     "size": [
+      200.0,
+      32.0
+     ],
+     "text": "设置",
+     "fontSize": 24,
+     "align": "MiddleCenter",
+     "color": "#FFFFFF"
+    },
+    {
+     "name": "VolumeLabel",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Text"
+     ],
+     "anchors": {
+      "min": [
+       0.0,
+       0.5
+      ],
+      "max": [
+       0.0,
+       0.5
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      24.0,
+      40.0
+     ],
+     "size": [
+      48.0,
+      22.0
+     ],
+     "text": "音量",
+     "fontSize": 16,
+     "align": "MiddleLeft",
+     "color": "#FFFFFF"
+    },
+    {
+     "name": "VolumeSlider",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Image",
+      "Slider"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       0.5
+      ],
+      "max": [
+       0.5,
+       0.5
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      -12.0,
+      40.0
+     ],
+     "size": [
+      180.0,
+      20.0
+     ],
+     "background": "#37474F",
+     "children": [
+      {
+       "name": "FillArea",
+       "active": true,
+       "components": [
+        "RectTransform"
+       ],
+       "anchors": {
+        "min": [
+         0.0,
+         0.0
+        ],
+        "max": [
+         1.0,
+         1.0
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        0.0,
+        0.0
+       ],
+       "size": [
+        -4.0,
+        -4.0
+       ],
+       "children": [
+        {
+         "name": "Fill",
+         "active": true,
+         "components": [
+          "RectTransform",
+          "CanvasRenderer",
+          "Image"
+         ],
+         "anchors": {
+          "min": [
+           0.0,
+           0.0
+          ],
+          "max": [
+           0.0,
+           0.0
+          ]
+         },
+         "pivot": [
+          0.5,
+          0.5
+         ],
+         "position": [
+          0.0,
+          0.0
+         ],
+         "size": [
+          0.0,
+          0.0
+         ],
+         "background": "#4FC3F7"
+        }
+       ]
+      },
+      {
+       "name": "HandleArea",
+       "active": true,
+       "components": [
+        "RectTransform"
+       ],
+       "anchors": {
+        "min": [
+         0.0,
+         0.0
+        ],
+        "max": [
+         1.0,
+         1.0
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        0.0,
+        0.0
+       ],
+       "size": [
+        0.0,
+        0.0
+       ],
+       "children": [
+        {
+         "name": "Handle",
+         "active": true,
+         "components": [
+          "RectTransform",
+          "CanvasRenderer",
+          "Image"
+         ],
+         "anchors": {
+          "min": [
+           0.0,
+           0.0
+          ],
+          "max": [
+           0.0,
+           0.0
+          ]
+         },
+         "pivot": [
+          0.5,
+          0.5
+         ],
+         "position": [
+          0.0,
+          0.0
+         ],
+         "size": [
+          14.0,
+          22.0
+         ],
+         "background": "#E1F5FE"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "VolumeValueText",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Text"
+     ],
+     "anchors": {
+      "min": [
+       1.0,
+       0.5
+      ],
+      "max": [
+       1.0,
+       0.5
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      -24.0,
+      40.0
+     ],
+     "size": [
+      48.0,
+      22.0
+     ],
+     "text": "",
+     "fontSize": 14,
+     "align": "MiddleCenter",
+     "color": "#4FC3F7"
+    },
+    {
+     "name": "PerfToggle",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "Toggle"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       0.5
+      ],
+      "max": [
+       0.5,
+       0.5
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      10.0
+     ],
+     "size": [
+      260.0,
+      24.0
+     ],
+     "children": [
+      {
+       "name": "Background",
+       "active": true,
+       "components": [
+        "RectTransform",
+        "CanvasRenderer",
+        "Image"
+       ],
+       "anchors": {
+        "min": [
+         0.0,
+         0.5
+        ],
+        "max": [
+         0.0,
+         0.5
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        18.0,
+        0.0
+       ],
+       "size": [
+        20.0,
+        20.0
+       ],
+       "background": "#37474F",
+       "children": [
+        {
+         "name": "Checkmark",
+         "active": true,
+         "components": [
+          "RectTransform",
+          "CanvasRenderer",
+          "Image"
+         ],
+         "anchors": {
+          "min": [
+           0.0,
+           0.0
+          ],
+          "max": [
+           1.0,
+           1.0
+          ]
+         },
+         "pivot": [
+          0.5,
+          0.5
+         ],
+         "position": [
+          0.0,
+          0.0
+         ],
+         "size": [
+          -8.0,
+          -8.0
+         ],
+         "background": "#4FC3F7"
+        }
+       ]
+      },
+      {
+       "name": "Label",
+       "active": true,
+       "components": [
+        "RectTransform",
+        "CanvasRenderer",
+        "Text"
+       ],
+       "anchors": {
+        "min": [
+         0.0,
+         0.5
+        ],
+        "max": [
+         0.0,
+         0.5
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        140.0,
+        0.0
+       ],
+       "size": [
+        220.0,
+        22.0
+       ],
+       "text": "显示性能信息（FPS / 延迟）",
+       "fontSize": 14,
+       "align": "MiddleLeft",
+       "color": "#FFFFFF"
+      }
+     ]
+    },
+    {
+     "name": "ContinueBtn",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Image",
+      "Button"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       0.5
+      ],
+      "max": [
+       0.5,
+       0.5
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      -46.0
+     ],
+     "size": [
+      260.0,
+      40.0
+     ],
+     "background": "#4FC3F7",
+     "children": [
+      {
+       "name": "Text",
+       "active": true,
+       "components": [
+        "RectTransform",
+        "CanvasRenderer",
+        "Text"
+       ],
+       "anchors": {
+        "min": [
+         0.0,
+         0.0
+        ],
+        "max": [
+         1.0,
+         1.0
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        0.0,
+        0.0
+       ],
+       "size": [
+        0.0,
+        0.0
+       ],
+       "text": "继续游戏",
+       "fontSize": 16,
+       "align": "MiddleCenter",
+       "color": "#FFFFFF"
+      }
+     ]
+    },
+    {
+     "name": "ExitBtn",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Image",
+      "Button"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       0.5
+      ],
+      "max": [
+       0.5,
+       0.5
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      -100.0
+     ],
+     "size": [
+      260.0,
+      40.0
+     ],
+     "background": "#BF360C",
+     "children": [
+      {
+       "name": "Text",
+       "active": true,
+       "components": [
+        "RectTransform",
+        "CanvasRenderer",
+        "Text"
+       ],
+       "anchors": {
+        "min": [
+         0.0,
+         0.0
+        ],
+        "max": [
+         1.0,
+         1.0
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        0.0,
+        0.0
+       ],
+       "size": [
+        0.0,
+        0.0
+       ],
+       "text": "退出对局",
+       "fontSize": 16,
+       "align": "MiddleCenter",
+       "color": "#FFFFFF"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}</script>
+</body></html>

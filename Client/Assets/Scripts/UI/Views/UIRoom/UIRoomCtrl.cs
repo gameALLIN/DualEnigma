@@ -181,7 +181,7 @@ namespace DualEnigma.UI
                 _view.StatusText.text = message;
         }
 
-        /// <summary>邀请好友：好友面板叠加打开（连接与房间保持不变），关闭后回到房间面板</summary>
+        /// <summary>邀请好友：好友管理面板叠加打开（受邀方视角；房主邀请走主界面抽屉），关闭后回到房间面板</summary>
         private void OnInviteClicked()
         {
             if (UIManager.Instance.GetTopPanel() is UIFriendsCtrl) return;

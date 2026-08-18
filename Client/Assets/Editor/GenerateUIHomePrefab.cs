@@ -19,22 +19,22 @@ using DualEnigma.Framework.UI;
 namespace DualEnigma.Editor
 {
     /// <summary>
-    /// UIHome 预制体生成器。
+    /// UIHome 预制体生成器（v2 布局，设计稿：TechnicalDocs/Client/UIPrefab/UIHome.html）。
     /// 层级结构：
     ///   UIHome (View + Ctrl + AutoBinder)
     ///   ├── Background (渐变背景 Image)
-    ///   ├── TitleText "双生迷城"
-    ///   ├── SubTitleText "DUAL ENIGMA · 双人协作生存"
-    ///   ├── DecorBar (冰火双色装饰条)
-    ///   │   ├── WaterBar (#4FC3F7)
-    ///   │   └── FireBar (#FF6F00)
-    ///   ├── PlayerCard (玩家信息卡)
-    ///   │   ├── AvatarBg → AvatarText (昵称首字)
-    ///   │   ├── DisplayNameText
-    ///   │   └── AccountIdText
-    ///   ├── StartBtn → Text
-    ///   ├── LogoutBtn → Text
-    ///   └── VersionText (右下角)
+    ///   ├── PlayerCard (右上) → AvatarBg → AvatarText / DisplayNameText / AccountIdText
+    ///   ├── StartBtn (左上) → Text
+    ///   ├── RoomBtn (左上) → Text
+    ///   ├── FeatureList (左下，HorizontalLayoutGroup)
+    ///   │   ├── MailBtn → Text
+    ///   │   ├── FriendsBtn → Text
+    ///   │   ├── AchievementBtn → Text
+    ///   │   └── SettingsBtn → Text（退出登录入口在设置面板内）
+    ///   └── TitleList (右下，VerticalLayoutGroup)
+    ///       ├── TitleText / SubTitleText
+    ///       ├── BarsRow (HorizontalLayoutGroup) → WaterBar / FireBar
+    ///       └── VersionText
     /// </summary>
     public static class GenerateUIHomePrefab
     {
@@ -69,8 +69,8 @@ namespace DualEnigma.Editor
         /// <summary>联机开房按钮色（熔岩橙，与开始按钮冰火呼应）</summary>
         private static readonly Color32 ROOM_BTN_COLOR = new Color32(0xFF, 0x6F, 0x00, 0xFF);
 
-        /// <summary>退出按钮色（深灰蓝）</summary>
-        private static readonly Color32 LOGOUT_BTN_COLOR = new Color32(0x37, 0x47, 0x4F, 0xFF);
+        /// <summary>功能列表按钮色（深灰蓝，邮箱/好友/成就/设置/退出登录）</summary>
+        private static readonly Color32 FEATURE_BTN_COLOR = new Color32(0x37, 0x47, 0x4F, 0xFF);
 
         /// <summary>冰元素装饰条（水蓝）</summary>
         private static readonly Color32 WATER_BAR_COLOR = new Color32(0x4F, 0xC3, 0xF7, 0xFF);
@@ -156,71 +156,183 @@ namespace DualEnigma.Editor
             GameObject bgObj = CreateImage("Background", root.transform, bgSprite, Color.white);
             SetStretch(bgObj.GetComponent<RectTransform>());
 
-            // ---- 标题区（屏幕居中布局，以面板中心为原点）----
+            // ---- 布局说明（v2 设计稿 TechnicalDocs/Client/UIPrefab/UIHome.html）----
+            // 左上：StartBtn + RoomBtn；右上：PlayerCard；
+            // 左下：FeatureList（水平 邮箱/好友/成就/设置/退出登录）；右下：标题区 + 版本号
 
-            // TitleText
-            CreateText("TitleText", "双生迷城", 56, root.transform, font,
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 220f),
-                new Vector2(600f, 70f), Color.white);
-
-            // SubTitleText
-            CreateText("SubTitleText", "DUAL ENIGMA · 双人协作生存", 18, root.transform, font,
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 172f),
-                new Vector2(500f, 26f), LABEL_COLOR);
-
-            // DecorBar（冰火双色装饰条，水蓝左 + 火橙右）
-            GameObject waterBar = CreateImage("WaterBar", root.transform, null, WATER_BAR_COLOR);
-            SetCenter(waterBar.GetComponent<RectTransform>(), new Vector2(150f, 6f), new Vector2(-80f, 146f));
-            GameObject fireBar = CreateImage("FireBar", root.transform, null, FIRE_BAR_COLOR);
-            SetCenter(fireBar.GetComponent<RectTransform>(), new Vector2(150f, 6f), new Vector2(80f, 146f));
-
-            // ---- 玩家信息卡 ----
+            // ---- 玩家信息卡（右上）----
             GameObject card = CreateImage("PlayerCard", root.transform, null, CARD_COLOR);
-            SetCenter(card.GetComponent<RectTransform>(), new Vector2(CARD_WIDTH, CARD_HEIGHT), new Vector2(0f, 30f));
+            SetAnchored(card.GetComponent<RectTransform>(), new Vector2(1f, 1f),
+                new Vector2(CARD_WIDTH, CARD_HEIGHT), new Vector2(-234f, -48f));
 
-            // AvatarBg + AvatarText（昵称首字头像占位）
+            // AvatarBg + AvatarText（昵称首字头像占位，卡片左侧）
             GameObject avatarBg = CreateImage("AvatarBg", card.transform, null, AVATAR_COLOR);
-            SetCenter(avatarBg.GetComponent<RectTransform>(), new Vector2(64f, 64f), new Vector2(-158f, 0f));
+            SetAnchored(avatarBg.GetComponent<RectTransform>(), new Vector2(0f, 0.5f),
+                new Vector2(64f, 64f), new Vector2(44f, 0f));
             CreateText("AvatarText", "?", 32, avatarBg.transform, font,
                 new Vector2(0.5f, 0.5f), Vector2.zero,
                 new Vector2(64f, 64f), Color.white);
 
-            // DisplayNameText（昵称，卡片左中）
+            // DisplayNameText（昵称，头像右侧）
             CreateText("DisplayNameText", "旅行者", 22, card.transform, font,
-                new Vector2(0f, 0.5f), new Vector2(-105f, 12f),
-                new Vector2(230f, 30f), Color.white).alignment = TextAnchor.MiddleLeft;
+                new Vector2(0f, 0.5f), new Vector2(218f, 14f),
+                new Vector2(260f, 28f), Color.white).alignment = TextAnchor.MiddleLeft;
 
             // AccountIdText（账号 ID，昵称下方）
             CreateText("AccountIdText", "ID: 0", 14, card.transform, font,
-                new Vector2(0f, 0.5f), new Vector2(-105f, -16f),
-                new Vector2(230f, 22f), LABEL_COLOR).alignment = TextAnchor.MiddleLeft;
+                new Vector2(0f, 0.5f), new Vector2(218f, -16f),
+                new Vector2(260f, 22f), LABEL_COLOR).alignment = TextAnchor.MiddleLeft;
 
-            // ---- 按钮区 ----
-
-            // StartBtn（主按钮）
+            // ---- 主操作区（左上）：开始游戏（强制双人 → 点击进入联机邀请流程）----
             CreateButton("StartBtn", "开始游戏", START_BTN_COLOR, root.transform, font,
-                new Vector2(0.5f, 0.5f), new Vector2(0f, -90f),
-                new Vector2(260f, 56f), 24, "Text");
+                new Vector2(0f, 1f), new Vector2(160f, -56f),
+                new Vector2(240f, 56f), 24, "Text");
 
-            // RoomBtn（联机开房，连接 game-server 创建房间）
-            CreateButton("RoomBtn", "联机开房", ROOM_BTN_COLOR, root.transform, font,
-                new Vector2(0.5f, 0.5f), new Vector2(0f, -158f),
-                new Vector2(260f, 44f), 17, "Text");
+            // ---- 功能列表（左下，水平排布：邮箱/好友/成就/设置；退出登录已移入设置面板）----
+            GameObject featureList = CreateUIObject("FeatureList", root.transform);
+            SetAnchored(featureList.GetComponent<RectTransform>(), new Vector2(0f, 0f),
+                new Vector2(384f, 44f), new Vector2(216f, 46f));
+            HorizontalLayoutGroup hLayout = featureList.AddComponent<HorizontalLayoutGroup>();
+            hLayout.spacing = 8f;
+            hLayout.childAlignment = TextAnchor.MiddleCenter;
+            hLayout.childControlWidth = false;
+            hLayout.childControlHeight = false;
+            hLayout.childForceExpandWidth = false;
+            hLayout.childForceExpandHeight = false;
 
-            // FriendsBtn（好友入口）
-            CreateButton("FriendsBtn", "好友", LOGOUT_BTN_COLOR, root.transform, font,
-                new Vector2(0.5f, 0.5f), new Vector2(0f, -212f),
-                new Vector2(260f, 44f), 17, "Text");
+            CreateButton("MailBtn", "邮箱", FEATURE_BTN_COLOR, featureList.transform, font,
+                new Vector2(0f, 0.5f), new Vector2(45f, 0f), new Vector2(90f, 44f), 16, "Text");
+            CreateButton("FriendsBtn", "好友", FEATURE_BTN_COLOR, featureList.transform, font,
+                new Vector2(0f, 0.5f), new Vector2(143f, 0f), new Vector2(90f, 44f), 16, "Text");
+            CreateButton("AchievementBtn", "成就", FEATURE_BTN_COLOR, featureList.transform, font,
+                new Vector2(0f, 0.5f), new Vector2(241f, 0f), new Vector2(90f, 44f), 16, "Text");
+            CreateButton("SettingsBtn", "设置", FEATURE_BTN_COLOR, featureList.transform, font,
+                new Vector2(0f, 0.5f), new Vector2(339f, 0f), new Vector2(90f, 44f), 16, "Text");
 
-            // LogoutBtn（次按钮）
-            CreateButton("LogoutBtn", "退出登录", LOGOUT_BTN_COLOR, root.transform, font,
-                new Vector2(0.5f, 0.5f), new Vector2(0f, -266f),
-                new Vector2(200f, 36f), 16, "Text");
+            // ---- 邀请抽屉（左侧垂直居中；箭头常驻，面板默认隐藏由 Ctrl 开关）----
+            GameObject inviteDrawer = CreateUIObject("InviteDrawer", root.transform);
+            SetStretch(inviteDrawer.GetComponent<RectTransform>());
 
-            // ---- 版本号（右下角）----
-            CreateText("VersionText", "v0.1", 14, root.transform, font,
-                new Vector2(1f, 0f), new Vector2(-20f, 20f),
-                new Vector2(300f, 24f), LABEL_COLOR).alignment = TextAnchor.MiddleRight;
+            CreateButton("DrawerToggleBtn", "▶", FEATURE_BTN_COLOR, inviteDrawer.transform, font,
+                new Vector2(0f, 0.5f), new Vector2(20f, 0f), new Vector2(32f, 64f), 18, "Text");
+
+            GameObject drawerPanel = CreateImage("DrawerPanel", inviteDrawer.transform, null, CARD_COLOR);
+            drawerPanel.GetComponent<Image>().raycastTarget = true;
+            RectTransform drawerRT = drawerPanel.GetComponent<RectTransform>();
+            drawerRT.anchorMin = drawerRT.anchorMax = new Vector2(0f, 0.5f);
+            drawerRT.pivot = new Vector2(0f, 0.5f);
+            drawerRT.anchoredPosition = new Vector2(44f, 0f);
+            drawerRT.sizeDelta = new Vector2(320f, 420f);
+            drawerPanel.SetActive(false);
+
+            CreateText("DrawerTitleText", "邀请好友", 18, drawerPanel.transform, font,
+                new Vector2(0f, 1f), new Vector2(80f, -26f), new Vector2(200f, 26f),
+                Color.white).alignment = TextAnchor.MiddleLeft;
+
+            CreateText("RoomCodeText", "房间码: ----", 13, drawerPanel.transform, font,
+                new Vector2(0f, 1f), new Vector2(80f, -52f), new Vector2(240f, 20f),
+                START_BTN_COLOR).alignment = TextAnchor.MiddleLeft;
+
+            // 好友滚动列表（仅已添加好友，行由 FriendItem 程序化生成）
+            GameObject scroll = CreateUIObject("FriendScroll", drawerPanel.transform);
+            RectTransform scrollRT = scroll.GetComponent<RectTransform>();
+            SetCenter(scrollRT, new Vector2(300f, 330f), new Vector2(0f, -24f));
+            Image scrollBg = scroll.AddComponent<Image>();
+            scrollBg.color = new Color32(0x2E, 0x3D, 0x45, 0xFF);
+            ScrollRect scrollRect = scroll.AddComponent<ScrollRect>();
+
+            GameObject viewport = CreateUIObject("Viewport", scroll.transform);
+            SetStretch(viewport.GetComponent<RectTransform>());
+            Mask mask = viewport.AddComponent<Mask>();
+            mask.showMaskGraphic = false;
+            Image viewportImg = viewport.AddComponent<Image>();
+            viewportImg.color = Color.white;
+
+            GameObject content = CreateUIObject("FriendListContent", viewport.transform);
+            RectTransform contentRT = content.GetComponent<RectTransform>();
+            contentRT.anchorMin = new Vector2(0f, 1f);
+            contentRT.anchorMax = new Vector2(1f, 1f);
+            contentRT.pivot = new Vector2(0.5f, 1f);
+            contentRT.anchoredPosition = Vector2.zero;
+            contentRT.sizeDelta = new Vector2(0f, 300f);
+            VerticalLayoutGroup contentLayout = content.AddComponent<VerticalLayoutGroup>();
+            contentLayout.childControlHeight = false;
+            contentLayout.childControlWidth = false;
+            contentLayout.childForceExpandHeight = false;
+            contentLayout.childForceExpandWidth = false;
+            contentLayout.spacing = 4f;
+
+            scrollRect.content = contentRT;
+            scrollRect.viewport = viewport.GetComponent<RectTransform>();
+            scrollRect.horizontal = false;
+            scrollRect.scrollSensitivity = 20f;
+
+            // 好友行模板：嵌套 Common/FriendItem 预制体实例（与 FriendListContent 同级，默认隐藏；
+            // Ctrl 运行时克隆 + SetCompactLayout(296) 切换紧凑形态）
+            GameObject friendItemPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/AssetPackage/Prefabs/UI/Common/FriendItem.prefab");
+            if (friendItemPrefab != null)
+            {
+                GameObject template = (GameObject)PrefabUtility.InstantiatePrefab(friendItemPrefab, viewport.transform);
+                template.name = "FriendRowTemplate";
+                template.SetActive(false);
+                RectTransform templateRT = template.GetComponent<RectTransform>();
+                templateRT.anchorMin = templateRT.anchorMax = new Vector2(0f, 1f);
+                templateRT.pivot = new Vector2(0.5f, 1f);
+                templateRT.anchoredPosition = Vector2.zero;
+                templateRT.sizeDelta = new Vector2(296f, FriendItem.ROW_HEIGHT);
+            }
+            else
+            {
+                Debug.LogWarning("[GenerateUIHomePrefab] 未找到 Common/FriendItem.prefab，抽屉行模板未嵌入（请先运行 DualEnigma/UI/生成 FriendItem 预制体）");
+            }
+
+            CreateText("StatusText", "", 12, drawerPanel.transform, font,
+                new Vector2(0.5f, 0f), new Vector2(0f, 12f), new Vector2(290f, 20f),
+                LABEL_COLOR).gameObject.SetActive(false);
+
+            // ---- 标题列表（右下，垂直排布：标题/副标题/双色条/版本号）----
+            GameObject titleList = CreateUIObject("TitleList", root.transform);
+            SetAnchored(titleList.GetComponent<RectTransform>(), new Vector2(1f, 0f),
+                new Vector2(460f, 114f), new Vector2(-270f, 81f));
+            VerticalLayoutGroup vLayout = titleList.AddComponent<VerticalLayoutGroup>();
+            vLayout.spacing = 8f;
+            vLayout.childAlignment = TextAnchor.UpperRight;
+            vLayout.childControlWidth = false;
+            vLayout.childControlHeight = false;
+            vLayout.childForceExpandWidth = false;
+            vLayout.childForceExpandHeight = false;
+
+            CreateText("TitleText", "双生迷城", 36, titleList.transform, font,
+                new Vector2(0f, 1f), new Vector2(230f, -20f),
+                new Vector2(460f, 40f), Color.white).alignment = TextAnchor.MiddleRight;
+
+            CreateText("SubTitleText", "DUAL ENIGMA · 双人协作生存", 16, titleList.transform, font,
+                new Vector2(0f, 1f), new Vector2(230f, -60f),
+                new Vector2(460f, 24f), LABEL_COLOR).alignment = TextAnchor.MiddleRight;
+
+            // 冰火双色条行（水平子列表，右对齐）
+            GameObject barsRow = CreateUIObject("BarsRow", titleList.transform);
+            SetAnchored(barsRow.GetComponent<RectTransform>(), new Vector2(0f, 1f),
+                new Vector2(310f, 6f), new Vector2(305f, -83f));
+            HorizontalLayoutGroup barsLayout = barsRow.AddComponent<HorizontalLayoutGroup>();
+            barsLayout.spacing = 10f;
+            barsLayout.childAlignment = TextAnchor.UpperRight;
+            barsLayout.childControlWidth = false;
+            barsLayout.childControlHeight = false;
+            barsLayout.childForceExpandWidth = false;
+            barsLayout.childForceExpandHeight = false;
+
+            GameObject waterBar = CreateImage("WaterBar", barsRow.transform, null, WATER_BAR_COLOR);
+            SetAnchored(waterBar.GetComponent<RectTransform>(), new Vector2(0f, 0.5f),
+                new Vector2(150f, 6f), new Vector2(75f, 0f));
+            GameObject fireBar = CreateImage("FireBar", barsRow.transform, null, FIRE_BAR_COLOR);
+            SetAnchored(fireBar.GetComponent<RectTransform>(), new Vector2(0f, 0.5f),
+                new Vector2(150f, 6f), new Vector2(235f, 0f));
+
+            CreateText("VersionText", "v0.1", 12, titleList.transform, font,
+                new Vector2(0f, 1f), new Vector2(230f, -104f),
+                new Vector2(460f, 20f), LABEL_COLOR).alignment = TextAnchor.MiddleRight;
 
             return root;
         }
@@ -248,16 +360,32 @@ namespace DualEnigma.Editor
             // ---- 按钮 ----
             so.FindProperty("m_StartBtn").objectReferenceValue =
                 FindDeepChild(root.transform, "StartBtn")?.GetComponent<Button>();
-            so.FindProperty("m_RoomBtn").objectReferenceValue =
-                FindDeepChild(root.transform, "RoomBtn")?.GetComponent<Button>();
             so.FindProperty("m_FriendsBtn").objectReferenceValue =
                 FindDeepChild(root.transform, "FriendsBtn")?.GetComponent<Button>();
-            so.FindProperty("m_LogoutBtn").objectReferenceValue =
-                FindDeepChild(root.transform, "LogoutBtn")?.GetComponent<Button>();
+            so.FindProperty("m_MailBtn").objectReferenceValue =
+                FindDeepChild(root.transform, "MailBtn")?.GetComponent<Button>();
+            so.FindProperty("m_AchievementBtn").objectReferenceValue =
+                FindDeepChild(root.transform, "AchievementBtn")?.GetComponent<Button>();
+            so.FindProperty("m_SettingsBtn").objectReferenceValue =
+                FindDeepChild(root.transform, "SettingsBtn")?.GetComponent<Button>();
 
             // ---- 文本 ----
             so.FindProperty("m_VersionText").objectReferenceValue =
                 FindDeepChild(root.transform, "VersionText")?.GetComponent<Text>();
+
+            // ---- 邀请抽屉 ----
+            so.FindProperty("m_DrawerToggleBtn").objectReferenceValue =
+                FindDeepChild(root.transform, "DrawerToggleBtn")?.GetComponent<Button>();
+            so.FindProperty("m_DrawerPanel").objectReferenceValue =
+                FindDeepChild(root.transform, "DrawerPanel")?.gameObject;
+            so.FindProperty("m_RoomCodeText").objectReferenceValue =
+                FindDeepChild(root.transform, "RoomCodeText")?.GetComponent<Text>();
+            so.FindProperty("m_FriendListContent").objectReferenceValue =
+                FindDeepChild(root.transform, "FriendListContent")?.GetComponent<Transform>();
+            so.FindProperty("m_StatusText").objectReferenceValue =
+                FindDeepChild(root.transform, "StatusText")?.GetComponent<Text>();
+            so.FindProperty("m_FriendRowTemplate").objectReferenceValue =
+                FindDeepChild(root.transform, "FriendRowTemplate")?.GetComponent<FriendItem>();
 
             so.ApplyModifiedProperties();
             EditorUtility.SetDirty(view);
@@ -414,6 +542,17 @@ namespace DualEnigma.Editor
             rt.anchorMax = Vector2.one;
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
+        }
+
+        /// <summary>
+        /// 将 RectTransform 设置为指定锚点定位。
+        /// </summary>
+        private static void SetAnchored(RectTransform rt, Vector2 anchor, Vector2 size, Vector2 pos)
+        {
+            rt.anchorMin = anchor;
+            rt.anchorMax = anchor;
+            rt.anchoredPosition = pos;
+            rt.sizeDelta = size;
         }
 
         /// <summary>

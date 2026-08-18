@@ -1,0 +1,931 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>UILogin · 页面设计稿</title><style>
+body{background:#1a2226;font-family:"Microsoft YaHei",Consolas,monospace;color:#B0BEC5;margin:20px}
+h1{color:#ECEFF1;font-size:20px}h1 small{color:#78909C;font-size:12px;font-weight:normal;margin-left:12px}
+a{color:#4FC3F7}
+.wrap{display:flex;gap:24px;align-items:flex-start}
+.page{position:relative;width:640px;height:360px;background:#263238;border:1px solid #546E7A;overflow:hidden;flex:none}
+.box{position:absolute;border:1px solid rgba(120,144,156,.45);box-sizing:border-box}
+.btn{position:absolute;border:1.5px solid rgba(120,144,156,.8);box-sizing:border-box;display:flex;align-items:center;justify-content:center;color:#ECEFF1;font-size:12px;overflow:hidden;white-space:nowrap}
+.t{position:absolute;display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;text-align:center;font-weight:600}
+.tree{background:#202a30;border:1px solid #546E7A;padding:12px;font-size:12px;line-height:1.5;max-height:720px;overflow:auto;flex:1}
+.legend{margin-top:8px;font-size:12px;color:#78909C}
+</style></head><body>
+<h1>UILogin <small>Client/Assets/AssetPackage/Prefabs/UI/UILogin/UILogin.prefab · 26 节点 · UILoginView.cs, UILoginCtrl.cs, UIAutoBinder.cs · <a href="index.html">← 索引</a></small></h1>
+<div class="wrap"><div><div class="page"><div class="box" style="left:0px;top:0px;width:640px;height:360px;background:#FFFFFF"></div><div class="box" style="left:220px;top:40px;width:200px;height:280px;background:#263238"></div><div class="t" style="left:230px;top:50px;width:180px;height:20px;font-size:14px;color:#FFFFFF">登录</div><div class="t" style="left:230px;top:81px;width:40px;height:18px;font-size:13px;color:#B0BEC5">用户名</div><div class="box" style="left:290px;top:81px;width:120px;height:18px;background:#37474F"></div><div class="t" style="left:295px;top:82px;width:110px;height:16px;font-size:12px;color:#FFFFFF">Text</div><div class="t" style="left:295px;top:82px;width:110px;height:16px;font-size:12px;color:#90A4AE">请输入用户名</div><div class="t" style="left:230px;top:106px;width:40px;height:18px;font-size:13px;color:#B0BEC5">密码</div><div class="box" style="left:290px;top:106px;width:120px;height:18px;background:#37474F"></div><div class="t" style="left:295px;top:107px;width:110px;height:16px;font-size:12px;color:#FFFFFF">Text</div><div class="t" style="left:295px;top:107px;width:110px;height:16px;font-size:12px;color:#90A4AE">请输入密码</div><div class="t" style="left:230px;top:131px;width:40px;height:18px;font-size:13px;color:#B0BEC5">昵称</div><div class="box" style="left:290px;top:131px;width:120px;height:18px;background:#37474F"></div><div class="t" style="left:295px;top:132px;width:110px;height:16px;font-size:12px;color:#FFFFFF">Text</div><div class="t" style="left:295px;top:132px;width:110px;height:16px;font-size:12px;color:#90A4AE">请输入昵称</div><div class="btn" style="left:270px;top:179px;width:100px;height:22px;background:#4FC3F7"><span>SubmitBtn</span></div><div class="t" style="left:270px;top:179px;width:100px;height:22px;font-size:16px;color:#FFFFFF">登录</div><div class="btn" style="left:245px;top:211px;width:150px;height:18px;background:#37474F"><span>ToggleModeBtn</span></div><div class="t" style="left:245px;top:211px;width:150px;height:18px;font-size:13px;color:#FFFFFF">没有账号？去注册</div><div class="t" style="left:230px;top:238px;width:180px;height:15px;font-size:11px;color:#FFFFFF">请求中...</div></div>
+<div class="legend">按预制体锚点精确换算（比例 0.5）· 文字/颜色/内容取自设计稿 · ✕隐藏节点不渲染</div></div>
+<pre class="tree">UILogin  [UILoginView.cs, UILoginCtrl.cs, UIAutoBinder.cs]  ·尺寸0×0
+├─ Background  [CanvasRenderer, Image]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0
+└─ Panel  [CanvasRenderer, Image]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,0) 尺寸400×560
+   ├─ TitleText  [CanvasRenderer, Text]  ·锚(0.5,1.0)~(0.5,1.0) 偏(0,-40) 尺寸360×40
+   ├─ UsernameGroup  ·锚(0.5,1.0)~(0.5,1.0) 偏(0,-100) 尺寸360×40
+   │  ├─ UsernameLabel  [CanvasRenderer, Text]  ·锚(0.0,0.5)~(0.0,0.5) 偏(40,0) 尺寸80×36
+   │  └─ UsernameInput  [CanvasRenderer, Image, Image]  ·锚(1.0,0.5)~(1.0,0.5) 偏(-120,0) 尺寸240×36
+   │     ├─ Text  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸-20×-4
+   │     └─ Placeholder  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸-20×-4
+   ├─ PasswordGroup  ·锚(0.5,1.0)~(0.5,1.0) 偏(0,-150) 尺寸360×40
+   │  ├─ PasswordLabel  [CanvasRenderer, Text]  ·锚(0.0,0.5)~(0.0,0.5) 偏(40,0) 尺寸80×36
+   │  └─ PasswordInput  [CanvasRenderer, Image, Image]  ·锚(1.0,0.5)~(1.0,0.5) 偏(-120,0) 尺寸240×36
+   │     ├─ Text  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸-20×-4
+   │     └─ Placeholder  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸-20×-4
+   ├─ DisplayNameGroup  ✕隐藏  ·锚(0.5,1.0)~(0.5,1.0) 偏(0,-200) 尺寸360×40
+   │  ├─ DisplayNameLabel  [CanvasRenderer, Text]  ·锚(0.0,0.5)~(0.0,0.5) 偏(40,0) 尺寸80×36
+   │  └─ DisplayNameInput  [CanvasRenderer, Image, Image]  ·锚(1.0,0.5)~(1.0,0.5) 偏(-120,0) 尺寸240×36
+   │     ├─ Text  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸-20×-4
+   │     └─ Placeholder  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸-20×-4
+   ├─ ErrorText  [CanvasRenderer, Text]  ✕隐藏  ·锚(0.5,1.0)~(0.5,1.0) 偏(0,-250) 尺寸360×30
+   ├─ SubmitBtn  [CanvasRenderer, Image, Button]  ·锚(0.5,1.0)~(0.5,1.0) 偏(0,-300) 尺寸200×45
+   │  └─ SubmitBtnText  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0
+   ├─ ToggleModeBtn  [CanvasRenderer, Image, Button]  ·锚(0.5,1.0)~(0.5,1.0) 偏(0,-360) 尺寸300×35
+   │  └─ ToggleModeBtnText  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0
+   └─ LoadingGroup  ✕隐藏  ·锚(0.5,1.0)~(0.5,1.0) 偏(0,-410) 尺寸360×30
+      └─ LoadingText  [CanvasRenderer, Text]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,0) 尺寸360×30</pre></div>
+<script type="application/json" id="ui-spec">{
+ "name": "UILogin",
+ "active": true,
+ "components": [
+  "RectTransform",
+  "UILoginView.cs",
+  "UILoginCtrl.cs",
+  "UIAutoBinder.cs"
+ ],
+ "anchors": {
+  "min": [
+   0.0,
+   0.0
+  ],
+  "max": [
+   1.0,
+   1.0
+  ]
+ },
+ "pivot": [
+  0.5,
+  0.5
+ ],
+ "position": [
+  0.0,
+  0.0
+ ],
+ "size": [
+  0.0,
+  0.0
+ ],
+ "children": [
+  {
+   "name": "Background",
+   "active": true,
+   "components": [
+    "RectTransform",
+    "CanvasRenderer",
+    "Image"
+   ],
+   "anchors": {
+    "min": [
+     0.0,
+     0.0
+    ],
+    "max": [
+     1.0,
+     1.0
+    ]
+   },
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "position": [
+    0.0,
+    0.0
+   ],
+   "size": [
+    0.0,
+    0.0
+   ],
+   "background": "#FFFFFF"
+  },
+  {
+   "name": "Panel",
+   "active": true,
+   "components": [
+    "RectTransform",
+    "CanvasRenderer",
+    "Image"
+   ],
+   "anchors": {
+    "min": [
+     0.5,
+     0.5
+    ],
+    "max": [
+     0.5,
+     0.5
+    ]
+   },
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "position": [
+    0.0,
+    0.0
+   ],
+   "size": [
+    400.0,
+    560.0
+   ],
+   "background": "#263238",
+   "children": [
+    {
+     "name": "TitleText",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Text"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       1.0
+      ],
+      "max": [
+       0.5,
+       1.0
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      -40.0
+     ],
+     "size": [
+      360.0,
+      40.0
+     ],
+     "text": "登录",
+     "fontSize": 32,
+     "align": "MiddleCenter",
+     "color": "#FFFFFF"
+    },
+    {
+     "name": "UsernameGroup",
+     "active": true,
+     "components": [
+      "RectTransform"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       1.0
+      ],
+      "max": [
+       0.5,
+       1.0
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      -100.0
+     ],
+     "size": [
+      360.0,
+      40.0
+     ],
+     "children": [
+      {
+       "name": "UsernameLabel",
+       "active": true,
+       "components": [
+        "RectTransform",
+        "CanvasRenderer",
+        "Text"
+       ],
+       "anchors": {
+        "min": [
+         0.0,
+         0.5
+        ],
+        "max": [
+         0.0,
+         0.5
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        40.0,
+        0.0
+       ],
+       "size": [
+        80.0,
+        36.0
+       ],
+       "text": "用户名",
+       "fontSize": 18,
+       "align": "MiddleCenter",
+       "color": "#B0BEC5"
+      },
+      {
+       "name": "UsernameInput",
+       "active": true,
+       "components": [
+        "RectTransform",
+        "CanvasRenderer",
+        "Image",
+        "Image"
+       ],
+       "anchors": {
+        "min": [
+         1.0,
+         0.5
+        ],
+        "max": [
+         1.0,
+         0.5
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        -120.0,
+        0.0
+       ],
+       "size": [
+        240.0,
+        36.0
+       ],
+       "background": "#37474F",
+       "children": [
+        {
+         "name": "Text",
+         "active": true,
+         "components": [
+          "RectTransform",
+          "CanvasRenderer",
+          "Text"
+         ],
+         "anchors": {
+          "min": [
+           0.0,
+           0.0
+          ],
+          "max": [
+           1.0,
+           1.0
+          ]
+         },
+         "pivot": [
+          0.5,
+          0.5
+         ],
+         "position": [
+          0.0,
+          0.0
+         ],
+         "size": [
+          -20.0,
+          -4.0
+         ],
+         "text": "",
+         "fontSize": 18,
+         "align": "MiddleLeft",
+         "color": "#FFFFFF"
+        },
+        {
+         "name": "Placeholder",
+         "active": true,
+         "components": [
+          "RectTransform",
+          "CanvasRenderer",
+          "Text"
+         ],
+         "anchors": {
+          "min": [
+           0.0,
+           0.0
+          ],
+          "max": [
+           1.0,
+           1.0
+          ]
+         },
+         "pivot": [
+          0.5,
+          0.5
+         ],
+         "position": [
+          0.0,
+          0.0
+         ],
+         "size": [
+          -20.0,
+          -4.0
+         ],
+         "text": "请输入用户名",
+         "fontSize": 18,
+         "align": "MiddleLeft",
+         "color": "#90A4AE"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "PasswordGroup",
+     "active": true,
+     "components": [
+      "RectTransform"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       1.0
+      ],
+      "max": [
+       0.5,
+       1.0
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      -150.0
+     ],
+     "size": [
+      360.0,
+      40.0
+     ],
+     "children": [
+      {
+       "name": "PasswordLabel",
+       "active": true,
+       "components": [
+        "RectTransform",
+        "CanvasRenderer",
+        "Text"
+       ],
+       "anchors": {
+        "min": [
+         0.0,
+         0.5
+        ],
+        "max": [
+         0.0,
+         0.5
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        40.0,
+        0.0
+       ],
+       "size": [
+        80.0,
+        36.0
+       ],
+       "text": "密码",
+       "fontSize": 18,
+       "align": "MiddleCenter",
+       "color": "#B0BEC5"
+      },
+      {
+       "name": "PasswordInput",
+       "active": true,
+       "components": [
+        "RectTransform",
+        "CanvasRenderer",
+        "Image",
+        "Image"
+       ],
+       "anchors": {
+        "min": [
+         1.0,
+         0.5
+        ],
+        "max": [
+         1.0,
+         0.5
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        -120.0,
+        0.0
+       ],
+       "size": [
+        240.0,
+        36.0
+       ],
+       "background": "#37474F",
+       "children": [
+        {
+         "name": "Text",
+         "active": true,
+         "components": [
+          "RectTransform",
+          "CanvasRenderer",
+          "Text"
+         ],
+         "anchors": {
+          "min": [
+           0.0,
+           0.0
+          ],
+          "max": [
+           1.0,
+           1.0
+          ]
+         },
+         "pivot": [
+          0.5,
+          0.5
+         ],
+         "position": [
+          0.0,
+          0.0
+         ],
+         "size": [
+          -20.0,
+          -4.0
+         ],
+         "text": "",
+         "fontSize": 18,
+         "align": "MiddleLeft",
+         "color": "#FFFFFF"
+        },
+        {
+         "name": "Placeholder",
+         "active": true,
+         "components": [
+          "RectTransform",
+          "CanvasRenderer",
+          "Text"
+         ],
+         "anchors": {
+          "min": [
+           0.0,
+           0.0
+          ],
+          "max": [
+           1.0,
+           1.0
+          ]
+         },
+         "pivot": [
+          0.5,
+          0.5
+         ],
+         "position": [
+          0.0,
+          0.0
+         ],
+         "size": [
+          -20.0,
+          -4.0
+         ],
+         "text": "请输入密码",
+         "fontSize": 18,
+         "align": "MiddleLeft",
+         "color": "#90A4AE"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "DisplayNameGroup",
+     "active": false,
+     "components": [
+      "RectTransform"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       1.0
+      ],
+      "max": [
+       0.5,
+       1.0
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      -200.0
+     ],
+     "size": [
+      360.0,
+      40.0
+     ],
+     "children": [
+      {
+       "name": "DisplayNameLabel",
+       "active": true,
+       "components": [
+        "RectTransform",
+        "CanvasRenderer",
+        "Text"
+       ],
+       "anchors": {
+        "min": [
+         0.0,
+         0.5
+        ],
+        "max": [
+         0.0,
+         0.5
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        40.0,
+        0.0
+       ],
+       "size": [
+        80.0,
+        36.0
+       ],
+       "text": "昵称",
+       "fontSize": 18,
+       "align": "MiddleCenter",
+       "color": "#B0BEC5"
+      },
+      {
+       "name": "DisplayNameInput",
+       "active": true,
+       "components": [
+        "RectTransform",
+        "CanvasRenderer",
+        "Image",
+        "Image"
+       ],
+       "anchors": {
+        "min": [
+         1.0,
+         0.5
+        ],
+        "max": [
+         1.0,
+         0.5
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        -120.0,
+        0.0
+       ],
+       "size": [
+        240.0,
+        36.0
+       ],
+       "background": "#37474F",
+       "children": [
+        {
+         "name": "Text",
+         "active": true,
+         "components": [
+          "RectTransform",
+          "CanvasRenderer",
+          "Text"
+         ],
+         "anchors": {
+          "min": [
+           0.0,
+           0.0
+          ],
+          "max": [
+           1.0,
+           1.0
+          ]
+         },
+         "pivot": [
+          0.5,
+          0.5
+         ],
+         "position": [
+          0.0,
+          0.0
+         ],
+         "size": [
+          -20.0,
+          -4.0
+         ],
+         "text": "",
+         "fontSize": 18,
+         "align": "MiddleLeft",
+         "color": "#FFFFFF"
+        },
+        {
+         "name": "Placeholder",
+         "active": true,
+         "components": [
+          "RectTransform",
+          "CanvasRenderer",
+          "Text"
+         ],
+         "anchors": {
+          "min": [
+           0.0,
+           0.0
+          ],
+          "max": [
+           1.0,
+           1.0
+          ]
+         },
+         "pivot": [
+          0.5,
+          0.5
+         ],
+         "position": [
+          0.0,
+          0.0
+         ],
+         "size": [
+          -20.0,
+          -4.0
+         ],
+         "text": "请输入昵称",
+         "fontSize": 18,
+         "align": "MiddleLeft",
+         "color": "#90A4AE"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "ErrorText",
+     "active": false,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Text"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       1.0
+      ],
+      "max": [
+       0.5,
+       1.0
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      -250.0
+     ],
+     "size": [
+      360.0,
+      30.0
+     ],
+     "text": "",
+     "fontSize": 16,
+     "align": "MiddleCenter",
+     "color": "#EF5350"
+    },
+    {
+     "name": "SubmitBtn",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Image",
+      "Button"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       1.0
+      ],
+      "max": [
+       0.5,
+       1.0
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      -300.0
+     ],
+     "size": [
+      200.0,
+      45.0
+     ],
+     "background": "#4FC3F7",
+     "children": [
+      {
+       "name": "SubmitBtnText",
+       "active": true,
+       "components": [
+        "RectTransform",
+        "CanvasRenderer",
+        "Text"
+       ],
+       "anchors": {
+        "min": [
+         0.0,
+         0.0
+        ],
+        "max": [
+         1.0,
+         1.0
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        0.0,
+        0.0
+       ],
+       "size": [
+        0.0,
+        0.0
+       ],
+       "text": "登录",
+       "fontSize": 20,
+       "align": "MiddleCenter",
+       "color": "#FFFFFF"
+      }
+     ]
+    },
+    {
+     "name": "ToggleModeBtn",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Image",
+      "Button"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       1.0
+      ],
+      "max": [
+       0.5,
+       1.0
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      -360.0
+     ],
+     "size": [
+      300.0,
+      35.0
+     ],
+     "background": "#37474F",
+     "children": [
+      {
+       "name": "ToggleModeBtnText",
+       "active": true,
+       "components": [
+        "RectTransform",
+        "CanvasRenderer",
+        "Text"
+       ],
+       "anchors": {
+        "min": [
+         0.0,
+         0.0
+        ],
+        "max": [
+         1.0,
+         1.0
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        0.0,
+        0.0
+       ],
+       "size": [
+        0.0,
+        0.0
+       ],
+       "text": "没有账号？去注册",
+       "fontSize": 20,
+       "align": "MiddleCenter",
+       "color": "#FFFFFF"
+      }
+     ]
+    },
+    {
+     "name": "LoadingGroup",
+     "active": false,
+     "components": [
+      "RectTransform"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       1.0
+      ],
+      "max": [
+       0.5,
+       1.0
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      -410.0
+     ],
+     "size": [
+      360.0,
+      30.0
+     ],
+     "children": [
+      {
+       "name": "LoadingText",
+       "active": true,
+       "components": [
+        "RectTransform",
+        "CanvasRenderer",
+        "Text"
+       ],
+       "anchors": {
+        "min": [
+         0.5,
+         0.5
+        ],
+        "max": [
+         0.5,
+         0.5
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        0.0,
+        0.0
+       ],
+       "size": [
+        360.0,
+        30.0
+       ],
+       "text": "请求中...",
+       "fontSize": 18,
+       "align": "MiddleCenter",
+       "color": "#FFFFFF"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}</script>
+</body></html>

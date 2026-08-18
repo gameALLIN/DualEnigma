@@ -1,0 +1,304 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Common · 页面设计稿</title><style>
+body{background:#1a2226;font-family:"Microsoft YaHei",Consolas,monospace;color:#B0BEC5;margin:20px}
+h1{color:#ECEFF1;font-size:20px}h1 small{color:#78909C;font-size:12px;font-weight:normal;margin-left:12px}
+a{color:#4FC3F7}
+.wrap{display:flex;gap:24px;align-items:flex-start}
+.page{position:relative;width:640px;height:360px;background:#263238;border:1px solid #546E7A;overflow:hidden;flex:none}
+.box{position:absolute;border:1px solid rgba(120,144,156,.45);box-sizing:border-box}
+.btn{position:absolute;border:1.5px solid rgba(120,144,156,.8);box-sizing:border-box;display:flex;align-items:center;justify-content:center;color:#ECEFF1;font-size:12px;overflow:hidden;white-space:nowrap}
+.t{position:absolute;display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;text-align:center;font-weight:600}
+.tree{background:#202a30;border:1px solid #546E7A;padding:12px;font-size:12px;line-height:1.5;max-height:720px;overflow:auto;flex:1}
+.legend{margin-top:8px;font-size:12px;color:#78909C}
+</style></head><body>
+<h1>Common <small>Client/Assets/AssetPackage/Prefabs/UI/Common/FriendItem.prefab · 8 节点 · FriendItem.cs · <a href="index.html">← 索引</a></small></h1>
+<div class="wrap"><div><div class="page"><div class="t" style="left:156px;top:174px;width:125px;height:13px;font-size:9px;color:#FFFFFF">昵称 (用户名)</div><div class="t" style="left:241px;top:174px;width:100px;height:12px;font-size:9px;color:#B0BEC5">离线</div><div class="t" style="left:358px;top:174px;width:60px;height:12px;font-size:9px;color:#B0BEC5">IdText</div><div class="btn" style="left:428px;top:174px;width:32px;height:13px;background:#4FC3F7"><span>PrimaryBtn</span></div><div class="t" style="left:428px;top:174px;width:32px;height:13px;font-size:9px;color:#FFFFFF">邀请</div><div class="btn" style="left:460px;top:174px;width:24px;height:13px;background:#EF5350"><span>SecondaryBtn</span></div><div class="t" style="left:460px;top:174px;width:24px;height:13px;font-size:9px;color:#FFFFFF">删除</div></div>
+<div class="legend">按预制体锚点精确换算（比例 0.5）· 文字/颜色/内容取自设计稿 · ✕隐藏节点不渲染</div></div>
+<pre class="tree">FriendItem  [CanvasRenderer, Image, FriendItem.cs]  ·尺寸656×34
+├─ NameText  [CanvasRenderer, Text]  ·锚(0.0,0.5)~(0.0,0.5) 偏(125,0) 尺寸250×26
+├─ StatusText  [CanvasRenderer, Text]  ·锚(0.0,0.5)~(0.0,0.5) 偏(270,0) 尺寸200×24
+├─ IdText  [CanvasRenderer, Text]  ·锚(1.0,0.5)~(1.0,0.5) 偏(-192,0) 尺寸120×24
+├─ PrimaryBtn  [CanvasRenderer, Image, Button]  ·锚(1.0,0.5)~(1.0,0.5) 偏(-80,0) 尺寸64×26
+│  └─ Text  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0
+└─ SecondaryBtn  [CanvasRenderer, Image, Button]  ·锚(1.0,0.5)~(1.0,0.5) 偏(-24,0) 尺寸48×26
+   └─ Text  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0</pre></div>
+<script type="application/json" id="ui-spec">{
+ "name": "FriendItem",
+ "active": true,
+ "components": [
+  "RectTransform",
+  "CanvasRenderer",
+  "Image",
+  "FriendItem.cs"
+ ],
+ "anchors": {
+  "min": [
+   0.5,
+   0.5
+  ],
+  "max": [
+   0.5,
+   0.5
+  ]
+ },
+ "pivot": [
+  0.5,
+  0.5
+ ],
+ "position": [
+  0.0,
+  0.0
+ ],
+ "size": [
+  656.0,
+  34.0
+ ],
+ "background": "#37474F",
+ "children": [
+  {
+   "name": "NameText",
+   "active": true,
+   "components": [
+    "RectTransform",
+    "CanvasRenderer",
+    "Text"
+   ],
+   "anchors": {
+    "min": [
+     0.0,
+     0.5
+    ],
+    "max": [
+     0.0,
+     0.5
+    ]
+   },
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "position": [
+    125.0,
+    0.0
+   ],
+   "size": [
+    250.0,
+    26.0
+   ],
+   "text": "昵称 (用户名)",
+   "fontSize": 15,
+   "align": "MiddleLeft",
+   "color": "#FFFFFF"
+  },
+  {
+   "name": "StatusText",
+   "active": true,
+   "components": [
+    "RectTransform",
+    "CanvasRenderer",
+    "Text"
+   ],
+   "anchors": {
+    "min": [
+     0.0,
+     0.5
+    ],
+    "max": [
+     0.0,
+     0.5
+    ]
+   },
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "position": [
+    270.0,
+    0.0
+   ],
+   "size": [
+    200.0,
+    24.0
+   ],
+   "text": "离线",
+   "fontSize": 13,
+   "align": "MiddleLeft",
+   "color": "#B0BEC5"
+  },
+  {
+   "name": "IdText",
+   "active": true,
+   "components": [
+    "RectTransform",
+    "CanvasRenderer",
+    "Text"
+   ],
+   "anchors": {
+    "min": [
+     1.0,
+     0.5
+    ],
+    "max": [
+     1.0,
+     0.5
+    ]
+   },
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "position": [
+    -192.0,
+    0.0
+   ],
+   "size": [
+    120.0,
+    24.0
+   ],
+   "text": "",
+   "fontSize": 13,
+   "align": "MiddleRight",
+   "color": "#B0BEC5"
+  },
+  {
+   "name": "PrimaryBtn",
+   "active": true,
+   "components": [
+    "RectTransform",
+    "CanvasRenderer",
+    "Image",
+    "Button"
+   ],
+   "anchors": {
+    "min": [
+     1.0,
+     0.5
+    ],
+    "max": [
+     1.0,
+     0.5
+    ]
+   },
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "position": [
+    -80.0,
+    0.0
+   ],
+   "size": [
+    64.0,
+    26.0
+   ],
+   "background": "#4FC3F7",
+   "children": [
+    {
+     "name": "Text",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Text"
+     ],
+     "anchors": {
+      "min": [
+       0.0,
+       0.0
+      ],
+      "max": [
+       1.0,
+       1.0
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      0.0
+     ],
+     "size": [
+      0.0,
+      0.0
+     ],
+     "text": "邀请",
+     "fontSize": 13,
+     "align": "MiddleCenter",
+     "color": "#FFFFFF"
+    }
+   ]
+  },
+  {
+   "name": "SecondaryBtn",
+   "active": true,
+   "components": [
+    "RectTransform",
+    "CanvasRenderer",
+    "Image",
+    "Button"
+   ],
+   "anchors": {
+    "min": [
+     1.0,
+     0.5
+    ],
+    "max": [
+     1.0,
+     0.5
+    ]
+   },
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "position": [
+    -24.0,
+    0.0
+   ],
+   "size": [
+    48.0,
+    26.0
+   ],
+   "background": "#EF5350",
+   "children": [
+    {
+     "name": "Text",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Text"
+     ],
+     "anchors": {
+      "min": [
+       0.0,
+       0.0
+      ],
+      "max": [
+       1.0,
+       1.0
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      0.0
+     ],
+     "size": [
+      0.0,
+      0.0
+     ],
+     "text": "删除",
+     "fontSize": 13,
+     "align": "MiddleCenter",
+     "color": "#FFFFFF"
+    }
+   ]
+  }
+ ]
+}</script>
+</body></html>

@@ -21,22 +21,53 @@ namespace DualEnigma.UI
 
         [Header("按钮")]
         [SerializeField] private Button m_StartBtn;
-        [SerializeField] private Button m_RoomBtn;
         [SerializeField] private Button m_FriendsBtn;
-        [SerializeField] private Button m_LogoutBtn;
+        [SerializeField] private Button m_MailBtn;
+        [SerializeField] private Button m_AchievementBtn;
+        [SerializeField] private Button m_SettingsBtn;
 
         [Header("文本")]
         [SerializeField] private Text m_VersionText;
+
+        [Header("邀请抽屉")]
+        [SerializeField] private Button m_DrawerToggleBtn;
+        [SerializeField] private GameObject m_DrawerPanel;
+        [SerializeField] private Text m_RoomCodeText;
+        [SerializeField] private Transform m_FriendListContent;
+        [SerializeField] private Text m_StatusText;
+        [SerializeField] private FriendItem m_FriendRowTemplate;
         // ===== Auto Bind End =====
 
         public Text AvatarText => m_AvatarText;
         public Text DisplayNameText => m_DisplayNameText;
         public Text AccountIdText => m_AccountIdText;
         public Button StartBtn => m_StartBtn;
-        public Button RoomBtn => m_RoomBtn;
         public Button FriendsBtn => m_FriendsBtn;
-        public Button LogoutBtn => m_LogoutBtn;
+        public Button MailBtn => m_MailBtn;
+        public Button AchievementBtn => m_AchievementBtn;
+        public Button SettingsBtn => m_SettingsBtn;
         public Text VersionText => m_VersionText;
+        public Button DrawerToggleBtn => m_DrawerToggleBtn;
+        public GameObject DrawerPanel => m_DrawerPanel;
+        public Text RoomCodeText => m_RoomCodeText;
+        public Transform FriendListContent => m_FriendListContent;
+        public Text StatusText => m_StatusText;
+        public FriendItem FriendRowTemplate => m_FriendRowTemplate;
+
+        /// <summary>显示抽屉状态提示（空串隐藏）</summary>
+        public void SetDrawerStatus(string message)
+        {
+            if (m_StatusText == null) return;
+            m_StatusText.text = message ?? "";
+            m_StatusText.gameObject.SetActive(!string.IsNullOrEmpty(message));
+        }
+
+        /// <summary>设置抽屉房间码文本</summary>
+        public void SetRoomCode(string roomCode)
+        {
+            if (m_RoomCodeText != null)
+                m_RoomCodeText.text = string.IsNullOrEmpty(roomCode) ? "房间码: ----" : $"房间码: {roomCode}";
+        }
 
         /// <summary>填充玩家信息卡：头像取昵称首字，ID 显示账号编号</summary>
         public void SetPlayerInfo(string displayName, long accountId)

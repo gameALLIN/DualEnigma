@@ -1,0 +1,372 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>UITest · 页面设计稿</title><style>
+body{background:#1a2226;font-family:"Microsoft YaHei",Consolas,monospace;color:#B0BEC5;margin:20px}
+h1{color:#ECEFF1;font-size:20px}h1 small{color:#78909C;font-size:12px;font-weight:normal;margin-left:12px}
+a{color:#4FC3F7}
+.wrap{display:flex;gap:24px;align-items:flex-start}
+.page{position:relative;width:640px;height:360px;background:#263238;border:1px solid #546E7A;overflow:hidden;flex:none}
+.box{position:absolute;border:1px solid rgba(120,144,156,.45);box-sizing:border-box}
+.btn{position:absolute;border:1.5px solid rgba(120,144,156,.8);box-sizing:border-box;display:flex;align-items:center;justify-content:center;color:#ECEFF1;font-size:12px;overflow:hidden;white-space:nowrap}
+.t{position:absolute;display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;text-align:center;font-weight:600}
+.tree{background:#202a30;border:1px solid #546E7A;padding:12px;font-size:12px;line-height:1.5;max-height:720px;overflow:auto;flex:1}
+.legend{margin-top:8px;font-size:12px;color:#78909C}
+</style></head><body>
+<h1>UITest <small>Client/Assets/AssetPackage/Prefabs/UI/UITest/UITest.prefab · 10 节点 · UITestView.cs, UITestCtrl.cs, UIAutoBinder.cs · <a href="index.html">← 索引</a></small></h1>
+<div class="wrap"><div><div class="page"><div class="box" style="left:0px;top:0px;width:640px;height:360px;background:#262633"></div><div class="t" style="left:220px;top:15px;width:200px;height:30px;font-size:16px;color:#FFFFFF">UITest 测试面板</div><div class="t" style="left:245px;top:148px;width:150px;height:25px;font-size:16px;color:#FFFFFF">计数: 0</div><div class="btn" style="left:270px;top:178px;width:100px;height:25px;background:#3399FF"><span>m_BtnAdd</span></div><div class="t" style="left:270px;top:178px;width:100px;height:25px;font-size:16px;color:#FFFFFF">计数 +1</div><div class="btn" style="left:270px;top:212px;width:100px;height:25px;background:#FF9933"><span>m_BtnReset</span></div><div class="t" style="left:270px;top:212px;width:100px;height:25px;font-size:16px;color:#FFFFFF">重置</div><div class="btn" style="left:270px;top:248px;width:100px;height:25px;background:#E63333"><span>m_BtnClose</span></div><div class="t" style="left:270px;top:248px;width:100px;height:25px;font-size:16px;color:#FFFFFF">关闭面板</div></div>
+<div class="legend">按预制体锚点精确换算（比例 0.5）· 文字/颜色/内容取自设计稿 · ✕隐藏节点不渲染</div></div>
+<pre class="tree">UITest  [UITestView.cs, UITestCtrl.cs, UIAutoBinder.cs]  ·尺寸0×0
+├─ m_Background  [CanvasRenderer, Image]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0
+├─ m_TitleText  [CanvasRenderer, Text]  ·锚(0.5,1.0)~(0.5,1.0) 偏(0,-60) 尺寸400×60
+├─ m_CountText  [CanvasRenderer, Text]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,40) 尺寸300×50
+├─ m_BtnAdd  [CanvasRenderer, Image, Button]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,-20) 尺寸200×50
+│  └─ Text  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0
+├─ m_BtnReset  [CanvasRenderer, Image, Button]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,-90) 尺寸200×50
+│  └─ Text  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0
+└─ m_BtnClose  [CanvasRenderer, Image, Button]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,-160) 尺寸200×50
+   └─ Text  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0</pre></div>
+<script type="application/json" id="ui-spec">{
+ "name": "UITest",
+ "active": true,
+ "components": [
+  "RectTransform",
+  "UITestView.cs",
+  "UITestCtrl.cs",
+  "UIAutoBinder.cs"
+ ],
+ "anchors": {
+  "min": [
+   0.0,
+   0.0
+  ],
+  "max": [
+   1.0,
+   1.0
+  ]
+ },
+ "pivot": [
+  0.5,
+  0.5
+ ],
+ "position": [
+  0.0,
+  0.0
+ ],
+ "size": [
+  0.0,
+  0.0
+ ],
+ "children": [
+  {
+   "name": "m_Background",
+   "active": true,
+   "components": [
+    "RectTransform",
+    "CanvasRenderer",
+    "Image"
+   ],
+   "anchors": {
+    "min": [
+     0.0,
+     0.0
+    ],
+    "max": [
+     1.0,
+     1.0
+    ]
+   },
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "position": [
+    0.0,
+    0.0
+   ],
+   "size": [
+    0.0,
+    0.0
+   ],
+   "background": "#262633"
+  },
+  {
+   "name": "m_TitleText",
+   "active": true,
+   "components": [
+    "RectTransform",
+    "CanvasRenderer",
+    "Text"
+   ],
+   "anchors": {
+    "min": [
+     0.5,
+     1.0
+    ],
+    "max": [
+     0.5,
+     1.0
+    ]
+   },
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "position": [
+    0.0,
+    -60.0
+   ],
+   "size": [
+    400.0,
+    60.0
+   ],
+   "text": "UITest 测试面板",
+   "fontSize": 36,
+   "align": "MiddleCenter",
+   "color": "#FFFFFF"
+  },
+  {
+   "name": "m_CountText",
+   "active": true,
+   "components": [
+    "RectTransform",
+    "CanvasRenderer",
+    "Text"
+   ],
+   "anchors": {
+    "min": [
+     0.5,
+     0.5
+    ],
+    "max": [
+     0.5,
+     0.5
+    ]
+   },
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "position": [
+    0.0,
+    40.0
+   ],
+   "size": [
+    300.0,
+    50.0
+   ],
+   "text": "计数: 0",
+   "fontSize": 28,
+   "align": "MiddleCenter",
+   "color": "#FFFFFF"
+  },
+  {
+   "name": "m_BtnAdd",
+   "active": true,
+   "components": [
+    "RectTransform",
+    "CanvasRenderer",
+    "Image",
+    "Button"
+   ],
+   "anchors": {
+    "min": [
+     0.5,
+     0.5
+    ],
+    "max": [
+     0.5,
+     0.5
+    ]
+   },
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "position": [
+    0.0,
+    -20.0
+   ],
+   "size": [
+    200.0,
+    50.0
+   ],
+   "background": "#3399FF",
+   "children": [
+    {
+     "name": "Text",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Text"
+     ],
+     "anchors": {
+      "min": [
+       0.0,
+       0.0
+      ],
+      "max": [
+       1.0,
+       1.0
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      0.0
+     ],
+     "size": [
+      0.0,
+      0.0
+     ],
+     "text": "计数 +1",
+     "fontSize": 20,
+     "align": "MiddleCenter",
+     "color": "#FFFFFF"
+    }
+   ]
+  },
+  {
+   "name": "m_BtnReset",
+   "active": true,
+   "components": [
+    "RectTransform",
+    "CanvasRenderer",
+    "Image",
+    "Button"
+   ],
+   "anchors": {
+    "min": [
+     0.5,
+     0.5
+    ],
+    "max": [
+     0.5,
+     0.5
+    ]
+   },
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "position": [
+    0.0,
+    -90.0
+   ],
+   "size": [
+    200.0,
+    50.0
+   ],
+   "background": "#FF9933",
+   "children": [
+    {
+     "name": "Text",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Text"
+     ],
+     "anchors": {
+      "min": [
+       0.0,
+       0.0
+      ],
+      "max": [
+       1.0,
+       1.0
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      0.0
+     ],
+     "size": [
+      0.0,
+      0.0
+     ],
+     "text": "重置",
+     "fontSize": 20,
+     "align": "MiddleCenter",
+     "color": "#FFFFFF"
+    }
+   ]
+  },
+  {
+   "name": "m_BtnClose",
+   "active": true,
+   "components": [
+    "RectTransform",
+    "CanvasRenderer",
+    "Image",
+    "Button"
+   ],
+   "anchors": {
+    "min": [
+     0.5,
+     0.5
+    ],
+    "max": [
+     0.5,
+     0.5
+    ]
+   },
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "position": [
+    0.0,
+    -160.0
+   ],
+   "size": [
+    200.0,
+    50.0
+   ],
+   "background": "#E63333",
+   "children": [
+    {
+     "name": "Text",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Text"
+     ],
+     "anchors": {
+      "min": [
+       0.0,
+       0.0
+      ],
+      "max": [
+       1.0,
+       1.0
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      0.0
+     ],
+     "size": [
+      0.0,
+      0.0
+     ],
+     "text": "关闭面板",
+     "fontSize": 20,
+     "align": "MiddleCenter",
+     "color": "#FFFFFF"
+    }
+   ]
+  }
+ ]
+}</script>
+</body></html>

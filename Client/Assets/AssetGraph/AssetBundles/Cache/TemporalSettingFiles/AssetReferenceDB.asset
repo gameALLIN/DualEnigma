@@ -1025,18 +1025,6 @@ MonoBehaviour:
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UIInvitePopup/UIInvitePopup.prefab
     m_exportTo: 
     m_variantName: 
-  - m_assetDatabaseId: 6aeeb201194274d4086e7e024d2961ef
-    m_importFrom: Assets/ArtResources/Textures/UI/UIHome_BgGradient.asset
-    m_exportTo: 
-    m_variantName: 
-  - m_assetDatabaseId: 029ab66b57ff06a4086c7a0889abf8db
-    m_importFrom: Assets/ArtResources/Textures/UI/UIHome_BgGradient_Sprite.asset
-    m_exportTo: 
-    m_variantName: 
-  - m_assetDatabaseId: 90e39c44318791341a5ecb6b51dda5d4
-    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIHome/UIHome.prefab
-    m_exportTo: 
-    m_variantName: 
   - m_assetDatabaseId: 67c23702a871a1448addc0203907cbd9
     m_importFrom: Assets/Scripts/Character/RemoteCharacterDriver.cs
     m_exportTo: 
@@ -1105,10 +1093,6 @@ MonoBehaviour:
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UIGameHud/UIGameHud.prefab
     m_exportTo: 
     m_variantName: 
-  - m_assetDatabaseId: 4249823a5ffdb5f4e96ef05c680ac9ee
-    m_importFrom: Assets/AssetPackage/Prefabs/UI/UISettings/UISettings.prefab
-    m_exportTo: 
-    m_variantName: 
   - m_assetDatabaseId: 3700caf15d9b81c4b88d85970ae5834c
     m_importFrom: Assets/Scripts/UI/Views/UIGameOver/UIGameOverModel.cs
     m_exportTo: 
@@ -1137,8 +1121,52 @@ MonoBehaviour:
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UIGameOver/UIGameOver.prefab
     m_exportTo: 
     m_variantName: 
+  - m_assetDatabaseId: 9b4e2f7a1c8d4e35a6f0b2c8d7e14a52
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/Common
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: c7e91a5f2d834b16e9a40f2c5d8b63e4
+    m_importFrom: Assets/Scripts/UI/Components/FriendItem.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 5c8d3a1f9e274b06d9a4c3f8e12b5d79
+    m_importFrom: Assets/Editor/GenerateFriendItemPrefab.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: a3f8c2d94b71e5064c8a2f13d9e04b17
+    m_importFrom: Assets/Scripts/UI/Components
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 4249823a5ffdb5f4e96ef05c680ac9ee
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UISettings/UISettings.prefab
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 634229ddc3acfba47b36770e0cf8cb5c
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIInviteList
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 0f898c8c0cef0824d8fa964c0bd27bcb
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIInviteList/UIInviteList.prefab
+    m_exportTo: 
+    m_variantName: 
   - m_assetDatabaseId: cfa8920e38871f04083e94e0c3712c64
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UIFriends/UIFriends.prefab
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: e2a95c31d7f04b8ea6c19d3f2b74e806
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/Common/FriendItem.prefab
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 6aeeb201194274d4086e7e024d2961ef
+    m_importFrom: Assets/ArtResources/Textures/UI/UIHome_BgGradient.asset
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 029ab66b57ff06a4086c7a0889abf8db
+    m_importFrom: Assets/ArtResources/Textures/UI/UIHome_BgGradient_Sprite.asset
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 90e39c44318791341a5ecb6b51dda5d4
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIHome/UIHome.prefab
     m_exportTo: 
     m_variantName: 
   m_version: 2

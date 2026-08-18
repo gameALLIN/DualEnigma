@@ -1,0 +1,432 @@
+{
+ "name": "UIHome",
+ "active": true,
+ "components": ["RectTransform", "UIHomeView.cs", "UIHomeCtrl.cs", "UIAutoBinder.cs"],
+ "anchors": {"min": [0.0, 0.0], "max": [1.0, 1.0]},
+ "pivot": [0.5, 0.5],
+ "position": [0.0, 0.0],
+ "size": [0.0, 0.0],
+ "children": [
+  {
+   "name": "Background",
+   "active": true,
+   "components": ["RectTransform", "CanvasRenderer", "Image"],
+   "anchors": {"min": [0.0, 0.0], "max": [1.0, 1.0]},
+   "pivot": [0.5, 0.5],
+   "position": [0.0, 0.0],
+   "size": [0.0, 0.0],
+   "background": "#263238"
+  },
+  {
+   "name": "PlayerCard",
+   "active": true,
+   "components": ["RectTransform", "CanvasRenderer", "Image"],
+   "anchors": {"min": [1.0, 1.0], "max": [1.0, 1.0]},
+   "pivot": [0.5, 0.5],
+   "position": [-234.0, -48.0],
+   "size": [420.0, 90.0],
+   "background": "#263238",
+   "children": [
+    {
+     "name": "AvatarBg",
+     "active": true,
+     "components": ["RectTransform", "CanvasRenderer", "Image"],
+     "anchors": {"min": [0.0, 0.5], "max": [0.0, 0.5]},
+     "pivot": [0.5, 0.5],
+     "position": [44.0, 0.0],
+     "size": [64.0, 64.0],
+     "background": "#4FC3F7",
+     "children": [
+      {
+       "name": "AvatarText",
+       "active": true,
+       "components": ["RectTransform", "CanvasRenderer", "Text"],
+       "anchors": {"min": [0.5, 0.5], "max": [0.5, 0.5]},
+       "pivot": [0.5, 0.5],
+       "position": [0.0, 0.0],
+       "size": [64.0, 64.0],
+       "text": "",
+       "fontSize": 32,
+       "align": "MiddleCenter",
+       "color": "#FFFFFF"
+      }
+     ]
+    },
+    {
+     "name": "DisplayNameText",
+     "active": true,
+     "components": ["RectTransform", "CanvasRenderer", "Text"],
+     "anchors": {"min": [0.0, 0.5], "max": [0.0, 0.5]},
+     "pivot": [0.5, 0.5],
+     "position": [218.0, 14.0],
+     "size": [260.0, 28.0],
+     "text": "旅行者",
+     "fontSize": 22,
+     "align": "MiddleLeft",
+     "color": "#FFFFFF"
+    },
+    {
+     "name": "AccountIdText",
+     "active": true,
+     "components": ["RectTransform", "CanvasRenderer", "Text"],
+     "anchors": {"min": [0.0, 0.5], "max": [0.0, 0.5]},
+     "pivot": [0.5, 0.5],
+     "position": [218.0, -16.0],
+     "size": [260.0, 22.0],
+     "text": "ID: 10001",
+     "fontSize": 14,
+     "align": "MiddleLeft",
+     "color": "#B0BEC5"
+    }
+   ]
+  },
+  {
+   "name": "StartBtn",
+   "active": true,
+   "components": ["RectTransform", "CanvasRenderer", "Image", "Button"],
+   "anchors": {"min": [0.0, 1.0], "max": [0.0, 1.0]},
+   "pivot": [0.5, 0.5],
+   "position": [160.0, -56.0],
+   "size": [240.0, 56.0],
+   "background": "#4FC3F7",
+   "children": [
+    {
+     "name": "Text",
+     "active": true,
+     "components": ["RectTransform", "CanvasRenderer", "Text"],
+     "anchors": {"min": [0.0, 0.0], "max": [1.0, 1.0]},
+     "pivot": [0.5, 0.5],
+     "position": [0.0, 0.0],
+     "size": [0.0, 0.0],
+     "text": "开始游戏",
+     "fontSize": 24,
+     "align": "MiddleCenter",
+     "color": "#FFFFFF"
+    }
+   ]
+  },
+  {
+   "name": "FeatureList",
+   "active": true,
+   "components": ["RectTransform", "HorizontalLayoutGroup"],
+   "anchors": {"min": [0.0, 0.0], "max": [0.0, 0.0]},
+   "pivot": [0.5, 0.5],
+   "position": [216.0, 46.0],
+   "size": [384.0, 44.0],
+   "children": [
+    {
+     "name": "MailBtn",
+     "active": true,
+     "components": ["RectTransform", "CanvasRenderer", "Image", "Button"],
+     "anchors": {"min": [0.0, 0.5], "max": [0.0, 0.5]},
+     "pivot": [0.5, 0.5],
+     "position": [45.0, 0.0],
+     "size": [90.0, 44.0],
+     "background": "#37474F",
+     "children": [
+      {
+       "name": "Text",
+       "active": true,
+       "components": ["RectTransform", "CanvasRenderer", "Text"],
+       "anchors": {"min": [0.0, 0.0], "max": [1.0, 1.0]},
+       "pivot": [0.5, 0.5],
+       "position": [0.0, 0.0],
+       "size": [0.0, 0.0],
+       "text": "邮箱",
+       "fontSize": 16,
+       "align": "MiddleCenter",
+       "color": "#FFFFFF"
+      }
+     ]
+    },
+    {
+     "name": "FriendsBtn",
+     "active": true,
+     "components": ["RectTransform", "CanvasRenderer", "Image", "Button"],
+     "anchors": {"min": [0.0, 0.5], "max": [0.0, 0.5]},
+     "pivot": [0.5, 0.5],
+     "position": [143.0, 0.0],
+     "size": [90.0, 44.0],
+     "background": "#37474F",
+     "children": [
+      {
+       "name": "Text",
+       "active": true,
+       "components": ["RectTransform", "CanvasRenderer", "Text"],
+       "anchors": {"min": [0.0, 0.0], "max": [1.0, 1.0]},
+       "pivot": [0.5, 0.5],
+       "position": [0.0, 0.0],
+       "size": [0.0, 0.0],
+       "text": "好友",
+       "fontSize": 16,
+       "align": "MiddleCenter",
+       "color": "#FFFFFF"
+      }
+     ]
+    },
+    {
+     "name": "AchievementBtn",
+     "active": true,
+     "components": ["RectTransform", "CanvasRenderer", "Image", "Button"],
+     "anchors": {"min": [0.0, 0.5], "max": [0.0, 0.5]},
+     "pivot": [0.5, 0.5],
+     "position": [241.0, 0.0],
+     "size": [90.0, 44.0],
+     "background": "#37474F",
+     "children": [
+      {
+       "name": "Text",
+       "active": true,
+       "components": ["RectTransform", "CanvasRenderer", "Text"],
+       "anchors": {"min": [0.0, 0.0], "max": [1.0, 1.0]},
+       "pivot": [0.5, 0.5],
+       "position": [0.0, 0.0],
+       "size": [0.0, 0.0],
+       "text": "成就",
+       "fontSize": 16,
+       "align": "MiddleCenter",
+       "color": "#FFFFFF"
+      }
+     ]
+    },
+    {
+     "name": "SettingsBtn",
+     "active": true,
+     "components": ["RectTransform", "CanvasRenderer", "Image", "Button"],
+     "anchors": {"min": [0.0, 0.5], "max": [0.0, 0.5]},
+     "pivot": [0.5, 0.5],
+     "position": [339.0, 0.0],
+     "size": [90.0, 44.0],
+     "background": "#37474F",
+     "children": [
+      {
+       "name": "Text",
+       "active": true,
+       "components": ["RectTransform", "CanvasRenderer", "Text"],
+       "anchors": {"min": [0.0, 0.0], "max": [1.0, 1.0]},
+       "pivot": [0.5, 0.5],
+       "position": [0.0, 0.0],
+       "size": [0.0, 0.0],
+       "text": "设置",
+       "fontSize": 16,
+       "align": "MiddleCenter",
+       "color": "#FFFFFF"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "InviteDrawer",
+   "active": true,
+   "components": ["RectTransform"],
+   "anchors": {"min": [0.0, 0.0], "max": [1.0, 1.0]},
+   "pivot": [0.5, 0.5],
+   "position": [0.0, 0.0],
+   "size": [0.0, 0.0],
+   "children": [
+    {
+     "name": "DrawerToggleBtn",
+     "active": true,
+     "components": ["RectTransform", "CanvasRenderer", "Image", "Button"],
+     "anchors": {"min": [0.0, 0.5], "max": [0.0, 0.5]},
+     "pivot": [0.5, 0.5],
+     "position": [20.0, 0.0],
+     "size": [32.0, 64.0],
+     "background": "#37474F",
+     "children": [
+      {
+       "name": "Text",
+       "active": true,
+       "components": ["RectTransform", "CanvasRenderer", "Text"],
+       "anchors": {"min": [0.0, 0.0], "max": [1.0, 1.0]},
+       "pivot": [0.5, 0.5],
+       "position": [0.0, 0.0],
+       "size": [0.0, 0.0],
+       "text": "▶",
+       "fontSize": 18,
+       "align": "MiddleCenter",
+       "color": "#FFFFFF"
+      }
+     ]
+    },
+    {
+     "name": "DrawerPanel",
+     "active": true,
+     "components": ["RectTransform", "CanvasRenderer", "Image"],
+     "anchors": {"min": [0.0, 0.5], "max": [0.0, 0.5]},
+     "pivot": [0.0, 0.5],
+     "position": [44.0, 0.0],
+     "size": [320.0, 420.0],
+     "background": "#263238",
+     "children": [
+      {
+       "name": "DrawerTitleText",
+       "active": true,
+       "components": ["RectTransform", "CanvasRenderer", "Text"],
+       "anchors": {"min": [0.0, 1.0], "max": [0.0, 1.0]},
+       "pivot": [0.5, 0.5],
+       "position": [80.0, -26.0],
+       "size": [200.0, 26.0],
+       "text": "邀请好友",
+       "fontSize": 18,
+       "align": "MiddleLeft",
+       "color": "#FFFFFF"
+      },
+      {
+       "name": "RoomCodeText",
+       "active": true,
+       "components": ["RectTransform", "CanvasRenderer", "Text"],
+       "anchors": {"min": [0.0, 1.0], "max": [0.0, 1.0]},
+       "pivot": [0.5, 0.5],
+       "position": [80.0, -52.0],
+       "size": [240.0, 20.0],
+       "text": "房间码: ----",
+       "fontSize": 13,
+       "align": "MiddleLeft",
+       "color": "#4FC3F7"
+      },
+      {
+       "name": "FriendScroll",
+       "active": true,
+       "components": ["RectTransform", "CanvasRenderer", "Image", "ScrollRect"],
+       "anchors": {"min": [0.5, 0.5], "max": [0.5, 0.5]},
+       "pivot": [0.5, 0.5],
+       "position": [0.0, -24.0],
+       "size": [300.0, 330.0],
+       "background": "#2E3D45",
+       "children": [
+        {
+         "name": "Viewport",
+         "active": true,
+         "components": ["RectTransform", "CanvasRenderer", "Image", "Mask"],
+         "anchors": {"min": [0.0, 0.0], "max": [1.0, 1.0]},
+         "pivot": [0.5, 0.5],
+         "position": [0.0, 0.0],
+         "size": [0.0, 0.0],
+         "background": "#FFFFFF",
+         "children": [
+          {
+           "name": "FriendListContent",
+           "active": true,
+           "components": ["RectTransform", "VerticalLayoutGroup"],
+           "anchors": {"min": [0.0, 1.0], "max": [1.0, 1.0]},
+           "pivot": [0.5, 1.0],
+           "position": [0.0, 0.0],
+           "size": [0.0, 300.0]
+          },
+          {
+           "name": "FriendRowTemplate",
+           "active": false,
+           "components": ["RectTransform", "CanvasRenderer", "Image", "FriendItem.cs"],
+           "anchors": {"min": [0.0, 1.0], "max": [0.0, 1.0]},
+           "pivot": [0.5, 1.0],
+           "position": [0.0, 0.0],
+           "size": [296.0, 34.0],
+           "background": "#37474F",
+           "note": "嵌套 Common/FriendItem 预制体实例（行模板，运行时克隆+SetCompactLayout(296)）"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "name": "StatusText",
+       "active": true,
+       "components": ["RectTransform", "CanvasRenderer", "Text"],
+       "anchors": {"min": [0.5, 0.0], "max": [0.5, 0.0]},
+       "pivot": [0.5, 0.5],
+       "position": [0.0, 12.0],
+       "size": [290.0, 20.0],
+       "text": "",
+       "fontSize": 12,
+       "align": "MiddleCenter",
+       "color": "#B0BEC5"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "TitleList",
+   "active": true,
+   "components": ["RectTransform", "VerticalLayoutGroup"],
+   "anchors": {"min": [1.0, 0.0], "max": [1.0, 0.0]},
+   "pivot": [0.5, 0.5],
+   "position": [-270.0, 81.0],
+   "size": [460.0, 114.0],
+   "children": [
+    {
+     "name": "TitleText",
+     "active": true,
+     "components": ["RectTransform", "CanvasRenderer", "Text"],
+     "anchors": {"min": [0.0, 1.0], "max": [0.0, 1.0]},
+     "pivot": [0.5, 0.5],
+     "position": [230.0, -20.0],
+     "size": [460.0, 40.0],
+     "text": "双生迷城",
+     "fontSize": 36,
+     "align": "MiddleRight",
+     "color": "#FFFFFF"
+    },
+    {
+     "name": "SubTitleText",
+     "active": true,
+     "components": ["RectTransform", "CanvasRenderer", "Text"],
+     "anchors": {"min": [0.0, 1.0], "max": [0.0, 1.0]},
+     "pivot": [0.5, 0.5],
+     "position": [230.0, -60.0],
+     "size": [460.0, 24.0],
+     "text": "DUAL ENIGMA · 双人协作生存",
+     "fontSize": 16,
+     "align": "MiddleRight",
+     "color": "#B0BEC5"
+    },
+    {
+     "name": "BarsRow",
+     "active": true,
+     "components": ["RectTransform", "HorizontalLayoutGroup"],
+     "anchors": {"min": [0.0, 1.0], "max": [0.0, 1.0]},
+     "pivot": [0.5, 0.5],
+     "position": [305.0, -83.0],
+     "size": [310.0, 6.0],
+     "children": [
+      {
+       "name": "WaterBar",
+       "active": true,
+       "components": ["RectTransform", "CanvasRenderer", "Image"],
+       "anchors": {"min": [0.0, 0.5], "max": [0.0, 0.5]},
+       "pivot": [0.5, 0.5],
+       "position": [75.0, 0.0],
+       "size": [150.0, 6.0],
+       "background": "#4FC3F7"
+      },
+      {
+       "name": "FireBar",
+       "active": true,
+       "components": ["RectTransform", "CanvasRenderer", "Image"],
+       "anchors": {"min": [0.0, 0.5], "max": [0.0, 0.5]},
+       "pivot": [0.5, 0.5],
+       "position": [235.0, 0.0],
+       "size": [150.0, 6.0],
+       "background": "#FF6F00"
+      }
+     ]
+    },
+    {
+     "name": "VersionText",
+     "active": true,
+     "components": ["RectTransform", "CanvasRenderer", "Text"],
+     "anchors": {"min": [0.0, 1.0], "max": [0.0, 1.0]},
+     "pivot": [0.5, 0.5],
+     "position": [230.0, -104.0],
+     "size": [460.0, 20.0],
+     "text": "v0.1.0 · Prototype",
+     "fontSize": 12,
+     "align": "MiddleRight",
+     "color": "#B0BEC5"
+    }
+   ]
+  }
+ ]
+}

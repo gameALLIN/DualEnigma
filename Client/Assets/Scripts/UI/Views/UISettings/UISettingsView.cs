@@ -19,6 +19,7 @@ namespace DualEnigma.UI
         [SerializeField] private Toggle m_PerfToggle;
         [SerializeField] private Button m_ContinueBtn;
         [SerializeField] private Button m_ExitBtn;
+        [SerializeField] private Button m_LogoutBtn;
         // ===== Auto Bind End =====
 
         public Slider VolumeSlider => m_VolumeSlider;
@@ -26,5 +27,6 @@ namespace DualEnigma.UI
         public Toggle PerfToggle => m_PerfToggle;
         public Button ContinueBtn => m_ContinueBtn;
         public Button ExitBtn => m_ExitBtn;
+        public Button LogoutBtn => m_LogoutBtn;
     }
 }

@@ -1,0 +1,514 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>UIRoom · 页面设计稿</title><style>
+body{background:#1a2226;font-family:"Microsoft YaHei",Consolas,monospace;color:#B0BEC5;margin:20px}
+h1{color:#ECEFF1;font-size:20px}h1 small{color:#78909C;font-size:12px;font-weight:normal;margin-left:12px}
+a{color:#4FC3F7}
+.wrap{display:flex;gap:24px;align-items:flex-start}
+.page{position:relative;width:640px;height:360px;background:#263238;border:1px solid #546E7A;overflow:hidden;flex:none}
+.box{position:absolute;border:1px solid rgba(120,144,156,.45);box-sizing:border-box}
+.btn{position:absolute;border:1.5px solid rgba(120,144,156,.8);box-sizing:border-box;display:flex;align-items:center;justify-content:center;color:#ECEFF1;font-size:12px;overflow:hidden;white-space:nowrap}
+.t{position:absolute;display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;text-align:center;font-weight:600}
+.tree{background:#202a30;border:1px solid #546E7A;padding:12px;font-size:12px;line-height:1.5;max-height:720px;overflow:auto;flex:1}
+.legend{margin-top:8px;font-size:12px;color:#78909C}
+</style></head><body>
+<h1>UIRoom <small>Client/Assets/AssetPackage/Prefabs/UI/UIRoom/UIRoom.prefab · 14 节点 · UIRoomView.cs, UIRoomCtrl.cs, UIAutoBinder.cs · <a href="index.html">← 索引</a></small></h1>
+<div class="wrap"><div><div class="page"><div class="box" style="left:0px;top:0px;width:640px;height:360px;background:#000000"></div><div class="box" style="left:200px;top:90px;width:240px;height:180px;background:#263238"></div><div class="t" style="left:245px;top:100px;width:150px;height:20px;font-size:14px;color:#FFFFFF">房间</div><div class="box" style="left:240px;top:138px;width:160px;height:45px;background:#37474F"></div><div class="t" style="left:245px;top:142px;width:150px;height:35px;font-size:16px;color:#4FC3F7">RoomCodeText</div><div class="t" style="left:220px;top:192px;width:200px;height:15px;font-size:11px;color:#FFFFFF">等待好友加入...</div><div class="t" style="left:210px;top:209px;width:220px;height:12px;font-size:9px;color:#B0BEC5">点击【邀请好友】发送房间邀请，或把房间码告诉对方</div><div class="btn" style="left:202px;top:239px;width:70px;height:20px;background:#4FC3F7"><span>InviteBtn</span></div><div class="t" style="left:202px;top:239px;width:70px;height:20px;font-size:14px;color:#FFFFFF">邀请好友</div><div class="btn" style="left:282px;top:238px;width:75px;height:22px;background:#FF6F00"><span>StartBtn</span></div><div class="t" style="left:282px;top:238px;width:75px;height:22px;font-size:16px;color:#FFFFFF">开始对局</div><div class="btn" style="left:368px;top:239px;width:70px;height:20px;background:#37474F"><span>LeaveBtn</span></div><div class="t" style="left:368px;top:239px;width:70px;height:20px;font-size:14px;color:#FFFFFF">退出房间</div></div>
+<div class="legend">按预制体锚点精确换算（比例 0.5）· 文字/颜色/内容取自设计稿 · ✕隐藏节点不渲染</div></div>
+<pre class="tree">UIRoom  [UIRoomView.cs, UIRoomCtrl.cs, UIAutoBinder.cs]  ·尺寸0×0
+├─ Dim  [CanvasRenderer, Image]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0
+└─ Panel  [CanvasRenderer, Image]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,0) 尺寸480×360
+   ├─ TitleText  [CanvasRenderer, Text]  ·锚(0.5,1.0)~(0.5,1.0) 偏(0,-40) 尺寸300×40
+   ├─ CodeBg  [CanvasRenderer, Image]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,40) 尺寸320×90
+   │  └─ RoomCodeText  [CanvasRenderer, Text]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,0) 尺寸300×70
+   ├─ StatusText  [CanvasRenderer, Text]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,-40) 尺寸400×30
+   ├─ TipText  [CanvasRenderer, Text]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,-70) 尺寸440×24
+   ├─ InviteBtn  [CanvasRenderer, Image, Button]  ·锚(0.5,0.0)~(0.5,0.0) 偏(-165,42) 尺寸140×40
+   │  └─ Text  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0
+   ├─ StartBtn  [CanvasRenderer, Image, Button]  ·锚(0.5,0.0)~(0.5,0.0) 偏(0,42) 尺寸150×44
+   │  └─ Text  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0
+   └─ LeaveBtn  [CanvasRenderer, Image, Button]  ·锚(0.5,0.0)~(0.5,0.0) 偏(165,42) 尺寸140×40
+      └─ Text  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0</pre></div>
+<script type="application/json" id="ui-spec">{
+ "name": "UIRoom",
+ "active": true,
+ "components": [
+  "RectTransform",
+  "UIRoomView.cs",
+  "UIRoomCtrl.cs",
+  "UIAutoBinder.cs"
+ ],
+ "anchors": {
+  "min": [
+   0.0,
+   0.0
+  ],
+  "max": [
+   1.0,
+   1.0
+  ]
+ },
+ "pivot": [
+  0.5,
+  0.5
+ ],
+ "position": [
+  0.0,
+  0.0
+ ],
+ "size": [
+  0.0,
+  0.0
+ ],
+ "children": [
+  {
+   "name": "Dim",
+   "active": true,
+   "components": [
+    "RectTransform",
+    "CanvasRenderer",
+    "Image"
+   ],
+   "anchors": {
+    "min": [
+     0.0,
+     0.0
+    ],
+    "max": [
+     1.0,
+     1.0
+    ]
+   },
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "position": [
+    0.0,
+    0.0
+   ],
+   "size": [
+    0.0,
+    0.0
+   ],
+   "background": "#000000"
+  },
+  {
+   "name": "Panel",
+   "active": true,
+   "components": [
+    "RectTransform",
+    "CanvasRenderer",
+    "Image"
+   ],
+   "anchors": {
+    "min": [
+     0.5,
+     0.5
+    ],
+    "max": [
+     0.5,
+     0.5
+    ]
+   },
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "position": [
+    0.0,
+    0.0
+   ],
+   "size": [
+    480.0,
+    360.0
+   ],
+   "background": "#263238",
+   "children": [
+    {
+     "name": "TitleText",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Text"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       1.0
+      ],
+      "max": [
+       0.5,
+       1.0
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      -40.0
+     ],
+     "size": [
+      300.0,
+      40.0
+     ],
+     "text": "房间",
+     "fontSize": 30,
+     "align": "MiddleCenter",
+     "color": "#FFFFFF"
+    },
+    {
+     "name": "CodeBg",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Image"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       0.5
+      ],
+      "max": [
+       0.5,
+       0.5
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      40.0
+     ],
+     "size": [
+      320.0,
+      90.0
+     ],
+     "background": "#37474F",
+     "children": [
+      {
+       "name": "RoomCodeText",
+       "active": true,
+       "components": [
+        "RectTransform",
+        "CanvasRenderer",
+        "Text"
+       ],
+       "anchors": {
+        "min": [
+         0.5,
+         0.5
+        ],
+        "max": [
+         0.5,
+         0.5
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        0.0,
+        0.0
+       ],
+       "size": [
+        300.0,
+        70.0
+       ],
+       "text": "",
+       "fontSize": 52,
+       "align": "MiddleCenter",
+       "color": "#4FC3F7"
+      }
+     ]
+    },
+    {
+     "name": "StatusText",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Text"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       0.5
+      ],
+      "max": [
+       0.5,
+       0.5
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      -40.0
+     ],
+     "size": [
+      400.0,
+      30.0
+     ],
+     "text": "等待好友加入...",
+     "fontSize": 20,
+     "align": "MiddleCenter",
+     "color": "#FFFFFF"
+    },
+    {
+     "name": "TipText",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Text"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       0.5
+      ],
+      "max": [
+       0.5,
+       0.5
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      -70.0
+     ],
+     "size": [
+      440.0,
+      24.0
+     ],
+     "text": "点击【邀请好友】发送房间邀请，或把房间码告诉对方",
+     "fontSize": 14,
+     "align": "MiddleCenter",
+     "color": "#B0BEC5"
+    },
+    {
+     "name": "InviteBtn",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Image",
+      "Button"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       0.0
+      ],
+      "max": [
+       0.5,
+       0.0
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      -165.0,
+      42.0
+     ],
+     "size": [
+      140.0,
+      40.0
+     ],
+     "background": "#4FC3F7",
+     "children": [
+      {
+       "name": "Text",
+       "active": true,
+       "components": [
+        "RectTransform",
+        "CanvasRenderer",
+        "Text"
+       ],
+       "anchors": {
+        "min": [
+         0.0,
+         0.0
+        ],
+        "max": [
+         1.0,
+         1.0
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        0.0,
+        0.0
+       ],
+       "size": [
+        0.0,
+        0.0
+       ],
+       "text": "邀请好友",
+       "fontSize": 15,
+       "align": "MiddleCenter",
+       "color": "#FFFFFF"
+      }
+     ]
+    },
+    {
+     "name": "StartBtn",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Image",
+      "Button"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       0.0
+      ],
+      "max": [
+       0.5,
+       0.0
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      0.0,
+      42.0
+     ],
+     "size": [
+      150.0,
+      44.0
+     ],
+     "background": "#FF6F00",
+     "children": [
+      {
+       "name": "Text",
+       "active": true,
+       "components": [
+        "RectTransform",
+        "CanvasRenderer",
+        "Text"
+       ],
+       "anchors": {
+        "min": [
+         0.0,
+         0.0
+        ],
+        "max": [
+         1.0,
+         1.0
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        0.0,
+        0.0
+       ],
+       "size": [
+        0.0,
+        0.0
+       ],
+       "text": "开始对局",
+       "fontSize": 16,
+       "align": "MiddleCenter",
+       "color": "#FFFFFF"
+      }
+     ]
+    },
+    {
+     "name": "LeaveBtn",
+     "active": true,
+     "components": [
+      "RectTransform",
+      "CanvasRenderer",
+      "Image",
+      "Button"
+     ],
+     "anchors": {
+      "min": [
+       0.5,
+       0.0
+      ],
+      "max": [
+       0.5,
+       0.0
+      ]
+     },
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "position": [
+      165.0,
+      42.0
+     ],
+     "size": [
+      140.0,
+      40.0
+     ],
+     "background": "#37474F",
+     "children": [
+      {
+       "name": "Text",
+       "active": true,
+       "components": [
+        "RectTransform",
+        "CanvasRenderer",
+        "Text"
+       ],
+       "anchors": {
+        "min": [
+         0.0,
+         0.0
+        ],
+        "max": [
+         1.0,
+         1.0
+        ]
+       },
+       "pivot": [
+        0.5,
+        0.5
+       ],
+       "position": [
+        0.0,
+        0.0
+       ],
+       "size": [
+        0.0,
+        0.0
+       ],
+       "text": "退出房间",
+       "fontSize": 15,
+       "align": "MiddleCenter",
+       "color": "#FFFFFF"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}</script>
+</body></html>

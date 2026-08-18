@@ -36,6 +36,9 @@ namespace DualEnigma.UI
         private UISettingsModel _model;
         private UISettingsView _view;
 
+        /// <summary>当前形态是否允许退出登录（主界面打开=true 显示退出登录；局内打开=false 显示退出对局）</summary>
+        private bool _allowLogout;
+
         /// <summary>弹窗当前是否可见</summary>
         public static bool IsVisible => s_Instance != null && s_Instance.gameObject.activeSelf;
 
@@ -74,13 +77,14 @@ namespace DualEnigma.UI
             ((IUIPanel)s_Instance).OnCreate();
         }
 
-        /// <summary>打开设置弹窗（单机模式伴随暂停）</summary>
-        public static void ShowPanel()
+        /// <summary>打开设置弹窗（单机模式伴随暂停）。allowLogout=true 为主界面形态（显示退出登录，隐藏退出对局）</summary>
+        public static void ShowPanel(bool allowLogout = false)
         {
             Ensure();
             if (s_Instance == null) return;
             if (s_Instance.gameObject.activeSelf) return;
 
+            s_Instance._allowLogout = allowLogout;
             s_Instance.gameObject.SetActive(true);
             ((IUIPanel)s_Instance).OnShow();
 
@@ -128,11 +132,28 @@ namespace DualEnigma.UI
         {
             if (_view == null) return;
 
+            // 双形态：主界面 → 退出登录；局内 → 退出对局（互斥显示）
+            if (_view.LogoutBtn != null)
+                _view.LogoutBtn.gameObject.SetActive(_allowLogout);
+            if (_view.ExitBtn != null)
+                _view.ExitBtn.gameObject.SetActive(!_allowLogout);
+
+            // 主界面形态下继续按钮语义为"关闭"
+            if (_view.ContinueBtn != null)
+            {
+                Text continueLabel = _view.ContinueBtn.GetComponentInChildren<Text>();
+                if (continueLabel != null)
+                    continueLabel.text = _allowLogout ? "关闭" : "继续游戏";
+            }
+
             if (_view.ContinueBtn != null)
                 _view.ContinueBtn.onClick.AddListener(OnContinueClicked);
 
             if (_view.ExitBtn != null)
                 _view.ExitBtn.onClick.AddListener(OnExitClicked);
+
+            if (_view.LogoutBtn != null)
+                _view.LogoutBtn.onClick.AddListener(OnLogoutClicked);
 
             if (_view.VolumeSlider != null)
             {
@@ -158,6 +179,9 @@ namespace DualEnigma.UI
 
             if (_view.ExitBtn != null)
                 _view.ExitBtn.onClick.RemoveListener(OnExitClicked);
+
+            if (_view.LogoutBtn != null)
+                _view.LogoutBtn.onClick.RemoveListener(OnLogoutClicked);
 
             if (_view.VolumeSlider != null)
                 _view.VolumeSlider.onValueChanged.RemoveListener(OnVolumeChanged);
@@ -195,6 +219,22 @@ namespace DualEnigma.UI
             HidePanel();
             if (GameManager.HasInstance)
                 GameManager.Instance.ExitToHome();
+        }
+
+        /// <summary>退出登录：若仍在房间先断开，清除令牌后关闭 UIHome 回到登录面板（主界面形态）</summary>
+        private void OnLogoutClicked()
+        {
+            HidePanel();
+
+            // 主界面即大厅：退出前断开可能持有的房间连接
+            GameServerClient client = GameServerClient.Instance;
+            if (client != null && client.IsConnected)
+                client.Disconnect();
+
+            if (AuthService.HasInstance)
+                AuthService.Instance.Logout();
+
+            UIManager.Instance.Pop();   // 关闭 UIHome，恢复显示 UILogin
         }
 
         private void OnVolumeChanged(float value)
