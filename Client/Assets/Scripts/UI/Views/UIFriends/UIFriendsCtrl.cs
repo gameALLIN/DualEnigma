@@ -135,26 +135,16 @@ namespace DualEnigma.UI
             foreach (FriendData friend in _model.Friends)
             {
                 FriendData captured = friend;
-                FriendRowView row = Instantiate(_view.FriendRowTemplate, _view.FriendListContent);
-                row.gameObject.SetActive(true);
-                row.name = "FriendRow_" + captured.accountId;
+                FriendItem row = FriendItem.Create(_view.FriendListContent, "FriendRow_" + captured.accountId);
+                row.SetMode(FriendItemMode.Friend);
+                row.BindFriend(captured);
 
-                if (row.NameText != null)
-                    row.NameText.text = $"{captured.displayName} ({captured.username})";
-                if (row.IdText != null)
-                    row.IdText.text = "ID: " + captured.accountId;
+                // 主按钮=邀请 / 次按钮=删除
+                if (row.PrimaryBtn != null)
+                    row.PrimaryBtn.onClick.AddListener(() => OnInviteFriendClicked(captured));
 
-                ApplyStatus(row, captured.status);
-
-                if (row.InviteBtn != null)
-                {
-                    // 游戏中无法接受邀请，置灰
-                    row.InviteBtn.interactable = captured.status != "ingame";
-                    row.InviteBtn.onClick.AddListener(() => OnInviteFriendClicked(captured));
-                }
-
-                if (row.DeleteBtn != null)
-                    row.DeleteBtn.onClick.AddListener(() => OnDeleteFriendClicked(captured));
+                if (row.SecondaryBtn != null)
+                    row.SecondaryBtn.onClick.AddListener(() => OnDeleteFriendClicked(captured));
             }
         }
 
@@ -173,18 +163,16 @@ namespace DualEnigma.UI
             foreach (FriendRequestData request in requests)
             {
                 FriendRequestData captured = request;
-                RequestRowView row = Instantiate(_view.RequestRowTemplate, _view.RequestListContent);
-                row.gameObject.SetActive(true);
-                row.name = "RequestRow_" + captured.requestId;
+                FriendItem row = FriendItem.Create(_view.RequestListContent, "RequestRow_" + captured.requestId);
+                row.SetMode(FriendItemMode.Request);
+                row.BindRequest(captured);
 
-                if (row.FromText != null)
-                    row.FromText.text = $"{captured.fromDisplayName} 请求加你为好友";
+                // 主按钮=接受 / 次按钮=拒绝
+                if (row.PrimaryBtn != null)
+                    row.PrimaryBtn.onClick.AddListener(() => OnAcceptRequestClicked(captured));
 
-                if (row.AcceptBtn != null)
-                    row.AcceptBtn.onClick.AddListener(() => OnAcceptRequestClicked(captured));
-
-                if (row.RejectBtn != null)
-                    row.RejectBtn.onClick.AddListener(() => OnRejectRequestClicked(captured));
+                if (row.SecondaryBtn != null)
+                    row.SecondaryBtn.onClick.AddListener(() => OnRejectRequestClicked(captured));
             }
 
             RefreshLayout();
@@ -270,33 +258,9 @@ namespace DualEnigma.UI
                 error => _view.SetStatus(error));
         }
 
-        /// <summary>渲染好友在线状态（四态，颜色区分）</summary>
-        private void ApplyStatus(FriendRowView row, string status)
-        {
-            if (row.StatusText == null) return;
+        /// <summary>在线状态四态渲染已内聚到 FriendItem.ApplyStatus</summary>
 
-            switch (status)
-            {
-                case "online":
-                    row.StatusText.text = "在线";
-                    row.StatusText.color = new Color32(0x66, 0xBB, 0x6A, 0xFF);
-                    break;
-                case "teaming":
-                    row.StatusText.text = "组队中";
-                    row.StatusText.color = new Color32(0x4F, 0xC3, 0xF7, 0xFF);
-                    break;
-                case "ingame":
-                    row.StatusText.text = "游戏中";
-                    row.StatusText.color = new Color32(0xFF, 0x6F, 0x00, 0xFF);
-                    break;
-                default:
-                    row.StatusText.text = "离线";
-                    row.StatusText.color = new Color32(0x78, 0x90, 0x9C, 0xFF);
-                    break;
-            }
-        }
-
-        /// <summary>搜索结果渲染为可点击的添加行（复用好友行模板：邀请/删除按钮语义映射为 添加/忽略）</summary>
+        /// <summary>搜索结果渲染为可点击的添加行（FriendItem Search 模式）</summary>
         private void RenderSearchResults()
         {
             if (_view.FriendListContent == null) return;
@@ -305,29 +269,13 @@ namespace DualEnigma.UI
             foreach (FriendData user in _model.SearchResults)
             {
                 FriendData captured = user;
-                FriendRowView row = Instantiate(_view.FriendRowTemplate, _view.FriendListContent);
-                row.gameObject.SetActive(true);
-                row.name = "SearchRow_" + captured.accountId;
+                FriendItem row = FriendItem.Create(_view.FriendListContent, "SearchRow_" + captured.accountId);
+                row.SetMode(FriendItemMode.Search);
+                row.BindFriend(captured);
 
-                if (row.NameText != null)
-                    row.NameText.text = $"{captured.displayName} ({captured.username})";
-                if (row.IdText != null)
-                    row.IdText.text = "ID: " + captured.accountId;
-
-                // 搜索结果无状态信息，隐藏状态列
-                if (row.StatusText != null)
-                    row.StatusText.gameObject.SetActive(false);
-
-                if (row.InviteBtn != null)
-                {
-                    // 搜索模式下复用第一个按钮作为"添加好友"
-                    Text btnText = row.InviteBtn.GetComponentInChildren<Text>();
-                    if (btnText != null) btnText.text = "添加";
-                    row.InviteBtn.onClick.AddListener(() => OnAddFriendClicked(captured));
-                }
-
-                if (row.DeleteBtn != null)
-                    row.DeleteBtn.gameObject.SetActive(false);
+                // 主按钮=添加好友（Search 模式已隐藏状态列与次按钮）
+                if (row.PrimaryBtn != null)
+                    row.PrimaryBtn.onClick.AddListener(() => OnAddFriendClicked(captured));
             }
         }
 
