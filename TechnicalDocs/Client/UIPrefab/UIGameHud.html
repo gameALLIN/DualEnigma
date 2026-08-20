@@ -1,107 +1,41 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>UIGameHud · 页面设计稿</title><style>
-body{background:#1a2226;font-family:"Microsoft YaHei",Consolas,monospace;color:#B0BEC5;margin:20px}
-h1{color:#ECEFF1;font-size:20px}h1 small{color:#78909C;font-size:12px;font-weight:normal;margin-left:12px}
-a{color:#4FC3F7}
-.wrap{display:flex;gap:24px;align-items:flex-start}
-.page{position:relative;width:640px;height:360px;background:#263238;border:1px solid #546E7A;overflow:hidden;flex:none}
-.box{position:absolute;border:1px solid rgba(120,144,156,.45);box-sizing:border-box}
-.btn{position:absolute;border:1.5px solid rgba(120,144,156,.8);box-sizing:border-box;display:flex;align-items:center;justify-content:center;color:#ECEFF1;font-size:12px;overflow:hidden;white-space:nowrap}
-.t{position:absolute;display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;text-align:center;font-weight:600}
-.tree{background:#202a30;border:1px solid #546E7A;padding:12px;font-size:12px;line-height:1.5;max-height:720px;overflow:auto;flex:1}
-.legend{margin-top:8px;font-size:12px;color:#78909C}
-</style></head><body>
-<h1>UIGameHud <small>Client/Assets/AssetPackage/Prefabs/UI/UIGameHud/UIGameHud.prefab · 27 节点 · UIGameHudView.cs, UIGameHudCtrl.cs, UIAutoBinder.cs · <a href="index.html">← 索引</a></small></h1>
-<div class="wrap"><div><div class="page"><div class="t" style="left:0px;top:0px;width:130px;height:11px;font-size:8px;color:#FFFFFF">第1章 1-1 · 第1轮</div><div class="box" style="left:240px;top:4px;width:160px;height:11px;background:#263238"></div><div class="box" style="left:241px;top:4px;width:158px;height:9px;background:#4FC3F7"></div><div class="t" style="left:270px;top:16px;width:100px;height:11px;font-size:8px;color:#FFFFFF">预告</div><div class="t" style="left:290px;top:27px;width:60px;height:10px;font-size:8px;color:#4FC3F7">PhaseTimerText</div><div class="t" style="left:8px;top:14px;width:40px;height:9px;font-size:8px;color:#4FC3F7">水人</div><div class="box" style="left:15px;top:23px;width:80px;height:8px;background:#263238"></div><div class="box" style="left:16px;top:24px;width:78px;height:6px;background:#4FC3F7"></div><div class="t" style="left:30px;top:24px;width:50px;height:7px;font-size:8px;color:#FFFFFF">AquaHPText</div><div class="box" style="left:15px;top:34px;width:80px;height:6px;background:#263238"></div><div class="box" style="left:16px;top:35px;width:78px;height:4px;background:#26A69A"></div><div class="t" style="left:40px;top:34px;width:30px;height:6px;font-size:8px;color:#FFFFFF">AquaEnergyText</div><div class="t" style="left:538px;top:14px;width:40px;height:9px;font-size:8px;color:#FF6F00">火人</div><div class="box" style="left:545px;top:23px;width:80px;height:8px;background:#263238"></div><div class="box" style="left:546px;top:24px;width:78px;height:6px;background:#FF6F00"></div><div class="t" style="left:560px;top:24px;width:50px;height:7px;font-size:8px;color:#FFFFFF">IgnisHPText</div><div class="box" style="left:545px;top:34px;width:80px;height:6px;background:#263238"></div><div class="box" style="left:546px;top:35px;width:78px;height:4px;background:#26A69A"></div><div class="t" style="left:570px;top:34px;width:30px;height:6px;font-size:8px;color:#FFFFFF">IgnisEnergyText</div><div class="btn" style="left:612px;top:0px;width:28px;height:15px;background:#37474F"><span>SettingsBtn</span></div><div class="t" style="left:612px;top:0px;width:28px;height:15px;font-size:11px;color:#FFFFFF">设置</div><div class="t" style="left:0px;top:349px;width:160px;height:11px;font-size:8px;color:#B0BEC5">冰×0  熔岩×0  岩石×0</div><div class="t" style="left:520px;top:350px;width:120px;height:10px;font-size:8px;color:#B0BEC5">PerfText</div></div>
-<div class="legend">按预制体锚点精确换算（比例 0.5）· 文字/颜色/内容取自设计稿 · ✕隐藏节点不渲染</div></div>
-<pre class="tree">UIGameHud  [UIGameHudView.cs, UIGameHudCtrl.cs, UIAutoBinder.cs]  ·尺寸0×0
-├─ LevelInfoText  [CanvasRenderer, Text]  ·锚(0.0,1.0)~(0.0,1.0) 偏(130,-11) 尺寸260×22
-├─ PhaseBarBg  [CanvasRenderer, Image]  ·锚(0.5,1.0)~(0.5,1.0) 偏(0,-18) 尺寸320×22
-│  └─ PhaseProgressFill  [CanvasRenderer, Image]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸-4×-4
-├─ PhaseNameText  [CanvasRenderer, Text]  ·锚(0.5,1.0)~(0.5,1.0) 偏(0,-42) 尺寸200×22
-├─ PhaseTimerText  [CanvasRenderer, Text]  ·锚(0.5,1.0)~(0.5,1.0) 偏(0,-64) 尺寸120×20
-├─ AquaPanel  ·锚(0.0,1.0)~(0.0,1.0) 偏(110,-60) 尺寸190×62
-│  ├─ AquaTitleText  [CanvasRenderer, Text]  ·锚(0.0,1.0)~(0.0,1.0) 偏(40,-9) 尺寸80×18
-│  ├─ AquaHPBarBg  [CanvasRenderer, Image]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,6) 尺寸160×16
-│  │  ├─ AquaHPFill  [CanvasRenderer, Image]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸-4×-4
-│  │  └─ AquaHPText  [CanvasRenderer, Text]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,0) 尺寸100×14
-│  └─ AquaEnergyBarBg  [CanvasRenderer, Image]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,-14) 尺寸160×12
-│     ├─ AquaEnergyFill  [CanvasRenderer, Image]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸-4×-4
-│     └─ AquaEnergyText  [CanvasRenderer, Text]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,0) 尺寸60×12
-├─ IgnisPanel  ·锚(1.0,1.0)~(1.0,1.0) 偏(-110,-60) 尺寸190×62
-│  ├─ IgnisTitleText  [CanvasRenderer, Text]  ·锚(0.0,1.0)~(0.0,1.0) 偏(40,-9) 尺寸80×18
-│  ├─ IgnisHPBarBg  [CanvasRenderer, Image]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,6) 尺寸160×16
-│  │  ├─ IgnisHPFill  [CanvasRenderer, Image]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸-4×-4
-│  │  └─ IgnisHPText  [CanvasRenderer, Text]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,0) 尺寸100×14
-│  └─ IgnisEnergyBarBg  [CanvasRenderer, Image]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,-14) 尺寸160×12
-│     ├─ IgnisEnergyFill  [CanvasRenderer, Image]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸-4×-4
-│     └─ IgnisEnergyText  [CanvasRenderer, Text]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,0) 尺寸60×12
-├─ SettingsBtn  [CanvasRenderer, Image, Button]  ·锚(1.0,1.0)~(1.0,1.0) 偏(-28,-15) 尺寸56×30
-│  └─ Text  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0
-├─ FragmentCountText  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(0.0,0.0) 偏(160,11) 尺寸320×22
-├─ PerfText  [CanvasRenderer, Text]  ·锚(1.0,0.0)~(1.0,0.0) 偏(-120,10) 尺寸240×20
-└─ DisconnectBannerText  [CanvasRenderer, Text]  ✕隐藏  ·锚(0.5,1.0)~(0.5,1.0) 偏(0,-88) 尺寸360×24</pre></div>
-<script type="application/json" id="ui-spec">{
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>UIGameHud · 页面设计稿</title>
+<link rel="stylesheet" href="viewer.css">
+</head>
+<body>
+<h1>UIGameHud <small>Client/Assets/AssetPackage/Prefabs/UI/UIGameHud/UIGameHud.prefab · UIGameHudView.cs, UIGameHudCtrl.cs, UIAutoBinder.cs · <a href="index.html">← 索引</a></small></h1>
+<div class="toolbar">
+  <label>缩放 <select id="zoom"><option value="0.5">50%</option><option value="0.75" selected>75%</option><option value="1">100%</option></select></label>
+  <label><input type="checkbox" id="showHidden"> 显示隐藏节点</label>
+</div>
+<div class="wrap">
+  <div>
+    <div id="preview" class="page"></div>
+    <div class="legend">按 ui-spec 锚点实时渲染（参考分辨率 1280×720）· 斜体灰字 = 动态文本占位 · 勾选「显示隐藏节点」可查看 ✕隐藏 节点（橙色虚线）</div>
+  </div>
+  <pre id="tree" class="tree"></pre>
+</div>
+<script type="application/json" id="ui-spec">
+{
  "name": "UIGameHud",
  "active": true,
- "components": [
-  "RectTransform",
-  "UIGameHudView.cs",
-  "UIGameHudCtrl.cs",
-  "UIAutoBinder.cs"
- ],
- "anchors": {
-  "min": [
-   0.0,
-   0.0
-  ],
-  "max": [
-   1.0,
-   1.0
-  ]
- },
- "pivot": [
-  0.5,
-  0.5
- ],
- "position": [
-  0.0,
-  0.0
- ],
- "size": [
-  0.0,
-  0.0
- ],
+ "components": ["RectTransform", "UIGameHudView.cs", "UIGameHudCtrl.cs", "UIAutoBinder.cs"],
+ "anchors": { "min": [0.0, 0.0], "max": [1.0, 1.0] },
+ "pivot": [0.5, 0.5],
+ "position": [0.0, 0.0],
+ "size": [0.0, 0.0],
  "children": [
   {
    "name": "LevelInfoText",
    "active": true,
-   "components": [
-    "RectTransform",
-    "CanvasRenderer",
-    "Text"
-   ],
-   "anchors": {
-    "min": [
-     0.0,
-     1.0
-    ],
-    "max": [
-     0.0,
-     1.0
-    ]
-   },
-   "pivot": [
-    0.5,
-    0.5
-   ],
-   "position": [
-    130.0,
-    -11.0
-   ],
-   "size": [
-    260.0,
-    22.0
-   ],
+   "components": ["RectTransform", "CanvasRenderer", "Text"],
+   "anchors": { "min": [0.0, 1.0], "max": [0.0, 1.0] },
+   "pivot": [0.5, 0.5],
+   "position": [130.0, -11.0],
+   "size": [260.0, 22.0],
    "text": "第1章 1-1 · 第1轮",
    "fontSize": 16,
    "align": "MiddleLeft",
@@ -110,65 +44,21 @@ a{color:#4FC3F7}
   {
    "name": "PhaseBarBg",
    "active": true,
-   "components": [
-    "RectTransform",
-    "CanvasRenderer",
-    "Image"
-   ],
-   "anchors": {
-    "min": [
-     0.5,
-     1.0
-    ],
-    "max": [
-     0.5,
-     1.0
-    ]
-   },
-   "pivot": [
-    0.5,
-    0.5
-   ],
-   "position": [
-    0.0,
-    -18.0
-   ],
-   "size": [
-    320.0,
-    22.0
-   ],
-   "background": "#263238",
+   "components": ["RectTransform", "CanvasRenderer", "Image"],
+   "anchors": { "min": [0.5, 1.0], "max": [0.5, 1.0] },
+   "pivot": [0.5, 0.5],
+   "position": [0.0, -18.0],
+   "size": [320.0, 22.0],
+   "background": "rgba(38,50,56,0.80)",
    "children": [
     {
      "name": "PhaseProgressFill",
      "active": true,
-     "components": [
-      "RectTransform",
-      "CanvasRenderer",
-      "Image"
-     ],
-     "anchors": {
-      "min": [
-       0.0,
-       0.0
-      ],
-      "max": [
-       1.0,
-       1.0
-      ]
-     },
-     "pivot": [
-      0.5,
-      0.5
-     ],
-     "position": [
-      0.0,
-      0.0
-     ],
-     "size": [
-      -4.0,
-      -4.0
-     ],
+     "components": ["RectTransform", "CanvasRenderer", "Image"],
+     "anchors": { "min": [0.0, 0.0], "max": [1.0, 1.0] },
+     "pivot": [0.5, 0.5],
+     "position": [0.0, 0.0],
+     "size": [-4.0, -4.0],
      "background": "#4FC3F7"
     }
    ]
@@ -176,33 +66,11 @@ a{color:#4FC3F7}
   {
    "name": "PhaseNameText",
    "active": true,
-   "components": [
-    "RectTransform",
-    "CanvasRenderer",
-    "Text"
-   ],
-   "anchors": {
-    "min": [
-     0.5,
-     1.0
-    ],
-    "max": [
-     0.5,
-     1.0
-    ]
-   },
-   "pivot": [
-    0.5,
-    0.5
-   ],
-   "position": [
-    0.0,
-    -42.0
-   ],
-   "size": [
-    200.0,
-    22.0
-   ],
+   "components": ["RectTransform", "CanvasRenderer", "Text"],
+   "anchors": { "min": [0.5, 1.0], "max": [0.5, 1.0] },
+   "pivot": [0.5, 0.5],
+   "position": [0.0, -42.0],
+   "size": [200.0, 22.0],
    "text": "预告",
    "fontSize": 16,
    "align": "MiddleCenter",
@@ -211,34 +79,12 @@ a{color:#4FC3F7}
   {
    "name": "PhaseTimerText",
    "active": true,
-   "components": [
-    "RectTransform",
-    "CanvasRenderer",
-    "Text"
-   ],
-   "anchors": {
-    "min": [
-     0.5,
-     1.0
-    ],
-    "max": [
-     0.5,
-     1.0
-    ]
-   },
-   "pivot": [
-    0.5,
-    0.5
-   ],
-   "position": [
-    0.0,
-    -64.0
-   ],
-   "size": [
-    120.0,
-    20.0
-   ],
-   "text": "",
+   "components": ["RectTransform", "CanvasRenderer", "Text"],
+   "anchors": { "min": [0.5, 1.0], "max": [0.5, 1.0] },
+   "pivot": [0.5, 0.5],
+   "position": [0.0, -64.0],
+   "size": [120.0, 20.0],
+   "text": "5.0s",
    "fontSize": 14,
    "align": "MiddleCenter",
    "color": "#4FC3F7"
@@ -246,62 +92,20 @@ a{color:#4FC3F7}
   {
    "name": "AquaPanel",
    "active": true,
-   "components": [
-    "RectTransform"
-   ],
-   "anchors": {
-    "min": [
-     0.0,
-     1.0
-    ],
-    "max": [
-     0.0,
-     1.0
-    ]
-   },
-   "pivot": [
-    0.5,
-    0.5
-   ],
-   "position": [
-    110.0,
-    -60.0
-   ],
-   "size": [
-    190.0,
-    62.0
-   ],
+   "components": ["RectTransform"],
+   "anchors": { "min": [0.0, 1.0], "max": [0.0, 1.0] },
+   "pivot": [0.5, 0.5],
+   "position": [110.0, -60.0],
+   "size": [190.0, 62.0],
    "children": [
     {
      "name": "AquaTitleText",
      "active": true,
-     "components": [
-      "RectTransform",
-      "CanvasRenderer",
-      "Text"
-     ],
-     "anchors": {
-      "min": [
-       0.0,
-       1.0
-      ],
-      "max": [
-       0.0,
-       1.0
-      ]
-     },
-     "pivot": [
-      0.5,
-      0.5
-     ],
-     "position": [
-      40.0,
-      -9.0
-     ],
-     "size": [
-      80.0,
-      18.0
-     ],
+     "components": ["RectTransform", "CanvasRenderer", "Text"],
+     "anchors": { "min": [0.0, 1.0], "max": [0.0, 1.0] },
+     "pivot": [0.5, 0.5],
+     "position": [40.0, -9.0],
+     "size": [80.0, 18.0],
      "text": "水人",
      "fontSize": 14,
      "align": "MiddleLeft",
@@ -310,98 +114,32 @@ a{color:#4FC3F7}
     {
      "name": "AquaHPBarBg",
      "active": true,
-     "components": [
-      "RectTransform",
-      "CanvasRenderer",
-      "Image"
-     ],
-     "anchors": {
-      "min": [
-       0.5,
-       0.5
-      ],
-      "max": [
-       0.5,
-       0.5
-      ]
-     },
-     "pivot": [
-      0.5,
-      0.5
-     ],
-     "position": [
-      0.0,
-      6.0
-     ],
-     "size": [
-      160.0,
-      16.0
-     ],
-     "background": "#263238",
+     "components": ["RectTransform", "CanvasRenderer", "Image"],
+     "anchors": { "min": [0.5, 0.5], "max": [0.5, 0.5] },
+     "pivot": [0.5, 0.5],
+     "position": [0.0, 6.0],
+     "size": [160.0, 16.0],
+     "background": "rgba(38,50,56,0.80)",
      "children": [
       {
        "name": "AquaHPFill",
        "active": true,
-       "components": [
-        "RectTransform",
-        "CanvasRenderer",
-        "Image"
-       ],
-       "anchors": {
-        "min": [
-         0.0,
-         0.0
-        ],
-        "max": [
-         1.0,
-         1.0
-        ]
-       },
-       "pivot": [
-        0.5,
-        0.5
-       ],
-       "position": [
-        0.0,
-        0.0
-       ],
-       "size": [
-        -4.0,
-        -4.0
-       ],
+       "components": ["RectTransform", "CanvasRenderer", "Image"],
+       "anchors": { "min": [0.0, 0.0], "max": [1.0, 1.0] },
+       "pivot": [0.5, 0.5],
+       "position": [0.0, 0.0],
+       "size": [-4.0, -4.0],
        "background": "#4FC3F7"
       },
       {
        "name": "AquaHPText",
        "active": true,
-       "components": [
-        "RectTransform",
-        "CanvasRenderer",
-        "Text"
-       ],
-       "anchors": {
-        "min": [
-         0.5,
-         0.5
-        ],
-        "max": [
-         0.5,
-         0.5
-        ]
-       },
-       "pivot": [
-        0.5,
-        0.5
-       ],
-       "position": [
-        0.0,
-        0.0
-       ],
-       "size": [
-        100.0,
-        14.0
-       ],
-       "text": "",
+       "components": ["RectTransform", "CanvasRenderer", "Text"],
+       "anchors": { "min": [0.5, 0.5], "max": [0.5, 0.5] },
+       "pivot": [0.5, 0.5],
+       "position": [0.0, 0.0],
+       "size": [100.0, 14.0],
+       "text": "100/100",
        "fontSize": 12,
        "align": "MiddleCenter",
        "color": "#FFFFFF"
@@ -411,98 +149,32 @@ a{color:#4FC3F7}
     {
      "name": "AquaEnergyBarBg",
      "active": true,
-     "components": [
-      "RectTransform",
-      "CanvasRenderer",
-      "Image"
-     ],
-     "anchors": {
-      "min": [
-       0.5,
-       0.5
-      ],
-      "max": [
-       0.5,
-       0.5
-      ]
-     },
-     "pivot": [
-      0.5,
-      0.5
-     ],
-     "position": [
-      0.0,
-      -14.0
-     ],
-     "size": [
-      160.0,
-      12.0
-     ],
-     "background": "#263238",
+     "components": ["RectTransform", "CanvasRenderer", "Image"],
+     "anchors": { "min": [0.5, 0.5], "max": [0.5, 0.5] },
+     "pivot": [0.5, 0.5],
+     "position": [0.0, -14.0],
+     "size": [160.0, 12.0],
+     "background": "rgba(38,50,56,0.80)",
      "children": [
       {
        "name": "AquaEnergyFill",
        "active": true,
-       "components": [
-        "RectTransform",
-        "CanvasRenderer",
-        "Image"
-       ],
-       "anchors": {
-        "min": [
-         0.0,
-         0.0
-        ],
-        "max": [
-         1.0,
-         1.0
-        ]
-       },
-       "pivot": [
-        0.5,
-        0.5
-       ],
-       "position": [
-        0.0,
-        0.0
-       ],
-       "size": [
-        -4.0,
-        -4.0
-       ],
+       "components": ["RectTransform", "CanvasRenderer", "Image"],
+       "anchors": { "min": [0.0, 0.0], "max": [1.0, 1.0] },
+       "pivot": [0.5, 0.5],
+       "position": [0.0, 0.0],
+       "size": [-4.0, -4.0],
        "background": "#26A69A"
       },
       {
        "name": "AquaEnergyText",
        "active": true,
-       "components": [
-        "RectTransform",
-        "CanvasRenderer",
-        "Text"
-       ],
-       "anchors": {
-        "min": [
-         0.5,
-         0.5
-        ],
-        "max": [
-         0.5,
-         0.5
-        ]
-       },
-       "pivot": [
-        0.5,
-        0.5
-       ],
-       "position": [
-        0.0,
-        0.0
-       ],
-       "size": [
-        60.0,
-        12.0
-       ],
-       "text": "",
+       "components": ["RectTransform", "CanvasRenderer", "Text"],
+       "anchors": { "min": [0.5, 0.5], "max": [0.5, 0.5] },
+       "pivot": [0.5, 0.5],
+       "position": [0.0, 0.0],
+       "size": [60.0, 12.0],
+       "text": "100",
        "fontSize": 11,
        "align": "MiddleCenter",
        "color": "#FFFFFF"
@@ -514,62 +186,20 @@ a{color:#4FC3F7}
   {
    "name": "IgnisPanel",
    "active": true,
-   "components": [
-    "RectTransform"
-   ],
-   "anchors": {
-    "min": [
-     1.0,
-     1.0
-    ],
-    "max": [
-     1.0,
-     1.0
-    ]
-   },
-   "pivot": [
-    0.5,
-    0.5
-   ],
-   "position": [
-    -110.0,
-    -60.0
-   ],
-   "size": [
-    190.0,
-    62.0
-   ],
+   "components": ["RectTransform"],
+   "anchors": { "min": [1.0, 1.0], "max": [1.0, 1.0] },
+   "pivot": [0.5, 0.5],
+   "position": [-110.0, -60.0],
+   "size": [190.0, 62.0],
    "children": [
     {
      "name": "IgnisTitleText",
      "active": true,
-     "components": [
-      "RectTransform",
-      "CanvasRenderer",
-      "Text"
-     ],
-     "anchors": {
-      "min": [
-       0.0,
-       1.0
-      ],
-      "max": [
-       0.0,
-       1.0
-      ]
-     },
-     "pivot": [
-      0.5,
-      0.5
-     ],
-     "position": [
-      40.0,
-      -9.0
-     ],
-     "size": [
-      80.0,
-      18.0
-     ],
+     "components": ["RectTransform", "CanvasRenderer", "Text"],
+     "anchors": { "min": [0.0, 1.0], "max": [0.0, 1.0] },
+     "pivot": [0.5, 0.5],
+     "position": [40.0, -9.0],
+     "size": [80.0, 18.0],
      "text": "火人",
      "fontSize": 14,
      "align": "MiddleLeft",
@@ -578,98 +208,32 @@ a{color:#4FC3F7}
     {
      "name": "IgnisHPBarBg",
      "active": true,
-     "components": [
-      "RectTransform",
-      "CanvasRenderer",
-      "Image"
-     ],
-     "anchors": {
-      "min": [
-       0.5,
-       0.5
-      ],
-      "max": [
-       0.5,
-       0.5
-      ]
-     },
-     "pivot": [
-      0.5,
-      0.5
-     ],
-     "position": [
-      0.0,
-      6.0
-     ],
-     "size": [
-      160.0,
-      16.0
-     ],
-     "background": "#263238",
+     "components": ["RectTransform", "CanvasRenderer", "Image"],
+     "anchors": { "min": [0.5, 0.5], "max": [0.5, 0.5] },
+     "pivot": [0.5, 0.5],
+     "position": [0.0, 6.0],
+     "size": [160.0, 16.0],
+     "background": "rgba(38,50,56,0.80)",
      "children": [
       {
        "name": "IgnisHPFill",
        "active": true,
-       "components": [
-        "RectTransform",
-        "CanvasRenderer",
-        "Image"
-       ],
-       "anchors": {
-        "min": [
-         0.0,
-         0.0
-        ],
-        "max": [
-         1.0,
-         1.0
-        ]
-       },
-       "pivot": [
-        0.5,
-        0.5
-       ],
-       "position": [
-        0.0,
-        0.0
-       ],
-       "size": [
-        -4.0,
-        -4.0
-       ],
+       "components": ["RectTransform", "CanvasRenderer", "Image"],
+       "anchors": { "min": [0.0, 0.0], "max": [1.0, 1.0] },
+       "pivot": [0.5, 0.5],
+       "position": [0.0, 0.0],
+       "size": [-4.0, -4.0],
        "background": "#FF6F00"
       },
       {
        "name": "IgnisHPText",
        "active": true,
-       "components": [
-        "RectTransform",
-        "CanvasRenderer",
-        "Text"
-       ],
-       "anchors": {
-        "min": [
-         0.5,
-         0.5
-        ],
-        "max": [
-         0.5,
-         0.5
-        ]
-       },
-       "pivot": [
-        0.5,
-        0.5
-       ],
-       "position": [
-        0.0,
-        0.0
-       ],
-       "size": [
-        100.0,
-        14.0
-       ],
-       "text": "",
+       "components": ["RectTransform", "CanvasRenderer", "Text"],
+       "anchors": { "min": [0.5, 0.5], "max": [0.5, 0.5] },
+       "pivot": [0.5, 0.5],
+       "position": [0.0, 0.0],
+       "size": [100.0, 14.0],
+       "text": "100/100",
        "fontSize": 12,
        "align": "MiddleCenter",
        "color": "#FFFFFF"
@@ -679,98 +243,32 @@ a{color:#4FC3F7}
     {
      "name": "IgnisEnergyBarBg",
      "active": true,
-     "components": [
-      "RectTransform",
-      "CanvasRenderer",
-      "Image"
-     ],
-     "anchors": {
-      "min": [
-       0.5,
-       0.5
-      ],
-      "max": [
-       0.5,
-       0.5
-      ]
-     },
-     "pivot": [
-      0.5,
-      0.5
-     ],
-     "position": [
-      0.0,
-      -14.0
-     ],
-     "size": [
-      160.0,
-      12.0
-     ],
-     "background": "#263238",
+     "components": ["RectTransform", "CanvasRenderer", "Image"],
+     "anchors": { "min": [0.5, 0.5], "max": [0.5, 0.5] },
+     "pivot": [0.5, 0.5],
+     "position": [0.0, -14.0],
+     "size": [160.0, 12.0],
+     "background": "rgba(38,50,56,0.80)",
      "children": [
       {
        "name": "IgnisEnergyFill",
        "active": true,
-       "components": [
-        "RectTransform",
-        "CanvasRenderer",
-        "Image"
-       ],
-       "anchors": {
-        "min": [
-         0.0,
-         0.0
-        ],
-        "max": [
-         1.0,
-         1.0
-        ]
-       },
-       "pivot": [
-        0.5,
-        0.5
-       ],
-       "position": [
-        0.0,
-        0.0
-       ],
-       "size": [
-        -4.0,
-        -4.0
-       ],
+       "components": ["RectTransform", "CanvasRenderer", "Image"],
+       "anchors": { "min": [0.0, 0.0], "max": [1.0, 1.0] },
+       "pivot": [0.5, 0.5],
+       "position": [0.0, 0.0],
+       "size": [-4.0, -4.0],
        "background": "#26A69A"
       },
       {
        "name": "IgnisEnergyText",
        "active": true,
-       "components": [
-        "RectTransform",
-        "CanvasRenderer",
-        "Text"
-       ],
-       "anchors": {
-        "min": [
-         0.5,
-         0.5
-        ],
-        "max": [
-         0.5,
-         0.5
-        ]
-       },
-       "pivot": [
-        0.5,
-        0.5
-       ],
-       "position": [
-        0.0,
-        0.0
-       ],
-       "size": [
-        60.0,
-        12.0
-       ],
-       "text": "",
+       "components": ["RectTransform", "CanvasRenderer", "Text"],
+       "anchors": { "min": [0.5, 0.5], "max": [0.5, 0.5] },
+       "pivot": [0.5, 0.5],
+       "position": [0.0, 0.0],
+       "size": [60.0, 12.0],
+       "text": "100",
        "fontSize": 11,
        "align": "MiddleCenter",
        "color": "#FFFFFF"
@@ -782,66 +280,21 @@ a{color:#4FC3F7}
   {
    "name": "SettingsBtn",
    "active": true,
-   "components": [
-    "RectTransform",
-    "CanvasRenderer",
-    "Image",
-    "Button"
-   ],
-   "anchors": {
-    "min": [
-     1.0,
-     1.0
-    ],
-    "max": [
-     1.0,
-     1.0
-    ]
-   },
-   "pivot": [
-    0.5,
-    0.5
-   ],
-   "position": [
-    -28.0,
-    -15.0
-   ],
-   "size": [
-    56.0,
-    30.0
-   ],
+   "components": ["RectTransform", "CanvasRenderer", "Image", "Button"],
+   "anchors": { "min": [1.0, 1.0], "max": [1.0, 1.0] },
+   "pivot": [0.5, 0.5],
+   "position": [-28.0, -15.0],
+   "size": [56.0, 30.0],
    "background": "#37474F",
    "children": [
     {
      "name": "Text",
      "active": true,
-     "components": [
-      "RectTransform",
-      "CanvasRenderer",
-      "Text"
-     ],
-     "anchors": {
-      "min": [
-       0.0,
-       0.0
-      ],
-      "max": [
-       1.0,
-       1.0
-      ]
-     },
-     "pivot": [
-      0.5,
-      0.5
-     ],
-     "position": [
-      0.0,
-      0.0
-     ],
-     "size": [
-      0.0,
-      0.0
-     ],
+     "components": ["RectTransform", "CanvasRenderer", "Text"],
+     "anchors": { "min": [0.0, 0.0], "max": [1.0, 1.0] },
+     "pivot": [0.5, 0.5],
+     "position": [0.0, 0.0],
+     "size": [0.0, 0.0],
      "text": "设置",
      "fontSize": 14,
      "align": "MiddleCenter",
@@ -852,33 +305,11 @@ a{color:#4FC3F7}
   {
    "name": "FragmentCountText",
    "active": true,
-   "components": [
-    "RectTransform",
-    "CanvasRenderer",
-    "Text"
-   ],
-   "anchors": {
-    "min": [
-     0.0,
-     0.0
-    ],
-    "max": [
-     0.0,
-     0.0
-    ]
-   },
-   "pivot": [
-    0.5,
-    0.5
-   ],
-   "position": [
-    160.0,
-    11.0
-   ],
-   "size": [
-    320.0,
-    22.0
-   ],
+   "components": ["RectTransform", "CanvasRenderer", "Text"],
+   "anchors": { "min": [0.0, 0.0], "max": [0.0, 0.0] },
+   "pivot": [0.5, 0.5],
+   "position": [160.0, 11.0],
+   "size": [320.0, 22.0],
    "text": "冰×0  熔岩×0  岩石×0",
    "fontSize": 14,
    "align": "MiddleLeft",
@@ -887,34 +318,12 @@ a{color:#4FC3F7}
   {
    "name": "PerfText",
    "active": true,
-   "components": [
-    "RectTransform",
-    "CanvasRenderer",
-    "Text"
-   ],
-   "anchors": {
-    "min": [
-     1.0,
-     0.0
-    ],
-    "max": [
-     1.0,
-     0.0
-    ]
-   },
-   "pivot": [
-    0.5,
-    0.5
-   ],
-   "position": [
-    -120.0,
-    10.0
-   ],
-   "size": [
-    240.0,
-    20.0
-   ],
-   "text": "",
+   "components": ["RectTransform", "CanvasRenderer", "Text"],
+   "anchors": { "min": [1.0, 0.0], "max": [1.0, 0.0] },
+   "pivot": [0.5, 0.5],
+   "position": [-120.0, 10.0],
+   "size": [240.0, 20.0],
+   "text": "60 FPS · 32ms",
    "fontSize": 13,
    "align": "MiddleRight",
    "color": "#B0BEC5"
@@ -922,38 +331,19 @@ a{color:#4FC3F7}
   {
    "name": "DisconnectBannerText",
    "active": false,
-   "components": [
-    "RectTransform",
-    "CanvasRenderer",
-    "Text"
-   ],
-   "anchors": {
-    "min": [
-     0.5,
-     1.0
-    ],
-    "max": [
-     0.5,
-     1.0
-    ]
-   },
-   "pivot": [
-    0.5,
-    0.5
-   ],
-   "position": [
-    0.0,
-    -88.0
-   ],
-   "size": [
-    360.0,
-    24.0
-   ],
+   "components": ["RectTransform", "CanvasRenderer", "Text"],
+   "anchors": { "min": [0.5, 1.0], "max": [0.5, 1.0] },
+   "pivot": [0.5, 0.5],
+   "position": [0.0, -88.0],
+   "size": [360.0, 24.0],
    "text": "对方断线，等待重连…",
    "fontSize": 16,
    "align": "MiddleCenter",
    "color": "#E53935"
   }
  ]
-}</script>
-</body></html>
+}
+</script>
+<script src="viewer.js"></script>
+</body>
+</html>

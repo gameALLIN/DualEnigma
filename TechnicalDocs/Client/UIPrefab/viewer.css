@@ -1,0 +1,57 @@
+/* UIPrefab 设计稿查看器样式 — 双生迷城 UI 设计稿 */
+* { box-sizing: border-box; }
+body {
+  background: #1a2226;
+  font-family: "Microsoft YaHei", Consolas, monospace;
+  color: #B0BEC5;
+  margin: 20px;
+}
+h1 { color: #ECEFF1; font-size: 20px; margin: 0 0 4px; }
+h1 small { color: #78909C; font-size: 12px; font-weight: normal; margin-left: 12px; }
+a { color: #4FC3F7; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.toolbar { margin: 8px 0 14px; font-size: 13px; display: flex; gap: 18px; align-items: center; }
+.toolbar label { cursor: pointer; user-select: none; }
+.toolbar select, .toolbar input { vertical-align: middle; accent-color: #4FC3F7; }
+.toolbar select { background: #263238; color: #ECEFF1; border: 1px solid #546E7A; padding: 2px 6px; }
+
+.wrap { display: flex; gap: 24px; align-items: flex-start; }
+
+/* 预览画布：1280x720 按缩放比例显示 */
+.page {
+  position: relative;
+  background: #10151a;
+  border: 1px solid #546E7A;
+  overflow: hidden;
+  flex: none;
+}
+.page .el { position: absolute; overflow: hidden; }
+.page .el.box { border: 1px solid rgba(120,144,156,.45); }
+.page .el.btn { border: 1.5px solid rgba(120,144,156,.8); }
+.page .el.txt {
+  display: flex; overflow: hidden; white-space: nowrap;
+  font-weight: 600; line-height: 1;
+}
+.page .el.dyn { font-style: italic; font-weight: normal; opacity: .55; }
+.page .el.ghost { opacity: .35; }
+.page .el.ghost.box, .page .el.ghost.btn { border-style: dashed; border-color: #FF6F00; }
+
+.legend { margin-top: 8px; font-size: 12px; color: #78909C; max-width: 960px; }
+
+.tree {
+  background: #202a30;
+  border: 1px solid #546E7A;
+  padding: 12px;
+  font-size: 12px;
+  line-height: 1.55;
+  max-height: 860px;
+  overflow: auto;
+  flex: 1;
+  margin: 0;
+  white-space: pre;
+}
+.tree .hidden-node { color: #616f77; }
+.tree .hidden-node::after { content: " ✕隐藏"; color: #FF6F00; }
+.tree .comps { color: #4FC3F7; }
+.tree .geo { color: #78909C; }

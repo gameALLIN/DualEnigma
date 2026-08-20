@@ -1,20 +1,45 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>UIPrefab · 设计稿索引</title><style>
-body{background:#1a2226;font-family:"Microsoft YaHei",Consolas,monospace;color:#B0BEC5;margin:24px}
-h1{color:#ECEFF1}table{border-collapse:collapse;margin-top:12px}
-td,th{border:1px solid #546E7A;padding:6px 14px;text-align:left}a{color:#4FC3F7;text-decoration:none}
-.flow{background:#202a30;border:1px solid #4FC3F7;padding:10px 14px;margin:14px 0;max-width:860px;font-size:13px}
-</style></head><body><h1>UI 页面设计稿索引</h1>
-<div class="flow">📐 工作流：<b>先 HTML 后代码</b> — ① 在本目录新建/迭代 &lt;页面&gt;.html（视觉稿 + 层级树 + 内嵌
-&lt;script id="ui-spec"&gt; 的 JSON 规格） → ② 设计定稿 → ③ 由生成工具解析 ui-spec JSON 产出
-预制体生成器与 View/Ctrl 代码 → ④ Unity 菜单生成预制体入库。<br>
-每个页面 HTML 内嵌完整节点规格（名称/组件/锚点/尺寸/颜色/文案），即后续代码生成的唯一数据源。</div>
-<table><tr><th>页面</th><th>预制体来源</th><th>节点数</th></tr><tr><td><a href="Common.html">Common</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/Common/FriendItem.prefab</td><td>8</td></tr>
-<tr><td><a href="UIFriends.html">UIFriends</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIFriends/UIFriends.prefab</td><td>42</td></tr>
-<tr><td><a href="UIGameHud.html">UIGameHud</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIGameHud/UIGameHud.prefab</td><td>27</td></tr>
-<tr><td><a href="UIGameOver.html">UIGameOver</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIGameOver/UIGameOver.prefab</td><td>9</td></tr>
-<tr><td><a href="UIHome.html">UIHome</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIHome/UIHome.prefab</td><td>20</td></tr>
-<tr><td><a href="UIInvitePopup.html">UIInvitePopup</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIInvitePopup/UIInvitePopup.prefab</td><td>13</td></tr>
-<tr><td><a href="UILogin.html">UILogin</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UILogin/UILogin.prefab</td><td>26</td></tr>
-<tr><td><a href="UIRoom.html">UIRoom</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIRoom/UIRoom.prefab</td><td>14</td></tr>
-<tr><td><a href="UISettings.html">UISettings</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UISettings/UISettings.prefab</td><td>19</td></tr>
-<tr><td><a href="UITest.html">UITest</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UITest/UITest.prefab</td><td>10</td></tr></table></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>UIPrefab · 设计稿索引</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #1a2226; font-family: "Microsoft YaHei", Consolas, monospace; color: #B0BEC5; margin: 24px; }
+  h1 { color: #ECEFF1; }
+  table { border-collapse: collapse; margin-top: 12px; }
+  td, th { border: 1px solid #546E7A; padding: 6px 14px; text-align: left; }
+  a { color: #4FC3F7; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .flow { background: #202a30; border: 1px solid #4FC3F7; padding: 10px 14px; margin: 14px 0; max-width: 900px; font-size: 13px; line-height: 1.7; }
+  .legend { margin-top: 14px; font-size: 12px; color: #78909C; max-width: 900px; line-height: 1.7; }
+</style>
+</head>
+<body>
+<h1>UI 页面设计稿索引</h1>
+<div class="flow">
+  📐 工作流：<b>先 HTML 后代码</b> — ① 在本目录新建/迭代 &lt;页面&gt;.html（视觉稿 + 层级树 + 内嵌
+  <code>&lt;script id="ui-spec"&gt;</code> 的 JSON 规格） → ② 设计定稿 → ③ 由生成工具解析 ui-spec JSON 产出
+  预制体生成器与 View/Ctrl 代码 → ④ Unity 菜单生成预制体入库。<br>
+  每个页面 HTML 内嵌完整节点规格（名称/组件/锚点/尺寸/颜色/文案），即后续代码生成的唯一数据源。
+  预览与层级树由 <code>viewer.js</code> 在浏览器端实时渲染，<b>直接编辑页面内嵌的 ui-spec JSON 后刷新即可看到效果</b>，无需任何转换脚本。
+</div>
+<table>
+  <tr><th>页面</th><th>预制体来源</th><th>说明</th></tr>
+  <tr><td><a href="UILogin.html">UILogin</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UILogin/UILogin.prefab</td><td>登录 / 注册（含隐藏昵称行、错误提示、加载态）</td></tr>
+  <tr><td><a href="UIHome.html">UIHome</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIHome/UIHome.prefab</td><td>主界面（开始游戏、功能入口、玩家卡片、邀请抽屉、标题区）</td></tr>
+  <tr><td><a href="UIFriends.html">UIFriends</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIFriends/UIFriends.prefab</td><td>好友（列表 / 搜索 / 房间邀请 / 好友申请）</td></tr>
+  <tr><td><a href="UIRoom.html">UIRoom</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIRoom/UIRoom.prefab</td><td>组队房间（房间码、邀请、开始、退出）</td></tr>
+  <tr><td><a href="UIGameHud.html">UIGameHud</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIGameHud/UIGameHud.prefab</td><td>对局 HUD（阶段进度、双角色状态、碎片计数）</td></tr>
+  <tr><td><a href="UIGameOver.html">UIGameOver</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIGameOver/UIGameOver.prefab</td><td>结算（胜利 / 失败、再来一局、返回主界面）</td></tr>
+  <tr><td><a href="UISettings.html">UISettings</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UISettings/UISettings.prefab</td><td>设置（音量、性能开关、继续 / 退出）</td></tr>
+  <tr><td><a href="UIInvitePopup.html">UIInvitePopup</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIInvitePopup/UIInvitePopup.prefab</td><td>邀请弹窗（房间邀请卡、好友申请卡，默认隐藏）</td></tr>
+  <tr><td><a href="Common.html">Common</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/Common/FriendItem.prefab</td><td>通用组件（好友列表项 FriendItem）</td></tr>
+  <tr><td><a href="UITest.html">UITest</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UITest/UITest.prefab</td><td>测试面板（计数 / 重置 / 关闭）</td></tr>
+</table>
+<div class="legend">
+  图例：斜体灰字 = 动态文本占位（运行时由代码赋值）· 橙色虚线 = ✕隐藏节点（勾选「显示隐藏节点」后可见）·
+  预览参考分辨率 1280×720，支持 50% / 75% / 100% 缩放。
+</div>
+</body>
+</html>

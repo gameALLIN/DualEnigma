@@ -15,15 +15,50 @@ OUT_DIR = r"D:\PersonProjects\DualEnigma\TechnicalDocs\Client\UIPrefab"
 CANVAS_W, CANVAS_H, SCALE = 1280, 720, 0.5
 
 guid_map = {}
-for meta in glob.glob(os.path.join(ASSETS, "**", "*.cs.meta"), recursive=True):
+asset_path_map = {}
+for meta in glob.glob(os.path.join(ASSETS, "**", "*.meta"), recursive=True):
     try:
         with open(meta, encoding="utf-8") as f:
             m = re.search(r"guid: ([0-9a-f]{32})", f.read())
-        if m:
-            stem = os.path.splitext(os.path.basename(meta))[0]
-            guid_map[m.group(1)] = stem[:-3] if stem.endswith(".cs") else stem
+        if not m: continue
+        stem = meta[:-5]  # 去掉 .meta
+        asset_path_map[m.group(1)] = stem
+        if stem.endswith(".cs"):
+            guid_map[m.group(1)] = os.path.splitext(os.path.basename(stem))[0]
     except OSError:
         pass
+
+def sprite_gradient(sprite_ref):
+    """Image 引用了 Sprite 资源时，解析其 Texture2D 像素，返回 CSS 背景（目前支持垂直渐变）。"""
+    m = re.search(r"guid: ([0-9a-f]{32})", sprite_ref or "")
+    if not m: return None
+    sasset = asset_path_map.get(m.group(1))
+    if not sasset or not sasset.endswith(".asset") or not os.path.exists(sasset): return None
+    try:
+        sbody = open(sasset, encoding="utf-8").read()
+    except OSError:
+        return None
+    tm = re.search(r"texture: \{fileID: \d+, guid: ([0-9a-f]{32})", sbody)
+    if not tm: return None
+    tasset = asset_path_map.get(tm.group(1))
+    if not tasset or not os.path.exists(tasset): return None
+    try:
+        tbody = open(tasset, encoding="utf-8").read()
+    except OSError:
+        return None
+    dm = re.search(r"_typelessdata: ([0-9a-f]+)", tbody)
+    wm = re.search(r"m_Width: (\d+)", tbody)
+    hm = re.search(r"m_Height: (\d+)", tbody)
+    if not (dm and wm and hm): return None
+    data, w, h = dm.group(1), int(wm.group(1)), int(hm.group(1))
+    if len(data) < w * h * 8: return None
+    def px(i):
+        p = data[i * 8: i * 8 + 8]
+        return "#%s%s%s" % (p[0:2], p[2:4], p[4:6])
+    # Unity 纹理数据从底部行开始；采样底/中/顶三行生成垂直渐变
+    bottom, middle, top = px(0), px((h // 2) * w), px((h - 1) * w)
+    if bottom == top: return bottom
+    return "linear-gradient(to top, %s 0%%, %s 50%%, %s 100%%)" % (bottom, middle, top)
 
 CLASS_NAMES = {1: "GameObject", 114: "MonoBehaviour", 222: "CanvasRenderer", 224: "RectTransform"}
 ALIGN = {0: "UpperLeft", 1: "UpperCenter", 2: "UpperRight", 3: "MiddleLeft",
@@ -46,6 +81,8 @@ def parse_color(s):
     m = re.match(r"\{r: ([\d.eE+-]+), g: ([\d.eE+-]+), b: ([\d.eE+-]+), a: ([\d.eE+-]+)\}", s or "")
     if not m: return None
     r, g, b, a = (min(1.0, max(0.0, float(x))) for x in m.groups())
+    if a < 0.99:
+        return "rgba(%d,%d,%d,%.2f)" % (round(r * 255), round(g * 255), round(b * 255), a)
     return "#%02X%02X%02X" % (round(r * 255), round(g * 255), round(b * 255))
 
 def parse(path):
@@ -107,6 +144,10 @@ def build(path):
             fsize = int(sm.group(1)) if sm else None
             align = ALIGN.get(int(am.group(1))) if am else None
         comps = [(n if t == "Script" else t) for t, n, _ in infos]
+        bgcolor = None
+        if img_comp:
+            bgcolor = (sprite_gradient(img_comp["fields"].get("m_Sprite"))
+                       or parse_color(img_comp["fields"].get("m_Color")))
         nodes.append({
             "name": docs[go]["fields"].get("m_Name", "?"), "depth": depth,
             "active": docs[go]["fields"].get("m_IsActive", "1") != "0",
@@ -116,7 +157,7 @@ def build(path):
             "isText": text_comp is not None, "isBtn": "Button" in types, "isImg": img_comp is not None,
             "hasVisual": bool(types & {"Text", "Image", "Button"}),
             "txt": txt, "tcolor": tcolor or "#ECEFF1", "fsize": fsize, "align": align,
-            "bgcolor": parse_color(img_comp["fields"].get("m_Color")) if img_comp else None,
+            "bgcolor": bgcolor,
         })
         for ch in d["children"]:
             if ch in docs: walk(ch, depth + 1)
@@ -172,12 +213,13 @@ def compute_rects(nodes, kids):
             cy = py + (1 - (ay0 + ay1) / 2) * ph - n["pos"][1]
         T = cy - (1 - n["pivot"][1]) * h
         return L, T, w, h
-    def walk(i, px, py, pw, ph):
+    def walk(i, px, py, pw, ph, parent_vis=True):
         n = nodes[i]
         L, T, w, h = calc(i, px, py, pw, ph)
-        if i > 0 and n["active"] and n["hasVisual"] and w > 3 and h > 3:
-            out.append((n, L, T, w, h))
-        for c in kids.get(i, []): walk(c, L, T, w, h)
+        vis = parent_vis and n["active"]
+        if i > 0 and vis and n["hasVisual"] and w > 3 and h > 3:
+            out.append((i, n, L, T, w, h))
+        for c in kids.get(i, []): walk(c, L, T, w, h, vis)
     walk(0, 0, 0, CANVAS_W, CANVAS_H)
     return out
 
@@ -228,20 +270,37 @@ td,th{border:1px solid #546E7A;padding:6px 14px;text-align:left}a{color:#4FC3F7;
 每个页面 HTML 内嵌完整节点规格（名称/组件/锚点/尺寸/颜色/文案），即后续代码生成的唯一数据源。</div>
 <table><tr><th>页面</th><th>预制体来源</th><th>节点数</th></tr>@@ROWS@@</table></body></html>"""
 
+ALIGN_CSS = {"Upper": ("flex-start",), "Middle": ("center",), "Lower": ("flex-end",)}
+HALIGN_CSS = {"Left": ("flex-start", "left"), "Center": ("center", "center"), "Right": ("flex-end", "right")}
+
+def align_css(align):
+    """Unity TextAnchor → (justify-content, align-items, text-align)"""
+    if not align: return "center", "center", "center"
+    v = next((ALIGN_CSS[k][0] for k in ALIGN_CSS if align.startswith(k)), "center")
+    hz = next((HALIGN_CSS[k] for k in HALIGN_CSS if align.endswith(k)), HALIGN_CSS["Center"])
+    return hz[0], v, hz[1]
+
 def render_elements(nodes, kids):
     els = []
-    for n, L, T, w, h in compute_rects(nodes, kids):
+    rects = compute_rects(nodes, kids)
+    # 有可见文本子节点的按钮不再重复显示节点名，避免与子文本重叠
+    btn_has_text = {i for i, n, *_ in rects if n["isBtn"]
+                    for c in kids.get(i, []) if nodes[c]["isText"]}
+    for i, n, L, T, w, h in rects:
         x, y, W, Hh = L * SCALE, T * SCALE, w * SCALE, h * SCALE
         if n["isText"]:
-            fs = max(8, min(16, Hh * 0.72))
+            if not (n["txt"] or "").strip(): continue  # 空文本不渲染（Placeholder 自带文案）
+            fs = (n["fsize"] * SCALE) if n["fsize"] else Hh * 0.72
+            fs = max(8, min(fs, Hh))
+            jc, ai, ta = align_css(n["align"])
             els.append('<div class="t" style="left:%.0fpx;top:%.0fpx;width:%.0fpx;height:%.0fpx;'
-                       'font-size:%.0fpx;color:%s">%s</div>'
-                       % (x, y, W, Hh, fs, n["tcolor"], H.escape(n["txt"] or n["name"])))
+                       'font-size:%.0fpx;color:%s;justify-content:%s;align-items:%s;text-align:%s">%s</div>'
+                       % (x, y, W, Hh, fs, n["tcolor"], jc, ai, ta, H.escape(n["txt"])))
         elif n["isBtn"]:
+            span = "" if i in btn_has_text else "<span>%s</span>" % H.escape(n["name"])
             els.append('<div class="btn" style="left:%.0fpx;top:%.0fpx;width:%.0fpx;height:%.0fpx;'
-                       'background:%s"><span>%s</span></div>'
-                       % (x, y, W, Hh, n["bgcolor"] or "rgba(255,255,255,0.08)",
-                          H.escape(n["txt"] or n["name"])))
+                       'background:%s">%s</div>'
+                       % (x, y, W, Hh, n["bgcolor"] or "rgba(255,255,255,0.08)", span))
         else:
             els.append('<div class="box" style="left:%.0fpx;top:%.0fpx;width:%.0fpx;height:%.0fpx;'
                        'background:%s"></div>'

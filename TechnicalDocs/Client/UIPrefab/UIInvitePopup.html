@@ -1,155 +1,61 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>UIInvitePopup · 页面设计稿</title><style>
-body{background:#1a2226;font-family:"Microsoft YaHei",Consolas,monospace;color:#B0BEC5;margin:20px}
-h1{color:#ECEFF1;font-size:20px}h1 small{color:#78909C;font-size:12px;font-weight:normal;margin-left:12px}
-a{color:#4FC3F7}
-.wrap{display:flex;gap:24px;align-items:flex-start}
-.page{position:relative;width:640px;height:360px;background:#263238;border:1px solid #546E7A;overflow:hidden;flex:none}
-.box{position:absolute;border:1px solid rgba(120,144,156,.45);box-sizing:border-box}
-.btn{position:absolute;border:1.5px solid rgba(120,144,156,.8);box-sizing:border-box;display:flex;align-items:center;justify-content:center;color:#ECEFF1;font-size:12px;overflow:hidden;white-space:nowrap}
-.t{position:absolute;display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;text-align:center;font-weight:600}
-.tree{background:#202a30;border:1px solid #546E7A;padding:12px;font-size:12px;line-height:1.5;max-height:720px;overflow:auto;flex:1}
-.legend{margin-top:8px;font-size:12px;color:#78909C}
-</style></head><body>
-<h1>UIInvitePopup <small>Client/Assets/AssetPackage/Prefabs/UI/UIInvitePopup/UIInvitePopup.prefab · 13 节点 · UIInvitePopupView.cs, UIInvitePopupCtrl.cs · <a href="index.html">← 索引</a></small></h1>
-<div class="wrap"><div><div class="page"><div class="t" style="left:210px;top:16px;width:108px;height:11px;font-size:8px;color:#FFFFFF">XX 邀请你进入房间</div><div class="t" style="left:301px;top:16px;width:38px;height:13px;font-size:9px;color:#FFB74D">RoomText</div><div class="btn" style="left:371px;top:15px;width:28px;height:14px;background:#37474F"><span>RejectBtn</span></div><div class="t" style="left:371px;top:15px;width:28px;height:14px;font-size:10px;color:#FFFFFF">拒绝</div><div class="btn" style="left:402px;top:15px;width:28px;height:14px;background:#4FC3F7"><span>AcceptBtn</span></div><div class="t" style="left:402px;top:15px;width:28px;height:14px;font-size:10px;color:#FFFFFF">接受</div><div class="t" style="left:141px;top:1px;width:150px;height:10px;font-size:8px;color:#FFFFFF">XX 请求加你为好友</div><div class="btn" style="left:406px;top:-1px;width:36px;height:14px;background:#EF5350"><span>ViewBtn</span></div><div class="t" style="left:406px;top:-1px;width:36px;height:14px;font-size:10px;color:#FFFFFF">去处理</div></div>
-<div class="legend">按预制体锚点精确换算（比例 0.5）· 文字/颜色/内容取自设计稿 · ✕隐藏节点不渲染</div></div>
-<pre class="tree">UIInvitePopup  [UIInvitePopupView.cs, UIInvitePopupCtrl.cs]  ·尺寸0×0
-└─ CardContainer  [Mono]  ·锚(0.5,1.0)~(0.5,1.0) 偏(0,-12) 尺寸440×0
-   ├─ InviteCardTemplate  [CanvasRenderer, Image, InviteCardView.cs]  ✕隐藏  ·锚(0.0,1.0)~(0.0,1.0) 偏(220,-32) 尺寸440×64
-   │  ├─ FromText  [CanvasRenderer, Text]  ·锚(0.0,0.5)~(0.0,0.5) 偏(108,0) 尺寸215×22
-   │  ├─ RoomText  [CanvasRenderer, Text]  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,0) 尺寸76×26
-   │  ├─ RejectBtn  [CanvasRenderer, Image, Button]  ·锚(1.0,0.5)~(1.0,0.5) 偏(-90,0) 尺寸56×28
-   │  │  └─ Text  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0
-   │  └─ AcceptBtn  [CanvasRenderer, Image, Button]  ·锚(1.0,0.5)~(1.0,0.5) 偏(-28,0) 尺寸56×28
-   │     └─ Text  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0
-   └─ RequestCardTemplate  [CanvasRenderer, Image, RequestCardView.cs]  ✕隐藏  ·锚(0.5,0.5)~(0.5,0.5) 偏(0,0) 尺寸440×48
-      ├─ FromText  [CanvasRenderer, Text]  ·锚(0.0,0.5)~(0.0,0.5) 偏(12,0) 尺寸300×20
-      └─ ViewBtn  [CanvasRenderer, Image, Button]  ·锚(1.0,0.5)~(1.0,0.5) 偏(-12,0) 尺寸72×28
-         └─ Text  [CanvasRenderer, Text]  ·锚(0.0,0.0)~(1.0,1.0) 偏(0,0) 尺寸0×0</pre></div>
-<script type="application/json" id="ui-spec">{
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>UIInvitePopup · 页面设计稿</title>
+<link rel="stylesheet" href="viewer.css">
+</head>
+<body>
+<h1>UIInvitePopup <small>Client/Assets/AssetPackage/Prefabs/UI/UIInvitePopup/UIInvitePopup.prefab · UIInvitePopupView.cs, UIInvitePopupCtrl.cs · <a href="index.html">← 索引</a></small></h1>
+<div class="toolbar">
+  <label>缩放 <select id="zoom"><option value="0.5">50%</option><option value="0.75" selected>75%</option><option value="1">100%</option></select></label>
+  <label><input type="checkbox" id="showHidden" checked> 显示隐藏节点</label>
+</div>
+<div class="wrap">
+  <div>
+    <div id="preview" class="page"></div>
+    <div class="legend">按 ui-spec 锚点实时渲染（参考分辨率 1280×720）· 斜体灰字 = 动态文本占位 · 本页卡片模板默认 ✕隐藏，已默认勾选「显示隐藏节点」（橙色虚线）以便预览</div>
+  </div>
+  <pre id="tree" class="tree"></pre>
+</div>
+<script type="application/json" id="ui-spec">
+{
  "name": "UIInvitePopup",
  "active": true,
- "components": [
-  "RectTransform",
-  "UIInvitePopupView.cs",
-  "UIInvitePopupCtrl.cs"
- ],
- "anchors": {
-  "min": [
-   0.0,
-   0.0
-  ],
-  "max": [
-   1.0,
-   1.0
-  ]
- },
- "pivot": [
-  0.5,
-  0.5
- ],
- "position": [
-  0.0,
-  0.0
- ],
- "size": [
-  0.0,
-  0.0
- ],
+ "components": ["RectTransform", "UIInvitePopupView.cs", "UIInvitePopupCtrl.cs"],
+ "anchors": { "min": [0.0, 0.0], "max": [1.0, 1.0] },
+ "pivot": [0.5, 0.5],
+ "position": [0.0, 0.0],
+ "size": [0.0, 0.0],
  "children": [
   {
    "name": "CardContainer",
    "active": true,
-   "components": [
-    "RectTransform",
-    "Mono"
-   ],
-   "anchors": {
-    "min": [
-     0.5,
-     1.0
-    ],
-    "max": [
-     0.5,
-     1.0
-    ]
-   },
-   "pivot": [
-    0.5,
-    1.0
-   ],
-   "position": [
-    0.0,
-    -12.0
-   ],
-   "size": [
-    440.0,
-    0.0
-   ],
+   "components": ["RectTransform", "VerticalLayoutGroup"],
+   "anchors": { "min": [0.5, 1.0], "max": [0.5, 1.0] },
+   "pivot": [0.5, 1.0],
+   "position": [0.0, -12.0],
+   "size": [440.0, 0.0],
+   "layout": { "type": "vertical", "spacing": 8.0, "align": "UpperCenter", "padding": [0, 0, 0, 0] },
    "children": [
     {
      "name": "InviteCardTemplate",
      "active": false,
-     "components": [
-      "RectTransform",
-      "CanvasRenderer",
-      "Image",
-      "InviteCardView.cs"
-     ],
-     "anchors": {
-      "min": [
-       0.0,
-       1.0
-      ],
-      "max": [
-       0.0,
-       1.0
-      ]
-     },
-     "pivot": [
-      0.5,
-      0.5
-     ],
-     "position": [
-      220.0,
-      -32.0
-     ],
-     "size": [
-      440.0,
-      64.0
-     ],
-     "background": "#263238",
+     "components": ["RectTransform", "CanvasRenderer", "Image", "InviteCardView.cs"],
+     "anchors": { "min": [0.0, 1.0], "max": [0.0, 1.0] },
+     "pivot": [0.5, 0.5],
+     "position": [220.0, -32.0],
+     "size": [440.0, 64.0],
+     "background": "rgba(38,50,56,0.94)",
      "children": [
       {
        "name": "FromText",
        "active": true,
-       "components": [
-        "RectTransform",
-        "CanvasRenderer",
-        "Text"
-       ],
-       "anchors": {
-        "min": [
-         0.0,
-         0.5
-        ],
-        "max": [
-         0.0,
-         0.5
-        ]
-       },
-       "pivot": [
-        0.5,
-        0.5
-       ],
-       "position": [
-        107.5,
-        0.0
-       ],
-       "size": [
-        215.0,
-        22.0
-       ],
+       "components": ["RectTransform", "CanvasRenderer", "Text"],
+       "anchors": { "min": [0.0, 0.5], "max": [0.0, 0.5] },
+       "pivot": [0.5, 0.5],
+       "position": [107.5, 0.0],
+       "size": [215.0, 22.0],
        "text": "XX 邀请你进入房间",
        "fontSize": 14,
        "align": "MiddleLeft",
@@ -158,34 +64,12 @@ a{color:#4FC3F7}
       {
        "name": "RoomText",
        "active": true,
-       "components": [
-        "RectTransform",
-        "CanvasRenderer",
-        "Text"
-       ],
-       "anchors": {
-        "min": [
-         0.5,
-         0.5
-        ],
-        "max": [
-         0.5,
-         0.5
-        ]
-       },
-       "pivot": [
-        0.5,
-        0.5
-       ],
-       "position": [
-        0.0,
-        0.0
-       ],
-       "size": [
-        76.0,
-        26.0
-       ],
-       "text": "",
+       "components": ["RectTransform", "CanvasRenderer", "Text"],
+       "anchors": { "min": [0.5, 0.5], "max": [0.5, 0.5] },
+       "pivot": [0.5, 0.5],
+       "position": [0.0, 0.0],
+       "size": [76.0, 26.0],
+       "text": "8888",
        "fontSize": 18,
        "align": "MiddleCenter",
        "color": "#FFB74D"
@@ -193,66 +77,21 @@ a{color:#4FC3F7}
       {
        "name": "RejectBtn",
        "active": true,
-       "components": [
-        "RectTransform",
-        "CanvasRenderer",
-        "Image",
-        "Button"
-       ],
-       "anchors": {
-        "min": [
-         1.0,
-         0.5
-        ],
-        "max": [
-         1.0,
-         0.5
-        ]
-       },
-       "pivot": [
-        0.5,
-        0.5
-       ],
-       "position": [
-        -90.0,
-        0.0
-       ],
-       "size": [
-        56.0,
-        28.0
-       ],
+       "components": ["RectTransform", "CanvasRenderer", "Image", "Button"],
+       "anchors": { "min": [1.0, 0.5], "max": [1.0, 0.5] },
+       "pivot": [0.5, 0.5],
+       "position": [-90.0, 0.0],
+       "size": [56.0, 28.0],
        "background": "#37474F",
        "children": [
         {
          "name": "Text",
          "active": true,
-         "components": [
-          "RectTransform",
-          "CanvasRenderer",
-          "Text"
-         ],
-         "anchors": {
-          "min": [
-           0.0,
-           0.0
-          ],
-          "max": [
-           1.0,
-           1.0
-          ]
-         },
-         "pivot": [
-          0.5,
-          0.5
-         ],
-         "position": [
-          0.0,
-          0.0
-         ],
-         "size": [
-          0.0,
-          0.0
-         ],
+         "components": ["RectTransform", "CanvasRenderer", "Text"],
+         "anchors": { "min": [0.0, 0.0], "max": [1.0, 1.0] },
+         "pivot": [0.5, 0.5],
+         "position": [0.0, 0.0],
+         "size": [0.0, 0.0],
          "text": "拒绝",
          "fontSize": 13,
          "align": "MiddleCenter",
@@ -263,66 +102,21 @@ a{color:#4FC3F7}
       {
        "name": "AcceptBtn",
        "active": true,
-       "components": [
-        "RectTransform",
-        "CanvasRenderer",
-        "Image",
-        "Button"
-       ],
-       "anchors": {
-        "min": [
-         1.0,
-         0.5
-        ],
-        "max": [
-         1.0,
-         0.5
-        ]
-       },
-       "pivot": [
-        0.5,
-        0.5
-       ],
-       "position": [
-        -28.0,
-        0.0
-       ],
-       "size": [
-        56.0,
-        28.0
-       ],
+       "components": ["RectTransform", "CanvasRenderer", "Image", "Button"],
+       "anchors": { "min": [1.0, 0.5], "max": [1.0, 0.5] },
+       "pivot": [0.5, 0.5],
+       "position": [-28.0, 0.0],
+       "size": [56.0, 28.0],
        "background": "#4FC3F7",
        "children": [
         {
          "name": "Text",
          "active": true,
-         "components": [
-          "RectTransform",
-          "CanvasRenderer",
-          "Text"
-         ],
-         "anchors": {
-          "min": [
-           0.0,
-           0.0
-          ],
-          "max": [
-           1.0,
-           1.0
-          ]
-         },
-         "pivot": [
-          0.5,
-          0.5
-         ],
-         "position": [
-          0.0,
-          0.0
-         ],
-         "size": [
-          0.0,
-          0.0
-         ],
+         "components": ["RectTransform", "CanvasRenderer", "Text"],
+         "anchors": { "min": [0.0, 0.0], "max": [1.0, 1.0] },
+         "pivot": [0.5, 0.5],
+         "position": [0.0, 0.0],
+         "size": [0.0, 0.0],
          "text": "接受",
          "fontSize": 13,
          "align": "MiddleCenter",
@@ -335,66 +129,21 @@ a{color:#4FC3F7}
     {
      "name": "RequestCardTemplate",
      "active": false,
-     "components": [
-      "RectTransform",
-      "CanvasRenderer",
-      "Image",
-      "RequestCardView.cs"
-     ],
-     "anchors": {
-      "min": [
-       0.5,
-       0.5
-      ],
-      "max": [
-       0.5,
-       0.5
-      ]
-     },
-     "pivot": [
-      0.5,
-      0.5
-     ],
-     "position": [
-      0.0,
-      0.0
-     ],
-     "size": [
-      440.0,
-      48.0
-     ],
-     "background": "#263238",
+     "components": ["RectTransform", "CanvasRenderer", "Image", "RequestCardView.cs"],
+     "anchors": { "min": [0.5, 0.5], "max": [0.5, 0.5] },
+     "pivot": [0.5, 0.5],
+     "position": [0.0, 0.0],
+     "size": [440.0, 48.0],
+     "background": "rgba(38,50,56,0.94)",
      "children": [
       {
        "name": "FromText",
        "active": true,
-       "components": [
-        "RectTransform",
-        "CanvasRenderer",
-        "Text"
-       ],
-       "anchors": {
-        "min": [
-         0.0,
-         0.5
-        ],
-        "max": [
-         0.0,
-         0.5
-        ]
-       },
-       "pivot": [
-        0.5,
-        0.5
-       ],
-       "position": [
-        12.0,
-        0.0
-       ],
-       "size": [
-        300.0,
-        20.0
-       ],
+       "components": ["RectTransform", "CanvasRenderer", "Text"],
+       "anchors": { "min": [0.0, 0.5], "max": [0.0, 0.5] },
+       "pivot": [0.5, 0.5],
+       "position": [162.0, 0.0],
+       "size": [300.0, 20.0],
        "text": "XX 请求加你为好友",
        "fontSize": 14,
        "align": "MiddleLeft",
@@ -403,66 +152,21 @@ a{color:#4FC3F7}
       {
        "name": "ViewBtn",
        "active": true,
-       "components": [
-        "RectTransform",
-        "CanvasRenderer",
-        "Image",
-        "Button"
-       ],
-       "anchors": {
-        "min": [
-         1.0,
-         0.5
-        ],
-        "max": [
-         1.0,
-         0.5
-        ]
-       },
-       "pivot": [
-        0.5,
-        0.5
-       ],
-       "position": [
-        -12.0,
-        0.0
-       ],
-       "size": [
-        72.0,
-        28.0
-       ],
+       "components": ["RectTransform", "CanvasRenderer", "Image", "Button"],
+       "anchors": { "min": [1.0, 0.5], "max": [1.0, 0.5] },
+       "pivot": [0.5, 0.5],
+       "position": [-12.0, 0.0],
+       "size": [72.0, 28.0],
        "background": "#EF5350",
        "children": [
         {
          "name": "Text",
          "active": true,
-         "components": [
-          "RectTransform",
-          "CanvasRenderer",
-          "Text"
-         ],
-         "anchors": {
-          "min": [
-           0.0,
-           0.0
-          ],
-          "max": [
-           1.0,
-           1.0
-          ]
-         },
-         "pivot": [
-          0.5,
-          0.5
-         ],
-         "position": [
-          0.0,
-          0.0
-         ],
-         "size": [
-          0.0,
-          0.0
-         ],
+         "components": ["RectTransform", "CanvasRenderer", "Text"],
+         "anchors": { "min": [0.0, 0.0], "max": [1.0, 1.0] },
+         "pivot": [0.5, 0.5],
+         "position": [0.0, 0.0],
+         "size": [0.0, 0.0],
          "text": "去处理",
          "fontSize": 13,
          "align": "MiddleCenter",
@@ -475,5 +179,8 @@ a{color:#4FC3F7}
    ]
   }
  ]
-}</script>
-</body></html>
+}
+</script>
+<script src="viewer.js"></script>
+</body>
+</html>
