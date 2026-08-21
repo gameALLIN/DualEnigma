@@ -1,10 +1,12 @@
 /// ============================================================
 /// 文件名: UIFriendsCtrl.cs
 /// 创建时间: 2026-08-15
+/// 最后更新: 2026-08-21
 /// 作者: DualEnigma
 /// 描述: 好友面板控制器。拉取/渲染好友、搜索添加好友；
 ///       好友申请列表读取 SocialNotifyService（全局轮询）；
-///       房间邀请已移交全局弹窗 UIInvitePopup 处理。
+///       房间邀请已移交全局弹窗 UIInvitePopup 处理；
+///       邀请好友未在房时静默自动建房，ConnectAck 后补发邀请。
 /// ============================================================
 
 using System.Collections.Generic;
@@ -28,6 +30,9 @@ namespace DualEnigma.UI
         private float _refreshTimer;
         private bool _refreshing;
 
+        /// <summary>静默建房完成后待发送的邀请（未在房时点邀请）</summary>
+        private FriendData _pendingInvite;
+
         protected override void OnCreate()
         {
             _model = new UIFriendsModel();
@@ -39,6 +44,25 @@ namespace DualEnigma.UI
                 _ = FriendApiService.Instance;
                 _api = ServiceLocator.Get<IFriendApiService>();
             }
+
+            // 静默建房完成后自动补发邀请（流程 A.2）
+            EventBus.Instance.Subscribe<RoomConnectedEvent>(OnRoomConnected);
+        }
+
+        protected override void OnDestroy()
+        {
+            if (EventBus.HasInstance)
+                EventBus.Instance.Unsubscribe<RoomConnectedEvent>(OnRoomConnected);
+            base.OnDestroy();
+        }
+
+        /// <summary>静默建房成功：用真实房间码补发挂起的邀请</summary>
+        private void OnRoomConnected(RoomConnectedEvent e)
+        {
+            if (_pendingInvite == null) return;
+            FriendData friend = _pendingInvite;
+            _pendingInvite = null;
+            SendInvite(friend, e.roomCode);
         }
 
         protected override void OnShow()
@@ -300,17 +324,32 @@ namespace DualEnigma.UI
                 error => _view.SetStatus(error));
         }
 
+        /// <summary>邀请好友（流程 A）：未在房时先静默自动建房，ConnectAck 后自动发出 REST 邀请</summary>
         private void OnInviteFriendClicked(FriendData friend)
         {
             if (_api == null) return;
-            string roomCode = NetworkSystem.Instance.CurrentRoomCode;
 
-            if (string.IsNullOrEmpty(roomCode))
+            string roomCode = NetworkSystem.HasInstance ? NetworkSystem.Instance.CurrentRoomCode : "";
+            if (!string.IsNullOrEmpty(roomCode))
             {
-                _view.SetStatus("尚未进入房间：请先回到主界面点击【联机开房】，看到房间码后再来邀请好友");
+                SendInvite(friend, roomCode);
                 return;
             }
 
+            // 未在房：静默连接 game-server 自动建房（主界面开始按钮同一链路）
+            if (GameServerClient.Instance.IsConnected)
+            {
+                _view.SetStatus("房间建立中，请稍候再邀请");
+                return;
+            }
+            _pendingInvite = friend;
+            _view.SetStatus($"正在创建房间，完成后将自动邀请 {friend.displayName}");
+            GameServerClient.Instance.Connect("");
+        }
+
+        /// <summary>发出 REST 邀请</summary>
+        private void SendInvite(FriendData friend, string roomCode)
+        {
             _view.SetStatus($"已邀请 {friend.displayName}，等待对方接受...");
             _api.CreateInvite(friend.accountId, roomCode,
                 _ => _view.SetStatus($"已邀请 {friend.displayName}，等待对方接受..."),

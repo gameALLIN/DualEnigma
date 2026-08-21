@@ -1,11 +1,13 @@
 /// ============================================================
 /// 文件名: UIInvitePopupCtrl.cs
 /// 创建时间: 2026-08-15
+/// 最后更新: 2026-08-21
 /// 作者: DualEnigma
 /// 描述: 全局邀请弹窗控制器。常驻 UILayer.Top（不进面板栈，
 ///       任何界面下均可见）。订阅 SocialNotifyChangedEvent，
 ///       以列表为准全量对账卡片：邀请卡（接受/拒绝）、
 ///       好友申请卡（跳转好友面板处理）。
+///       接受邀请 = 直连进房（UIRoom 已停用，停留主界面）。
 /// ============================================================
 
 using System.Collections.Generic;
@@ -201,9 +203,8 @@ namespace DualEnigma.UI
             _api.AcceptInvite(invite.inviteId,
                 roomCode =>
                 {
-                    // 接受邀请 → 进入房间等待界面（不弹面板栈，全局弹窗常驻）
-                    UIRoomCtrl.Prepare(roomCode);
-                    UIManager.Instance.Push<UIRoomCtrl>(UIMode.FullScreen);
+                    // 流程 B：直连进房（playerId=1），停留主界面等待房主开始（UIRoom 已停用）
+                    GameServerClient.Instance.Connect(roomCode);
                 },
                 error => Debug.LogError($"[UIInvitePopup] 接受邀请失败: {error}"));
             // 卡片移除交给下一次轮询对账（服务端列表中该邀请已消失）

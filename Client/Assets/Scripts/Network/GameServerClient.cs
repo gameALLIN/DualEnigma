@@ -105,10 +105,14 @@ namespace DualEnigma.Network
         }
 
         [Serializable]
+        private class OpponentDisconnectData { public string state; }
+
+        [Serializable]
         private class OpponentDisconnectMessage
         {
             public string type;
             public int playerId;
+            public OpponentDisconnectData data;
         }
 
         [Serializable]
@@ -203,7 +207,7 @@ namespace DualEnigma.Network
         private class FragmentDropPlanMessage { public string type; public DropPlanData data; }
 
         [Serializable]
-        private class FragmentCaughtData { public int fragmentId; }
+        private class FragmentCaughtData { public int fragmentId; public float posX; public float posY; }
 
         [Serializable]
         private class FragmentCaughtRequest
@@ -348,11 +352,14 @@ namespace DualEnigma.Network
             }));
         }
 
-        /// <summary>上报碎片接住（本地收集完成时由 NetworkGameSync 调用）</summary>
-        public void SendFragmentCaught(int fragmentId)
+        /// <summary>上报碎片接住（本地收集完成时由 NetworkGameSync 调用；携带碰撞瞬间碎片坐标供服务器几何判定同接）</summary>
+        public void SendFragmentCaught(int fragmentId, float posX, float posY)
         {
             if (!IsConnected) return;
-            _ = SendJsonAsync(JsonUtility.ToJson(new FragmentCaughtRequest { data = new FragmentCaughtData { fragmentId = fragmentId } }));
+            _ = SendJsonAsync(JsonUtility.ToJson(new FragmentCaughtRequest
+            {
+                data = new FragmentCaughtData { fragmentId = fragmentId, posX = posX, posY = posY }
+            }));
         }
 
         /// <summary>发送一行 JSON（线程安全，同一时刻仅一个 SendAsync）</summary>
@@ -545,7 +552,11 @@ namespace DualEnigma.Network
                 case "S2C_OpponentDisconnect":
                 {
                     OpponentDisconnectMessage msg = JsonUtility.FromJson<OpponentDisconnectMessage>(json);
-                    EventBus.Instance.Publish(new OpponentDisconnectEvent { playerId = msg.playerId });
+                    EventBus.Instance.Publish(new OpponentDisconnectEvent
+                    {
+                        playerId = msg.playerId,
+                        state = msg.data?.state ?? ""
+                    });
                     break;
                 }
 

@@ -34,6 +34,9 @@ namespace DualEnigma.Network
     {
         /// <summary>断线玩家 ID</summary>
         public int playerId;
+
+        /// <summary>断线场景："lobby" = 大厅离开（可补位再邀） | "waiting" = 对局中断线（重连窗口，断线重连里程碑处理）</summary>
+        public string state;
     }
 
     /// <summary>有玩家加入房间（收到 S2C_PlayerJoined，房间内广播）</summary>

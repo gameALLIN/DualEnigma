@@ -1,13 +1,16 @@
 /// ============================================================
 /// 文件名: UIHomeCtrl.cs
 /// 创建时间: 2026-07-10 17:46:28
-/// 最后更新: 2026-08-18
+/// 最后更新: 2026-08-21
 /// 作者: SLR
-/// 描述: 主界面控制器（主界面即大厅）。开始游戏=后台自动建房并展开
-///       左侧邀请抽屉；从抽屉邀请好友，满员后按钮变【开始对局】，
+/// 描述: 主界面控制器（主界面即大厅，唯一房间入口，UIRoom 已停用）。
+///       开局按钮状态机：未连接=可点"开始游戏"（点击静默建房）；
+///       建房中=灰"创建房间中..."；在房 1 人=灰"等待好友加入..."；
+///       满员=房主(playerId=0)亮"开始对局"发 C2S_StartGame，
+///       非房主保持灰"等待房主开始游戏"；
+///       对手大厅离开(state=lobby)=回灰可再邀补位。
+///       抽屉邀请未在房时静默建房，ConnectAck 后自动发出 REST 邀请。
 ///       GameStart 广播后隐藏全部面板进入对局。
-///       左侧抽屉：箭头常驻开关，面板仅显示已添加好友（FriendItem Invite 模式）。
-///       房间等待面板（UIRoom）仅好友（受邀方）加入房间时使用。
 /// ============================================================
 
 using System.Collections.Generic;
@@ -31,14 +34,23 @@ namespace DualEnigma.UI
 
         private readonly List<FriendData> _friends = new List<FriendData>();
 
-        /// <summary>房间是否已就绪（建房成功）</summary>
+        /// <summary>是否已在房间（ConnectAck 完成）</summary>
         private bool _roomReady;
+
+        /// <summary>正在连接/建房（含静默建房）</summary>
+        private bool _connecting;
 
         /// <summary>房间人数（含自己）</summary>
         private int _playerCount = 1;
 
+        /// <summary>静默建房完成后待发送的邀请（未在房时点邀请）</summary>
+        private FriendData _pendingInvite;
+
         private float _refreshTimer;
         private bool _refreshing;
+
+        /// <summary>是否房主（playerId=0 创建房间者）</summary>
+        private bool IsHost => NetworkSystem.HasInstance && NetworkSystem.Instance.LocalPlayerId == 0;
 
         protected override void OnCreate()
         {
@@ -97,9 +109,9 @@ namespace DualEnigma.UI
             if (NetworkSystem.HasInstance && !string.IsNullOrEmpty(NetworkSystem.Instance.CurrentRoomCode))
             {
                 _roomReady = true;
+                _connecting = false;
                 _view.SetRoomCode(NetworkSystem.Instance.CurrentRoomCode);
-                SetStartLabel("开始对局");
-                _view.StartBtn.interactable = _playerCount >= 2;
+                UpdateStartButton();
             }
             else
             {
@@ -172,52 +184,103 @@ namespace DualEnigma.UI
         }
 
         // ============================================================
-        //  房间流程（主界面即大厅）
+        //  房间流程（主界面即大厅，唯一房间入口）
         // ============================================================
 
-        /// <summary>开始游戏：未建房→后台创建房间；已满员→请求开局</summary>
-        private void OnStartGameClicked()
+        /// <summary>
+        /// 开局按钮状态机（唯一收口，所有状态变化都经此刷新）：
+        /// 未连接=亮"开始游戏"（点击静默建房）；建房中=灰"创建房间中..."；
+        /// 在房 1 人=灰"等待好友加入..."；满员=房主亮"开始对局"/非房主灰"等待房主开始游戏"。
+        /// </summary>
+        private void UpdateStartButton()
         {
-            if (_roomReady)
-            {
-                if (_playerCount < 2)
-                {
-                    _view.SetDrawerStatus("好友尚未加入，无法开始");
-                    return;
-                }
+            if (_view == null || _view.StartBtn == null) return;
 
-                _view.SetDrawerStatus("正在开始对局...");
-                GameServerClient.Instance.RequestStartGame();
+            if (!_roomReady)
+            {
+                _view.StartBtn.interactable = !_connecting;
+                SetStartLabel(_connecting ? "创建房间中..." : "开始游戏");
                 return;
             }
 
-            SetStartLabel("创建房间中...");
-            if (_view.StartBtn != null) _view.StartBtn.interactable = false;
+            if (_playerCount >= 2)
+            {
+                _view.StartBtn.interactable = IsHost;
+                SetStartLabel(IsHost ? "开始对局" : "等待房主开始游戏");
+            }
+            else
+            {
+                _view.StartBtn.interactable = false;
+                SetStartLabel(IsHost ? "等待好友加入..." : "等待房主开始游戏");
+            }
+        }
+
+        /// <summary>点击开始：未在房→静默建房；房主满员→请求开局</summary>
+        private void OnStartGameClicked()
+        {
+            if (!_roomReady)
+            {
+                if (_connecting) return;
+                ConnectSilently(null);
+                return;
+            }
+
+            // 防御：非房主按钮本应灰色，时序错乱也不允许发开局请求
+            if (!IsHost)
+            {
+                UpdateStartButton();
+                return;
+            }
+
+            if (_playerCount < 2)
+            {
+                _view.SetDrawerStatus("好友尚未加入，无法开始");
+                return;
+            }
+
+            _view.SetDrawerStatus("正在开始对局...");
+            GameServerClient.Instance.RequestStartGame();
+        }
+
+        /// <summary>静默连接 game-server（空房间码=自动建房）；完成后自动发出待发邀请</summary>
+        private void ConnectSilently(FriendData pendingInvite)
+        {
+            _connecting = true;
+            _pendingInvite = pendingInvite;
+            UpdateStartButton();
             GameServerClient.Instance.Connect("");
         }
 
         private void OnRoomConnected(RoomConnectedEvent e)
         {
             _roomReady = true;
+            _connecting = false;
             _playerCount = 1;
 
             _view.SetRoomCode(e.roomCode);
-            SetStartLabel("开始对局");
-            if (_view.StartBtn != null) _view.StartBtn.interactable = false;
-            _view.SetDrawerStatus("房间已创建，从左侧列表邀请好友");
+            _view.SetDrawerStatus(IsHost
+                ? "房间已创建，从左侧列表邀请好友"
+                : "已加入房间，等待房主开始游戏");
+            UpdateStartButton();
 
-            SetDrawerOpen(true); // 建房成功自动展开邀请抽屉
+            SetDrawerOpen(true); // 建房/进房成功自动展开邀请抽屉
             RefreshFriends();
+
+            // 静默建房前挂起的邀请：拿到房间码后立即补发（流程 A.2）
+            if (_pendingInvite != null)
+            {
+                FriendData friend = _pendingInvite;
+                _pendingInvite = null;
+                SendInvite(friend, e.roomCode);
+            }
         }
 
         private void OnPlayerJoined(PlayerJoinedRoomEvent e)
         {
             _playerCount = Mathf.Max(1, e.playerCount);
-            if (_playerCount >= 2)
-            {
-                if (_view.StartBtn != null) _view.StartBtn.interactable = true;
+            UpdateStartButton();
+            if (_playerCount >= 2 && IsHost)
                 _view.SetDrawerStatus("好友已就位，点击【开始对局】");
-            }
         }
 
         private void OnGameStart(RoomGameStartEvent e)
@@ -231,8 +294,19 @@ namespace DualEnigma.UI
         private void OnOpponentDisconnected(OpponentDisconnectEvent e)
         {
             _playerCount = 1;
-            if (_view.StartBtn != null) _view.StartBtn.interactable = false;
-            _view.SetDrawerStatus("对方连接中断，等待重连...");
+
+            if (e.state == "lobby")
+            {
+                // 大厅离开：回到等待好友，可再邀补位（验收 3）
+                UpdateStartButton();
+                _view.SetDrawerStatus("对方已离开房间");
+            }
+            else
+            {
+                // 对局中断线（waiting）：重连窗口属断线重连里程碑，这里只提示
+                UpdateStartButton();
+                _view.SetDrawerStatus("对方连接中断，等待重连...");
+            }
         }
 
         private void OnServerDisconnected(ServerDisconnectedEvent e)
@@ -244,11 +318,12 @@ namespace DualEnigma.UI
         private void ResetRoomUi()
         {
             _roomReady = false;
+            _connecting = false;
+            _pendingInvite = null;
             _playerCount = 1;
-            SetStartLabel("开始游戏");
-            if (_view.StartBtn != null) _view.StartBtn.interactable = true;
             _view.SetRoomCode("");
             _view.SetDrawerStatus("");
+            UpdateStartButton();
         }
 
         private void SetStartLabel(string label)
@@ -349,13 +424,32 @@ namespace DualEnigma.UI
             }
         }
 
-        /// <summary>邀请好友进房（房间码取当前连接）</summary>
+        /// <summary>邀请好友进房（流程 A）：未在房时先静默建房，ConnectAck 后自动发出</summary>
         private void OnInviteFriendClicked(FriendData friend)
         {
             if (_api == null) return;
-            string roomCode = NetworkSystem.HasInstance ? NetworkSystem.Instance.CurrentRoomCode : "";
 
-            if (string.IsNullOrEmpty(roomCode))
+            string roomCode = NetworkSystem.HasInstance ? NetworkSystem.Instance.CurrentRoomCode : "";
+            if (_roomReady && !string.IsNullOrEmpty(roomCode))
+            {
+                SendInvite(friend, roomCode);
+                return;
+            }
+
+            // 未在房：静默自动建房，拿到房间码后补发邀请（任务 A.1/A.2）
+            if (_connecting || GameServerClient.Instance.IsConnected)
+            {
+                _view.SetDrawerStatus("房间正在建立，请稍候...");
+                return;
+            }
+            _view.SetDrawerStatus("正在创建房间，完成后将自动邀请 " + friend.displayName);
+            ConnectSilently(friend);
+        }
+
+        /// <summary>发出 REST 邀请（房间码取当前连接）</summary>
+        private void SendInvite(FriendData friend, string roomCode)
+        {
+            if (_api == null || string.IsNullOrEmpty(roomCode))
             {
                 _view.SetDrawerStatus("房间尚未就绪，请稍候再试");
                 return;
