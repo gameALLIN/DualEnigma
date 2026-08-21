@@ -47,13 +47,17 @@ public class GameStateMachine {
     private void nextPhase() {
         GamePhase[] phases = GamePhase.values();
         int nextIndex = (currentPhase.ordinal() + 1) % phases.length;
-        setPhase(phases[nextIndex]);
 
         // 7 阶段循环完成 = 一轮结束
         if (nextIndex == 0) {
+            if (!room.getGameManager().advanceRound()) {
+                log.info("All 36 rounds completed, game finished");
+                stop();
+                return;
+            }
             log.info("Round completed, advancing to next round");
-            // TODO: 推进 chapter/section/round
         }
+        setPhase(phases[nextIndex]);
     }
 
     /**
@@ -63,8 +67,6 @@ public class GameStateMachine {
         currentPhase = phase;
         phaseEndTime = System.currentTimeMillis() + Constants.getPhaseDurationMs(phase);
 
-        onPhaseEnter(phase);
-
         // 构建广播消息
         S2C_PhaseChange change = new S2C_PhaseChange();
         change.setPlayerId(-1);
@@ -72,43 +74,12 @@ public class GameStateMachine {
         change.getData().setPhase(phase);
         change.getData().setDurationMs((int) Constants.getPhaseDurationMs(phase));
         change.getData().setPhaseEndTime(phaseEndTime);
-
         room.broadcastToAll(change);
-        log.info("Phase changed to: {} (duration={}ms)", phase, Constants.getPhaseDurationMs(phase));
-    }
 
-    /**
-     * 阶段进入回调.
-     */
-    private void onPhaseEnter(GamePhase phase) {
-        switch (phase) {
-            case Preview -> {
-                // 选灾难 + 生成碎片计划
-                log.debug("Preview phase: generating disaster + fragment plan");
-            }
-            case FragmentCollect -> {
-                // 下发掉落计划
-                log.debug("FragmentCollect phase: sending drop plan");
-            }
-            case DisasterPreview -> {
-                log.debug("DisasterPreview phase");
-            }
-            case Build -> {
-                log.debug("Build phase");
-            }
-            case DisasterImpact -> {
-                // 启动灾难模拟
-                log.debug("DisasterImpact phase: starting disaster simulation");
-            }
-            case Rest -> {
-                // 同步建筑 HP
-                log.debug("Rest phase: syncing building HP");
-            }
-            case Upgrade -> {
-                // 推送天赋 3 选 1
-                log.debug("Upgrade phase: pushing talent options");
-            }
-        }
+        // 阶段进入钩子（在 PhaseChange 广播之后，保证客户端先知道阶段再收阶段内容）
+        room.getGameManager().onPhaseEnter(phase);
+
+        log.info("Phase changed to: {} (duration={}ms)", phase, Constants.getPhaseDurationMs(phase));
     }
 
     public GamePhase getCurrentPhase() { return currentPhase; }

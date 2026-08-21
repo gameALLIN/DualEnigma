@@ -49,6 +49,8 @@ public final class Constants {
     // ─── 碎片 ───
     public static final long SIMULTANEOUS_WINDOW_MS = 100;
     public static final float FRAGMENT_DESPAWN_SEC = 3.0f;
+    /** 同接几何判定半径（格）：双方玩家距碎片均在此半径内判为同时接住 */
+    public static final float FRAGMENT_CATCH_RADIUS = 1.2f;
 
     // ─── 庇护 ───
     public static final float MAX_SHELTER_ENERGY = 100f;

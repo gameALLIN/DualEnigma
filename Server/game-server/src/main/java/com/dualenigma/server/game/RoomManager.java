@@ -1,7 +1,9 @@
 package com.dualenigma.server.game;
 
 import com.dualenigma.network.ClientSession;
+import com.dualenigma.network.HeartbeatManager;
 import com.dualenigma.network.MessageCodec;
+import com.dualenigma.server.logic.ConflictResolver;
 import com.dualenigma.server.logic.FragmentPlanner;
 import com.dualenigma.server.util.IdGenerator;
 import com.dualenigma.network.protocol.s2c.S2C_ConnectAck;
@@ -11,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import jakarta.annotation.PostConstruct;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,7 +27,7 @@ import java.util.concurrent.ConcurrentMap;
  * 房主把 roomCode 通过 account-server 邀请好友，实现好友开房.
  */
 @Component
-public class RoomManager {
+public class RoomManager implements HeartbeatManager.DisconnectListener {
 
     private static final Logger log = LoggerFactory.getLogger(RoomManager.class);
 
@@ -31,13 +35,46 @@ public class RoomManager {
     private final Queue<GameRoom> waitingQueue = new ConcurrentLinkedQueue<>();
     private final MessageCodec messageCodec;
     private final FragmentPlanner fragmentPlanner;
+    private final ConflictResolver conflictResolver;
     private final OnlineRegistry onlineRegistry;
+    private final HeartbeatManager heartbeatManager;
 
     public RoomManager(MessageCodec messageCodec, FragmentPlanner fragmentPlanner,
-                       OnlineRegistry onlineRegistry) {
+                       ConflictResolver conflictResolver, OnlineRegistry onlineRegistry,
+                       HeartbeatManager heartbeatManager) {
         this.messageCodec = messageCodec;
         this.fragmentPlanner = fragmentPlanner;
+        this.conflictResolver = conflictResolver;
         this.onlineRegistry = onlineRegistry;
+        this.heartbeatManager = heartbeatManager;
+    }
+
+    @PostConstruct
+    public void init() {
+        // 会话断开 → 房间断线处理（释放席位/通知对方/空房回收）
+        heartbeatManager.addDisconnectListener(this);
+    }
+
+    /**
+     * 会话断开回调（HeartbeatManager 触发）.
+     * 找到会话所在房间 → 释放席位并通知对方；大厅房清空则立即回收.
+     */
+    @Override
+    public void onDisconnect(ClientSession session) {
+        String roomCode = session.getRoomCode();
+        if (roomCode == null || roomCode.isEmpty()) return;
+
+        GameRoom room = rooms.get(roomCode);
+        if (room == null) return;
+
+        room.onPlayerDisconnect(session.getPlayerId());
+
+        // 大厅房间人走空 → 立即回收（防止空房残留在匹配队列）
+        if (!room.isGameStarted() && room.getPlayerCount() <= 0) {
+            rooms.remove(roomCode);
+            waitingQueue.remove(room);
+            log.info("Empty lobby room {} removed", roomCode);
+        }
     }
 
     /**
@@ -72,7 +109,7 @@ public class RoomManager {
             while (rooms.containsKey(newCode)) {
                 newCode = IdGenerator.nextRoomCode();
             }
-            GameRoom newRoom = new GameRoom(newCode, messageCodec, fragmentPlanner);
+            GameRoom newRoom = new GameRoom(newCode, messageCodec, fragmentPlanner, conflictResolver);
             rooms.put(newCode, newRoom);
             addPlayerToRoom(newRoom, session);
             waitingQueue.add(newRoom);

@@ -29,11 +29,17 @@ network (纯基础设施, 零业务依赖)
 mysql -u root -p < account-server/src/main/resources/db/schema.sql
 mysql -u root -p < game-server/src/main/resources/db/schema.sql
 
-# 3. 分别启动（两个终端）
+# 3. 全量构建（含 network 模块，安装到本地仓库）
 cd Server
-mvn -pl game-server -am spring-boot:run      # 终端 1: 游戏服 :8080
-mvn -pl account-server -am spring-boot:run   # 终端 2: 账号服 :8081
+mvn install -DskipTests
+
+# 4. 分别启动（两个终端）
+java -jar game-server/target/game-server-1.0.0.jar       # 终端 1: 游戏服 :8080
+java -jar account-server/target/account-server-1.0.0.jar # 终端 2: 账号服 :8081
 ```
+
+> 注意：`mvn -pl game-server -am spring-boot:run` 会因 reactor 包含父 POM 报
+> "Unable to find a suitable main class"，请勿使用。
 
 ### Mac Linux Docker 部署
 

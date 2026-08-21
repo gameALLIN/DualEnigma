@@ -273,7 +273,9 @@ namespace DualEnigma.Fragment
                     fragmentId = fragmentId,
                     playerId = pending.playerId,
                     isJumping = pending.isJumping,
-                    multiplier = multiplier
+                    multiplier = multiplier,
+                    posX = pending.fragment != null ? pending.fragment.transform.position.x : 0f,
+                    posY = pending.fragment != null ? pending.fragment.transform.position.y : 0f
                 });
 
                 // 为第二个玩家发布事件
@@ -282,7 +284,9 @@ namespace DualEnigma.Fragment
                     fragmentId = fragmentId,
                     playerId = playerId,
                     isJumping = isJumping,
-                    multiplier = multiplier
+                    multiplier = multiplier,
+                    posX = fragment.transform.position.x,
+                    posY = fragment.transform.position.y
                 });
 
                 // 被动技能检查（双方均触发，同时接住概率100%）
@@ -363,7 +367,9 @@ namespace DualEnigma.Fragment
                 fragmentId = fragmentId,
                 playerId = pending.playerId,
                 isJumping = pending.isJumping,
-                multiplier = multiplier
+                multiplier = multiplier,
+                posX = pending.fragment != null ? pending.fragment.transform.position.x : 0f,
+                posY = pending.fragment != null ? pending.fragment.transform.position.y : 0f
             });
 
             // 被动技能检查（地面接住概率30%，跳跃接住概率50%）

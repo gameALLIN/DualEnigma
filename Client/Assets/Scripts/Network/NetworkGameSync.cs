@@ -27,7 +27,7 @@ namespace DualEnigma.Network
             if (!NetworkSystem.HasInstance || !NetworkSystem.Instance.IsConnected) return;
             if (e.playerId != NetworkSystem.Instance.LocalPlayerId) return;
 
-            GameServerClient.Instance.SendFragmentCaught(e.fragmentId);
+            GameServerClient.Instance.SendFragmentCaught(e.fragmentId, e.posX, e.posY);
         }
 
         protected override void OnDestroy()

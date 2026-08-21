@@ -4,8 +4,9 @@ import com.dualenigma.network.ClientSession;
 import com.dualenigma.network.MessageCodec;
 import com.dualenigma.network.protocol.Message;
 import com.dualenigma.network.protocol.c2s.C2S_HighFreqState;
-import com.dualenigma.network.protocol.s2c.S2C_FragmentResult;
 import com.dualenigma.network.protocol.s2c.S2C_HighFreqState;
+import com.dualenigma.network.protocol.s2c.S2C_OpponentDisconnect;
+import com.dualenigma.server.logic.ConflictResolver;
 import com.dualenigma.server.logic.FragmentPlanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,6 @@ public class GameRoom {
     private final ClientSession[] players = new ClientSession[2];
     private final GameManager gameManager;
     private final MessageCodec messageCodec;
-    private final FragmentPlanner fragmentPlanner;
     private final long createdAt = System.currentTimeMillis();
     private int playerCount = 0;
     private boolean gameStarted = false;
@@ -30,11 +30,11 @@ public class GameRoom {
     /** 未开局房间的最大存活时间（毫秒），超时由 RoomManager 回收 */
     private static final long LOBBY_TIMEOUT_MS = 10 * 60 * 1000L;
 
-    public GameRoom(String roomCode, MessageCodec messageCodec, FragmentPlanner fragmentPlanner) {
+    public GameRoom(String roomCode, MessageCodec messageCodec, FragmentPlanner fragmentPlanner,
+                    ConflictResolver conflictResolver) {
         this.roomCode = roomCode;
         this.messageCodec = messageCodec;
-        this.fragmentPlanner = fragmentPlanner;
-        this.gameManager = new GameManager(this, fragmentPlanner);
+        this.gameManager = new GameManager(this, fragmentPlanner, conflictResolver);
     }
 
     /**
@@ -73,11 +73,28 @@ public class GameRoom {
     }
 
     /**
-     * 玩家断线.
+     * 玩家断线（WebSocket 关闭/心跳超时，由 RoomManager 回调）.
+     * 大厅阶段：释放席位并通知对方（对方客户端将开始按钮置灰，房主可重新邀请）.
+     * 对局阶段：保留席位（重连窗口/AI 接管归断线重连里程碑），仅通知对方.
      */
     public void onPlayerDisconnect(int playerId) {
-        log.info("Player {} disconnected from room {}", playerId, roomCode);
-        // TODO: 通知对方 → 启动重连计时器 → 30s 后 AI 接管 → 120s 超时
+        if (playerId < 0 || playerId > 1) return;
+        if (players[playerId] == null) return; // 未入房或已处理
+
+        players[playerId] = null;
+        log.info("Player {} disconnected from room {} (started={})", playerId, roomCode, gameStarted);
+
+        if (!gameStarted) {
+            // 大厅阶段释放席位，房主可再邀请新好友补位
+            playerCount--;
+        }
+
+        S2C_OpponentDisconnect msg = new S2C_OpponentDisconnect();
+        msg.setPlayerId(playerId);
+        msg.setTimestamp(System.currentTimeMillis());
+        // lobby=大厅离开（重置开始按钮）；waiting=对局中断线（等待重连/AI 接管）
+        msg.getData().setState(gameStarted ? "waiting" : "lobby");
+        broadcastToAll(msg);
     }
 
     /** 房间内两名玩家的会话（元素可能为 null，供满员广播使用） */
@@ -143,20 +160,9 @@ public class GameRoom {
         }
     }
 
-    public void onFragmentCaught(int playerId, int fragmentId) {
-        // MVP：透传判定结果给双方（权威计分/同接判定/倍率归 M5）
-        try {
-            S2C_FragmentResult result = new S2C_FragmentResult();
-            result.setTimestamp(System.currentTimeMillis());
-            result.getData().setFragmentId(fragmentId);
-            result.getData().setPlayerId(playerId);
-            result.getData().setMultiplier(1);
-            result.getData().setSimultaneous(false);
-            broadcastToAll(result);
-            log.info("Fragment {} caught by player {} in room {}", fragmentId, playerId, roomCode);
-        } catch (Exception e) {
-            log.warn("Failed to broadcast fragment result: {}", e.getMessage());
-        }
+    public void onFragmentCaught(int playerId, int fragmentId, float fragX, float fragY) {
+        // 几何仲裁 + 记账在 GameManager（同接翻倍/防重/结果广播）
+        gameManager.onFragmentCaught(playerId, fragmentId, fragX, fragY);
     }
 
     public void onBuildingPlace(int playerId, int buildingType, int material, int gridX, int gridY) {

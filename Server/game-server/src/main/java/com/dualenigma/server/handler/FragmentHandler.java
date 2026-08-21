@@ -35,10 +35,12 @@ public class FragmentHandler implements MessageHandler {
     @Override
     public void handle(ClientSession session, Message msg) {
         C2S_FragmentCaught caught = (C2S_FragmentCaught) msg;
-        int fragmentId = caught.getData().getFragmentId();
         GameRoom room = roomManager.getRoom(session.getRoomCode());
         if (room != null) {
-            room.onFragmentCaught(session.getPlayerId(), fragmentId);
+            room.onFragmentCaught(session.getPlayerId(),
+                    caught.getData().getFragmentId(),
+                    caught.getData().getPosX(),
+                    caught.getData().getPosY());
         }
     }
 }

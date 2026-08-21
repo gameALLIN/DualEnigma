@@ -25,6 +25,8 @@ namespace DualEnigma.Core
         public byte playerId;
         public bool isJumping;
         public int multiplier;
+        public float posX;   // 接住瞬间碎片世界坐标（服务器同接几何判定用）
+        public float posY;
     }
 
     /// <summary>碎片自然消失事件（由 FragmentController 发布，FragmentSystem 订阅）</summary>
