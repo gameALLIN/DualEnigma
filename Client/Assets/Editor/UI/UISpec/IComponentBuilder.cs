@@ -89,6 +89,7 @@ namespace DualEnigma.UI.Editor
                 { "Mask", new MaskBuilder() },
                 { "HorizontalLayoutGroup", new LayoutGroupBuilder(true) },
                 { "VerticalLayoutGroup", new LayoutGroupBuilder(false) },
+                { "LayoutElement", new LayoutElementBuilder() },
                 { "Slider", new SliderBuilder() },
                 { "Toggle", new ToggleBuilder() },
             };

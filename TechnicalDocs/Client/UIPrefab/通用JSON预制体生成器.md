@@ -1,8 +1,8 @@
 # 通用 JSON 预制体生成器（ui-spec 解释器）
 
-> **文档版本**: v1.0  
-> **最后更新**: 2026-08-20  
-> **文档状态**: 设计定稿（工具待实现，实施计划见 §九）  
+> **文档版本**: v1.1  
+> **最后更新**: 2026-08-21  
+> **文档状态**: 工具已实现（ref 嵌套预制体与 LayoutElement 已落地；手写生成器退役见 §六）  
 > **用途**: 定义「HTML 设计稿 → Unity 预制体」的通用 JSON 解释器方案，替代现有 9 个手写预制体生成器，闭合 UI 制作流程的数据链路  
 > **关联文档**: `TechnicalDocs/Client/UI系统.md`（MVC 架构与绑定规范）、`TechnicalDocs/Client/UIPrefab/index.html`（设计稿索引与工作流说明）、`TechnicalDocs/Client/UIPrefab/HTML可视化编辑器.md`（布局可视化编辑，上游工具）、`TechnicalDocs/Client/UIPrefab/tools/gen_ui_html.py`（反向导出工具）
 
@@ -170,6 +170,7 @@ GameObject 树
 | `ScrollRect` | 复用 `background` | **约定子节点**：`Viewport`（Mask+Image，showMaskGraphic=false）内含 `XxxContent`（LayoutGroup 节点）；解释器自动接线 viewport/content；horizontal=false，scrollSensitivity=20 |
 | `Mask` | 复用 `background` | showMaskGraphic=false，白色底 |
 | `HorizontalLayoutGroup` / `VerticalLayoutGroup` | `layout: {type, spacing, padding[左,上,右,下], align}` | childControlWidth/Height=false，childForceExpandWidth/Height=false（与手写生成器一致）；容器 size 为 0 时按内容撑开（viewer 同规则） |
+| `LayoutElement`（v1.3） | 复用 `size`（preferredWidth/Height）+ 可选 `flexibleWidth` | 布局容器内子节点的首选尺寸声明；`flexibleWidth>0` 弹性占满剩余空间（如 FriendItem 昵称列）。运行时窄容器回流（`FriendItem.SetCompactLayout`）依赖 preferredWidth |
 | `Slider` | 复用 `background` | **约定子节点**：`FillArea`（内含 Fill）+ `HandleArea`（内含 Handle），解释器补建 Fill/Handle 图形并接线 |
 | `Toggle` | — | **约定子节点**：`Background`（内含 Checkmark）+ `Label`；解释器补建 Checkmark 并接线 graphic |
 | `Xxx.cs` | — | 脚本组件：类名解析（见 §5.5）后 AddComponent；View 挂根节点后自动设置 UIAutoBinder.ViewTypeName |
@@ -178,20 +179,23 @@ GameObject 树
 
 `#RRGGBB`（不透明）与 `rgba(r,g,b,a)`（半透明，如 Placeholder 的 `rgba(144,164,174,0.50)`）；与 viewer.js 的 CSS 渲染格式保持一致。
 
-### 4.4 v1.2 扩展字段（新增提案）
+### 4.4 v1.2/v1.3 扩展字段
 
-现有 10 份设计稿未用到、但通用化后需要的能力：
+| 字段 | 类型 | 用途 | 示例 | 状态 |
+|------|------|------|------|------|
+| `ref` | string | 嵌套预制体实例（相对 `AssetPackage/Prefabs/UI/` 的路径），实例化后保留 spec 中的锚点/位置/尺寸覆盖；`children`/`components` 被忽略（结构由被引用预制体决定）；命名 `m_Xxx` 照常参与 View 字段绑定 | `"ref": "Common/FriendItem"` | ✅ 已实现（v1.3） |
+| `flexibleWidth` | number | LayoutElement 弹性宽度（>0 时该列在布局容器中弹性占满剩余空间） | `"flexibleWidth": 1` | ✅ 已实现（v1.3） |
+| `note` | string | 节点备注（仅文档用途，解释器忽略） | `"note": "行模板，运行时克隆"` | ✅ |
+| `sprite` | string | 引用程序化 Sprite 资产路径（如渐变背景），Image 用 sprite 替代纯色 | `"sprite": "Textures/UI/BgGradient"` | ✅ |
+| `fontStyle` | string | Text 斜体/加粗（Placeholder 需斜体，当前为隐式约定） | `"fontStyle": "italic"` | ✅ |
+| `scale` | `[sx, sy]` | 节点缩放 → RectTransform.localScale（默认 [1,1]；由 HTML 可视化编辑器写入） | `"scale": [1.2, 1.2]` | ✅ |
+| `rotation` | number | 旋转角度(deg) → localRotation = Euler(0,0,deg)（默认 0；编辑器属性面板写入） | `"rotation": 15` | ✅ |
 
-| 字段 | 类型 | 用途 | 示例 |
-|------|------|------|------|
-| `ref` | string | 嵌套预制体实例（相对 `AssetPackage/Prefabs/UI/` 的路径），实例化后保留 spec 中的锚点覆盖 | `"ref": "Common/FriendItem"` |
-| `note` | string | 节点备注（仅文档用途，解释器忽略；tools/UIHome.spec.json 已有先例） | `"note": "行模板，运行时克隆"` |
-| `sprite` | string | 引用程序化 Sprite 资产路径（如渐变背景），Image 用 sprite 替代纯色 | `"sprite": "Textures/UI/BgGradient"` |
-| `fontStyle` | string | Text 斜体/加粗（Placeholder 需斜体，当前为隐式约定） | `"fontStyle": "italic"` |
-| `scale` | `[sx, sy]` | 节点缩放 → RectTransform.localScale（默认 [1,1]；由 HTML 可视化编辑器写入） | `"scale": [1.2, 1.2]` |
-| `rotation` | number | 旋转角度(deg) → localRotation = Euler(0,0,deg)（默认 0；编辑器属性面板写入） | `"rotation": 15` |
-
-> **兼容性**：扩展字段全部可选，旧规格零改动即可被解释。viewer.js 未识别的字段自然忽略，预览不受影响。
+> **兼容性**：扩展字段全部可选，旧规格零改动即可被解释。viewer.js 未识别的字段自然忽略，预览不受影响（flexibleWidth 列预览按首选宽近似渲染）。
+>
+> **ref 依赖顺序**：引用页（如 UIHome）生成前，被引用页（如 Common）的预制体必须已存在——批量生成时先勾选 Common。
+>
+> **ref 与反向导出**：gen_ui_html.py 反向导出时嵌套实例按 Unity YAML 属 stripped 对象，导出结果中该节点缺失（diff 对账时忽略 ref 节点即可）。
 
 ---
 
@@ -360,12 +364,12 @@ GameObject BuildNode(UISpecNode node, Transform parent, BuildContext ctx)
 
 ## 九、实施计划
 
-| 阶段 | 内容 | 验收标准 | 预估 |
-|------|------|---------|------|
-| P0 核心链路 | UISpecExtractor / UISpecNode / PrefabBuilder（RectTransform+Image+Text+Button+脚本组件）/ ViewBinder / 菜单窗口 | 用 UITest、UIHome 生成预制体，与手写产物经 gen_ui_html.py 反向导出 diff，布局/颜色/文案一致 | ~1 天 |
-| P1 复合组件 | InputField / ScrollRect / Mask / LayoutGroup / Slider / Toggle + 干跑校验完整规则 | UILogin（InputField）、UIFriends（ScrollRect+行模板）、UISettings（Slider/Toggle）三个最复杂页面通过 diff 验证 | ~1 天 |
-| P2 迁移退役 | 9 页面 + Common 全量迁移；逐个 diff 验证；删除 10 个手写生成器 + UIPrefabCreator | 全部页面由通用生成器产出；`Client/Assets/Editor/` 下 Generate*UI*.cs 清零；工程编译 0 error | ~0.5 天 |
-| P3 增强项 | 嵌套预制体 ref、sprite/渐变、批量生成窗口、一致性校验菜单化 | UIFriends 行模板改用 ref 实例化 FriendItem | ~0.5 天 |
+| 阶段 | 内容 | 验收标准 | 预估 | 状态 |
+|------|------|---------|------|------|
+| P0 核心链路 | UISpecExtractor / UISpecNode / PrefabBuilder（RectTransform+Image+Text+Button+脚本组件）/ ViewBinder / 菜单窗口 | 用 UITest、UIHome 生成预制体，与手写产物经 gen_ui_html.py 反向导出 diff，布局/颜色/文案一致 | ~1 天 | ✅ |
+| P1 复合组件 | InputField / ScrollRect / Mask / LayoutGroup / Slider / Toggle + 干跑校验完整规则 | UILogin（InputField）、UIFriends（ScrollRect+行模板）、UISettings（Slider/Toggle）三个最复杂页面通过 diff 验证 | ~1 天 | ✅ |
+| P2 迁移退役 | 9 页面 + Common 全量迁移；逐个 diff 验证；删除 10 个手写生成器 + UIPrefabCreator | 全部页面由通用生成器产出；`Client/Assets/Editor/` 下 Generate*UI*.cs 清零；工程编译 0 error | ~0.5 天 | 🔲 待执行 |
+| P3 增强项 | 嵌套预制体 ref、LayoutElement、sprite/渐变、批量生成窗口、一致性校验菜单化 | UIHome 行模板 ref 实例化 Common/FriendItem 并自动绑定 m_FriendRowTemplate；FriendItem 布局驱动（HorizontalLayoutGroup + LayoutElement） | ~0.5 天 | ✅ 2026-08-21 |
 
 > **验证方法**：以现有 9 个预制体为基准（手写生成器的产物），通用生成器重新产出后用 `gen_ui_html.py` 分别反向导出 HTML，比对两份 ui-spec JSON——节点树、锚点/位置/尺寸、颜色、文案逐字段一致（数值容差 ±0.5）即为通过。这本身也是对能力 10（一致性闭环）的首场实战。
 >
@@ -375,11 +379,12 @@ GameObject BuildNode(UISpecNode node, Transform parent, BuildContext ctx)
 
 ## 十、待定事项
 
-- [ ] `gen_ui_html.py` 清理行为调整：重跑时不再删除目录下 `*.md`（本文档及后续技术文档的存续依赖此项）→ 🔲 待实现 P3 前完成
+- [ ] `gen_ui_html.py` 清理行为调整：重跑时不再删除目录下 `*.md`（本文档及后续技术文档的存续依赖此项）→ 🔲 待实现 P2 前完成
+- [ ] `gen_ui_html.py` 反向导出 ref 节点（嵌套实例为 stripped 对象，目前导出缺失该节点；对账时忽略即可）→ 后续按需
 - [ ] 全量重建 vs 增量保留人工修改 → 当前决策：全量重建（§8.1），后续如有强需求再引入白名单节点
 - [ ] `tools/*.spec.json` 处置：标记废弃 or 由反向导出覆盖 → 🔲 待讨论
-- [ ] 脚本组件类型解析范围：固定命名空间列表 vs 全程序集扫描 → 当前决策：固定列表（§5.5），解析失败即报错兜底
-- [ ] View 绑定的类型推断细节：节点同时挂多个组件时按字段类型优先级（具体组件 > Transform > GameObject）→ 待实现时确认
+- [x] 脚本组件类型解析范围：固定命名空间列表 vs 全程序集扫描 → 已实现固定列表（§5.5）+ 全程序集简名兜底
+- [x] View 绑定的类型推断细节：节点同时挂多个组件时按字段类型优先级（具体组件 > Transform > GameObject）→ 已实现 ResolveReference（§5.6）；子节点自身挂绑定目标组件时允许命中其本身（行模板引用场景），但不跨越其边界下钻
 - [ ] index.html 工作流描述更新（"由后续生成工具解析 JSON 产出..."改为本工具实际菜单路径）→ P2 完成后同步
 
 ---

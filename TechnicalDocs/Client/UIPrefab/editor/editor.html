@@ -22,17 +22,27 @@
   <!-- 中栏：工具栏 + 画布 + 状态栏 -->
   <main id="center">
     <div id="toolbar">
+      <div id="toolGroup">
+        <button class="tool-btn" data-tool="pan" title="平移视图 (Q)">✋</button>
+        <button class="tool-btn" data-tool="move" title="移动 (W) — 拖动改位置，方向键微调">✥</button>
+        <button class="tool-btn" data-tool="rotate" title="旋转 (E) — 绕轴心拖动，Shift 吸附 15°">⟳</button>
+        <button class="tool-btn" data-tool="scale" title="缩放 (R) — 拖动手柄改 scale，拖本体等比">⤢</button>
+        <button class="tool-btn active" data-tool="rect" title="矩形 (T) — 手柄改尺寸">▭</button>
+      </div>
+      <span class="sep"></span>
       <label>缩放 <select id="zoom">
         <option value="0.25">25%</option><option value="0.5" selected>50%</option>
         <option value="0.75">75%</option><option value="1">100%</option>
         <option value="1.5">150%</option><option value="2">200%</option>
       </select></label>
-      <label><input type="checkbox" id="gridOn"> 网格</label>
-      <label><input type="checkbox" id="snapOn" checked> 吸附</label>
-      <label>步长 <select id="snapStep">
-        <option value="1" selected>1px</option><option value="2">2px</option>
-        <option value="4">4px</option><option value="8">8px</option>
-      </select></label>
+      <label title="网格 (G)"><input type="checkbox" id="gridOn"> 网格</label>
+      <span id="snapGroup" class="on" title="吸附 (S) 开关">
+        <label><input type="checkbox" id="snapOn" checked> 🧲吸附</label>
+        <select id="snapStep">
+          <option value="1" selected>1px</option><option value="2">2px</option>
+          <option value="4">4px</option><option value="8">8px</option>
+        </select>
+      </span>
       <span class="sep"></span>
       <button id="undoBtn" title="Ctrl+Z">↶ 撤销</button>
       <button id="redoBtn" title="Ctrl+Shift+Z / Ctrl+Y">↷ 重做</button>
@@ -41,7 +51,7 @@
       <span id="dirtyMark" class="dirty" title="有未保存改动">●</span>
     </div>
     <div id="canvasWrap">
-      <div id="canvas" class="canvas">
+      <div id="canvas" class="canvas tool-rect">
         <div id="canvasContent"></div>
         <div id="selection" class="selection" hidden>
           <div class="handle" data-dir="nw"></div><div class="handle" data-dir="n"></div>
@@ -49,9 +59,11 @@
           <div class="handle" data-dir="se"></div><div class="handle" data-dir="s"></div>
           <div class="handle" data-dir="sw"></div><div class="handle" data-dir="w"></div>
         </div>
+        <div id="dragBadge" hidden></div>
       </div>
     </div>
-    <div id="statusbar"><span id="statusPath">未选择节点</span><span id="statusMsg"></span></div>
+    <div id="snapHint" class="on">🧲 吸附 1px</div>
+    <div id="statusbar"><span id="statusPath">未选择节点</span><span id="statusTool"></span><span id="statusMsg"></span></div>
   </main>
 
   <!-- 右栏：属性面板 -->

@@ -144,6 +144,9 @@ namespace DualEnigma.UI.Editor
         /// <summary>旋转角度（度）→ localRotation = Euler(0, 0, deg)</summary>
         public float rotation;
 
+        /// <summary>弹性宽度（仅 LayoutElement 节点；&gt;0 时该列在布局中弹性占满剩余空间）</summary>
+        public float flexibleWidth;
+
         // ===== 便捷访问 =====
 
         /// <summary>pivot 向量</summary>

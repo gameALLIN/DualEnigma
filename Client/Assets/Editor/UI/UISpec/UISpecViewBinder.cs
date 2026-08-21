@@ -161,12 +161,12 @@ namespace DualEnigma.UI.Editor
             for (int i = 0; i < node.childCount; i++)
             {
                 Transform child = node.GetChild(i);
-                // 嵌套视图边界：子节点挂有其他绑定目标组件时不下钻
-                if (!HostsOtherBindTarget(child, self))
-                {
-                    Transform hit = FindRecursive(child, nodeName, self, false);
-                    if (hit != null) return hit;
-                }
+                // 子节点本身允许命中（如行模板节点挂行视图/FriendItem 组件，
+                // 父 View 正是要引用这个节点对象）；但不跨越其边界继续下钻
+                if (child.name == nodeName) return child;
+                if (HostsOtherBindTarget(child, self)) continue;
+                Transform hit = FindRecursive(child, nodeName, self, false);
+                if (hit != null) return hit;
             }
             return null;
         }

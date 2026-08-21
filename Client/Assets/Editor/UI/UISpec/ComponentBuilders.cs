@@ -182,6 +182,23 @@ namespace DualEnigma.UI.Editor
         }
     }
 
+    /// <summary>
+    /// LayoutElement（v1.3）：preferredWidth/Height 取节点 size（布局容器内即首选尺寸），
+    /// flexibleWidth 可选（&gt;0 时该列弹性占满剩余空间，如好友行昵称列）。
+    /// 供运行时窄容器回流（FriendItem.SetCompactLayout 依赖 preferredWidth）。
+    /// </summary>
+    public sealed class LayoutElementBuilder : IComponentBuilder
+    {
+        public void Build(GameObject go, UISpecNode node, BuildContext ctx)
+        {
+            LayoutElement le = go.AddComponent<LayoutElement>();
+            Vector2 size = node.Size;
+            le.preferredWidth = size.x;
+            le.preferredHeight = size.y;
+            le.flexibleWidth = node.flexibleWidth;
+        }
+    }
+
     /// <summary>Slider：Fill/Handle 图形接线在二次处理阶段完成</summary>
     public sealed class SliderBuilder : IComponentBuilder
     {

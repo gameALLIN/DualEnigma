@@ -1,7 +1,7 @@
 /// ============================================================
 /// 文件名: FriendItem.cs
 /// 创建时间: 2026-08-18
-/// 最后更新: 2026-08-18
+/// 最后更新: 2026-08-21
 /// 作者: DualEnigma
 /// 描述: 好友条目通用组件（水平列表容器驱动）。行内子控件由
 ///       HorizontalLayoutGroup + LayoutElement 排布：昵称列弹性占满、
@@ -107,11 +107,15 @@ namespace DualEnigma.UI
             return item;
         }
 
-        /// <summary>子控件缺失时程序化补建（纯代码形态 / 预制体漏绑兜底）；并缓存 LayoutElement</summary>
+        /// <summary>子控件缺失时程序化补建（纯代码形态 / 预制体漏绑兜底）；并缓存 LayoutElement。
+        /// m_Bg 允许绑到根节点自身 Image（spec 绑定器只搜子节点，自引用由这里兜底），
+        /// 其余子控件任一缺失才整体重建，避免预制体形态下重复创建子节点。</summary>
         private void EnsureControls()
         {
-            if (m_Bg == null || m_NameText == null || m_StatusText == null ||
-                m_IdText == null || m_PrimaryBtn == null || m_SecondaryBtn == null)
+            if (m_Bg == null) m_Bg = GetComponent<Image>();
+
+            if (m_NameText == null || m_StatusText == null || m_IdText == null ||
+                m_PrimaryBtn == null || m_SecondaryBtn == null)
             {
                 BuildChildren();
             }
@@ -138,7 +142,9 @@ namespace DualEnigma.UI
             if (_builtinFont == null)
                 _builtinFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
 
-            m_Bg = gameObject.AddComponent<Image>();
+            // 复用根节点已有 Image（预制体形态），避免重复挂图
+            m_Bg = GetComponent<Image>();
+            if (m_Bg == null) m_Bg = gameObject.AddComponent<Image>();
             m_Bg.color = FRIEND_ROW_BG;
 
             ApplyLayoutSettings(GetComponent<HorizontalLayoutGroup>() ?? gameObject.AddComponent<HorizontalLayoutGroup>());

@@ -13,6 +13,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEditor;
 using UnityEngine;
 
 namespace DualEnigma.UI.Editor
@@ -130,6 +131,16 @@ namespace DualEnigma.UI.Editor
             // 所在子树内最近的视图脚本（绑定目标）决定字段可匹配性的检查对象
             Type viewType = FindNearestViewType(node) ?? parentViewType;
 
+            // v1.3：ref 嵌套预制体节点单独校验，children/components 不参与递归构建
+            if (!string.IsNullOrEmpty(node.@ref))
+            {
+                ValidateRef(node, path, result);
+                ValidateBindingName(node, path, viewType, result);
+                if (node.children != null && node.children.Length > 0)
+                    result.Warning(path, "ref 节点的 children 将被忽略（结构由被引用预制体决定）");
+                return;
+            }
+
             ValidateComponents(node, path, result);
             ValidateConventions(node, path, result);
             ValidateBindingName(node, path, viewType, result);
@@ -138,6 +149,15 @@ namespace DualEnigma.UI.Editor
                 foreach (UISpecNode child in node.children)
                     if (child != null)
                         ValidateNode(child, path + "/" + child.name, viewType, result);
+        }
+
+        /// <summary>ref 节点校验：目标预制体必须存在（相对 PREFAB_ROOT，不含扩展名）</summary>
+        private static void ValidateRef(UISpecNode node, string path, UISpecValidationResult result)
+        {
+            string prefabPath = UISpecPrefabBuilder.PREFAB_ROOT + "/" + node.@ref + ".prefab";
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath) == null)
+                result.Error(path,
+                    $"ref 预制体不存在: {prefabPath}（请先单独生成被引用页面，如 Common）");
         }
 
         /// <summary>在节点脚本组件中查找最近的绑定目标类型（View/行视图等）</summary>

@@ -78,6 +78,10 @@ namespace DualEnigma.UI.Editor
         /// <summary>递归构建单个节点（§5.2）</summary>
         private static GameObject BuildNode(UISpecNode node, Transform parent, BuildContext ctx)
         {
+            // v1.3：ref 嵌套预制体实例化（Common 公共组件，如 FriendItem 行模板）
+            if (!string.IsNullOrEmpty(node.@ref))
+                return InstantiateRefNode(node, parent, ctx);
+
             GameObject go = new GameObject(node.name);
             if (parent != null)
                 go.transform.SetParent(parent, false);
@@ -117,6 +121,50 @@ namespace DualEnigma.UI.Editor
                     if (child != null)
                         BuildNode(child, go.transform, ctx);
 
+            return go;
+        }
+
+        /// <summary>
+        /// v1.3：ref 节点 → 实例化嵌套预制体（相对 PREFAB_ROOT 的路径，如 "Common/FriendItem"）。
+        /// spec 的布局字段（anchors/pivot/position/size/active）覆盖实例默认值；
+        /// children 与 components 被忽略（结构与组件由被引用预制体决定）。
+        /// </summary>
+        private static GameObject InstantiateRefNode(UISpecNode node, Transform parent, BuildContext ctx)
+        {
+            string prefabPath = PREFAB_ROOT + "/" + node.@ref + ".prefab";
+            GameObject source = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            if (source == null)
+            {
+                Debug.LogError($"[UISpec] 节点 {node.name}: ref 预制体未找到 {prefabPath}（需先单独生成被引用页面，如 Common）");
+                // 降级为空容器，保证后续节点不受阻断
+                GameObject fallback = new GameObject(node.name);
+                if (parent != null) fallback.transform.SetParent(parent, false);
+                fallback.AddComponent<RectTransform>();
+                if (!node.active) fallback.SetActive(false);
+                ctx.Register(node, fallback);
+                return fallback;
+            }
+
+            GameObject go = parent != null
+                ? (GameObject)PrefabUtility.InstantiatePrefab(source, parent)
+                : (GameObject)PrefabUtility.InstantiatePrefab(source);
+            go.name = node.name;
+
+            // 布局覆盖：模板的摆放位置由宿主设计稿决定
+            RectTransform rt = go.GetComponent<RectTransform>();
+            if (rt != null)
+            {
+                UISpecAnchors anchors = node.anchors ?? new UISpecAnchors();
+                rt.anchorMin = anchors.Min;
+                rt.anchorMax = anchors.Max;
+                rt.pivot = node.Pivot;
+                rt.anchoredPosition = node.Position;
+                rt.sizeDelta = node.Size;
+            }
+
+            if (!node.active) go.SetActive(false);
+
+            ctx.Register(node, go);
             return go;
         }
 

@@ -22,61 +22,65 @@
 {
  "name": "FriendItem",
  "active": true,
- "components": ["RectTransform", "CanvasRenderer", "Image", "FriendItem.cs"],
+ "components": ["RectTransform", "CanvasRenderer", "Image", "HorizontalLayoutGroup", "FriendItem.cs"],
  "anchors": { "min": [0.5, 0.5], "max": [0.5, 0.5] },
  "pivot": [0.5, 0.5],
  "position": [0.0, 0.0],
  "size": [656.0, 34.0],
- "background": "#243447",
+ "background": "#37474F",
+ "note": "水平列表容器驱动：子列由 HorizontalLayoutGroup + LayoutElement 排布（首选宽=size，昵称列 flexibleWidth=1 弹性占满）。窄容器运行时 SetCompactLayout(width) 自动回流。配色与 FriendItem.cs 运行时常量一致。",
+ "layout": { "type": "horizontal", "spacing": 8, "align": "MiddleLeft", "padding": [12, 0, 12, 0] },
  "children": [
   {
    "name": "NameText",
    "active": true,
-   "components": ["RectTransform", "CanvasRenderer", "Text"],
-   "anchors": { "min": [0.0, 0.5], "max": [0.0, 0.5] },
+   "components": ["RectTransform", "CanvasRenderer", "Text", "LayoutElement"],
+   "anchors": { "min": [0, 0.5], "max": [0, 0.5] },
    "pivot": [0.5, 0.5],
-   "position": [125.0, 0.0],
-   "size": [250.0, 26.0],
+   "position": [0.0, 0.0],
+   "size": [240.0, 26.0],
+   "flexibleWidth": 1,
+   "note": "昵称列：弹性占满剩余宽度（预览按首选宽 240 近似渲染）",
    "text": "昵称 (用户名)",
    "fontSize": 15,
    "align": "MiddleLeft",
-   "color": "#F2F6FA"
+   "color": "#FFFFFF"
   },
   {
    "name": "StatusText",
    "active": true,
-   "components": ["RectTransform", "CanvasRenderer", "Text"],
-   "anchors": { "min": [0.0, 0.5], "max": [0.0, 0.5] },
+   "components": ["RectTransform", "CanvasRenderer", "Text", "LayoutElement"],
+   "anchors": { "min": [0, 0.5], "max": [0, 0.5] },
    "pivot": [0.5, 0.5],
-   "position": [270.0, 0.0],
-   "size": [200.0, 24.0],
+   "position": [0.0, 0.0],
+   "size": [120.0, 24.0],
    "text": "离线",
    "fontSize": 13,
    "align": "MiddleLeft",
-   "color": "#7C8B99"
+   "color": "#B0BEC5"
   },
   {
    "name": "IdText",
    "active": true,
-   "components": ["RectTransform", "CanvasRenderer", "Text"],
-   "anchors": { "min": [1.0, 0.5], "max": [1.0, 0.5] },
+   "components": ["RectTransform", "CanvasRenderer", "Text", "LayoutElement"],
+   "anchors": { "min": [0, 0.5], "max": [0, 0.5] },
    "pivot": [0.5, 0.5],
-   "position": [-192.0, 0.0],
+   "position": [0.0, 0.0],
    "size": [120.0, 24.0],
    "text": "ID:100001",
    "fontSize": 13,
    "align": "MiddleRight",
-   "color": "#7C8B99"
+   "color": "#B0BEC5"
   },
   {
    "name": "PrimaryBtn",
    "active": true,
-   "components": ["RectTransform", "CanvasRenderer", "Image", "Button"],
-   "anchors": { "min": [1.0, 0.5], "max": [1.0, 0.5] },
+   "components": ["RectTransform", "CanvasRenderer", "Image", "Button", "LayoutElement"],
+   "anchors": { "min": [0, 0.5], "max": [0, 0.5] },
    "pivot": [0.5, 0.5],
-   "position": [-80.0, 0.0],
+   "position": [0.0, 0.0],
    "size": [64.0, 26.0],
-   "background": "#45C4E9",
+   "background": "#4FC3F7",
    "children": [
     {
      "name": "Text",
@@ -89,19 +93,19 @@
      "text": "邀请",
      "fontSize": 13,
      "align": "MiddleCenter",
-     "color": "#F2F6FA"
+     "color": "#FFFFFF"
     }
    ]
   },
   {
    "name": "SecondaryBtn",
    "active": true,
-   "components": ["RectTransform", "CanvasRenderer", "Image", "Button"],
-   "anchors": { "min": [1.0, 0.5], "max": [1.0, 0.5] },
+   "components": ["RectTransform", "CanvasRenderer", "Image", "Button", "LayoutElement"],
+   "anchors": { "min": [0, 0.5], "max": [0, 0.5] },
    "pivot": [0.5, 0.5],
-   "position": [-24.0, 0.0],
+   "position": [0.0, 0.0],
    "size": [48.0, 26.0],
-   "background": "#FF8A3D",
+   "background": "#EF5350",
    "children": [
     {
      "name": "Text",
@@ -114,7 +118,7 @@
      "text": "删除",
      "fontSize": 13,
      "align": "MiddleCenter",
-     "color": "#F2F6FA"
+     "color": "#FFFFFF"
     }
    ]
   }

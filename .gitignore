@@ -25,9 +25,15 @@ Thumbs.db
 .codely-cli/commands/
 .codely-cli/tool-outputs/
 .codely-cli/tmp/
+.codely-cli/clipboard/
 .codely-cli/settings.json
 .codelyignore
 .com-unity-codely.json
+
+# ===========================
+# 本地日志
+# ===========================
+Client/mem-log/
 
 # ===========================
 # Unity Build
