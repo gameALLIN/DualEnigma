@@ -293,18 +293,6 @@ MonoBehaviour:
     m_importFrom: Assets/ArtResources/Textures/UI
     m_exportTo: 
     m_variantName: 
-  - m_assetDatabaseId: ec806c54fd6e78e4aa387fa14df28f26
-    m_importFrom: Assets/ArtResources/Textures/UI/UILogin_BgGradient.asset
-    m_exportTo: 
-    m_variantName: 
-  - m_assetDatabaseId: 7ff9f335b7641d243801772b6669f537
-    m_importFrom: Assets/ArtResources/Textures/UI/UILogin_BgGradient_Sprite.asset
-    m_exportTo: 
-    m_variantName: 
-  - m_assetDatabaseId: 7a56916ea757165428227aa3b5a4d455
-    m_importFrom: Assets/AssetPackage/Prefabs/UI/UILogin/UILogin.prefab
-    m_exportTo: 
-    m_variantName: 
   - m_assetDatabaseId: 2b271fc68769bb94b9ec5becec3a7a53
     m_importFrom: Assets/Scripts/Shelter/ShelterParams.cs
     m_exportTo: 
@@ -1021,10 +1009,6 @@ MonoBehaviour:
     m_importFrom: Assets/Scripts/Network/GameServerClient.cs
     m_exportTo: 
     m_variantName: 
-  - m_assetDatabaseId: 93665bc8017042441b29d48ba214f5f3
-    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIInvitePopup/UIInvitePopup.prefab
-    m_exportTo: 
-    m_variantName: 
   - m_assetDatabaseId: 67c23702a871a1448addc0203907cbd9
     m_importFrom: Assets/Scripts/Character/RemoteCharacterDriver.cs
     m_exportTo: 
@@ -1035,10 +1019,6 @@ MonoBehaviour:
     m_variantName: 
   - m_assetDatabaseId: c475d74ec4a1cca4383e2604114fdfa8
     m_importFrom: Assets/Scripts/Character/NetworkCharacterReporter.cs
-    m_exportTo: 
-    m_variantName: 
-  - m_assetDatabaseId: 8651f78b00bf1444d87f79c896ae941f
-    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIRoom/UIRoom.prefab
     m_exportTo: 
     m_variantName: 
   - m_assetDatabaseId: bcb3a4786f469434f9dcc31d3cc045af
@@ -1089,10 +1069,6 @@ MonoBehaviour:
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UISettings
     m_exportTo: 
     m_variantName: 
-  - m_assetDatabaseId: 2a69ab1b2c0ff094a9570008e00ca7c5
-    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIGameHud/UIGameHud.prefab
-    m_exportTo: 
-    m_variantName: 
   - m_assetDatabaseId: 3700caf15d9b81c4b88d85970ae5834c
     m_importFrom: Assets/Scripts/UI/Views/UIGameOver/UIGameOverModel.cs
     m_exportTo: 
@@ -1117,10 +1093,6 @@ MonoBehaviour:
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UIGameOver
     m_exportTo: 
     m_variantName: 
-  - m_assetDatabaseId: 7a0bd9d3113bdd1418ce3f7ae1437a01
-    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIGameOver/UIGameOver.prefab
-    m_exportTo: 
-    m_variantName: 
   - m_assetDatabaseId: 9b4e2f7a1c8d4e35a6f0b2c8d7e14a52
     m_importFrom: Assets/AssetPackage/Prefabs/UI/Common
     m_exportTo: 
@@ -1137,24 +1109,84 @@ MonoBehaviour:
     m_importFrom: Assets/Scripts/UI/Components
     m_exportTo: 
     m_variantName: 
-  - m_assetDatabaseId: 4249823a5ffdb5f4e96ef05c680ac9ee
-    m_importFrom: Assets/AssetPackage/Prefabs/UI/UISettings/UISettings.prefab
+  - m_assetDatabaseId: 75d7197c2398fcc4dbe98510070fd307
+    m_importFrom: Assets/Editor/UI/UISpec/UISpecBuildUtil.cs
     m_exportTo: 
     m_variantName: 
-  - m_assetDatabaseId: 634229ddc3acfba47b36770e0cf8cb5c
-    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIInviteList
+  - m_assetDatabaseId: 61055512cee414b4ab5a04b85d6b6ff5
+    m_importFrom: Assets/Editor/UI/UISpec/UISpecPrefabBuilder.cs
     m_exportTo: 
     m_variantName: 
-  - m_assetDatabaseId: 0f898c8c0cef0824d8fa964c0bd27bcb
-    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIInviteList/UIInviteList.prefab
+  - m_assetDatabaseId: 4743ae502b16fc541ac89dbf903d7203
+    m_importFrom: Assets/Editor/UI/UISpec/UISpecGenerateWindow.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: a7fb2e67ea211894d883f2d34c937740
+    m_importFrom: Assets/Editor/UI/UISpec/UISpecValidator.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 7fc0069493728ea4297777205bd4b6ee
+    m_importFrom: Assets/Editor/UI/UISpec/UISpecViewBinder.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: ced52c34aa2c0274a9f413dcb9e53ccd
+    m_importFrom: Assets/Editor/UI/UISpec/UISpecExtractor.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: bb10d17e006346b429a0b43bc0a109c2
+    m_importFrom: Assets/Editor/UI/UISpec/UISpecNode.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 63ad6825489267e48a1a0450c40e0f68
+    m_importFrom: Assets/Editor/UI/UISpec/IComponentBuilder.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 5f6c56fdae7ab9e4e90fc3bae5df75d1
+    m_importFrom: Assets/Editor/UI/UISpec/ComponentBuilders.cs
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 9300d866952bd194ba97666a6410cd8f
+    m_importFrom: Assets/Editor/UI/UISpec
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: e2a95c31d7f04b8ea6c19d3f2b74e806
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/Common/FriendItem.prefab
     m_exportTo: 
     m_variantName: 
   - m_assetDatabaseId: cfa8920e38871f04083e94e0c3712c64
     m_importFrom: Assets/AssetPackage/Prefabs/UI/UIFriends/UIFriends.prefab
     m_exportTo: 
     m_variantName: 
-  - m_assetDatabaseId: e2a95c31d7f04b8ea6c19d3f2b74e806
-    m_importFrom: Assets/AssetPackage/Prefabs/UI/Common/FriendItem.prefab
+  - m_assetDatabaseId: 2a69ab1b2c0ff094a9570008e00ca7c5
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIGameHud/UIGameHud.prefab
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 7a0bd9d3113bdd1418ce3f7ae1437a01
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIGameOver/UIGameOver.prefab
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 93665bc8017042441b29d48ba214f5f3
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIInvitePopup/UIInvitePopup.prefab
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: ec806c54fd6e78e4aa387fa14df28f26
+    m_importFrom: Assets/ArtResources/Textures/UI/UILogin_BgGradient.asset
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 7ff9f335b7641d243801772b6669f537
+    m_importFrom: Assets/ArtResources/Textures/UI/UILogin_BgGradient_Sprite.asset
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 7a56916ea757165428227aa3b5a4d455
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UILogin/UILogin.prefab
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 8651f78b00bf1444d87f79c896ae941f
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UIRoom/UIRoom.prefab
+    m_exportTo: 
+    m_variantName: 
+  - m_assetDatabaseId: 4249823a5ffdb5f4e96ef05c680ac9ee
+    m_importFrom: Assets/AssetPackage/Prefabs/UI/UISettings/UISettings.prefab
     m_exportTo: 
     m_variantName: 
   - m_assetDatabaseId: 6aeeb201194274d4086e7e024d2961ef
