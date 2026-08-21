@@ -126,7 +126,7 @@ GameObject 树
 | `IComponentBuilder.cs` | 接口：`void Build(GameObject go, UISpecNode node, BuildContext ctx)`；注册表 `Dictionary<string, IComponentBuilder>`，未知组件名 → 校验期报错 |
 | `UISpecPrefabBuilder.cs` | 递归构建入口 + 复合接线（ScrollRect/InputField/Button 的子节点引用） |
 | `UISpecViewBinder.cs` | 遍历 `m_Xxx`/`mi_Xxx` 节点，按 View 字段名/类型绑定（SerializedObject） |
-| `UISpecGenerateWindow.cs` | EditorWindow 菜单：页面多选 / 生成 / 干跑校验；扫描 `TechnicalDocs/Client/UIPrefab/*.html` 列出可选页面 |
+| `UISpecGenerateWindow.cs` | EditorWindow 菜单：页面多选 / 生成 / 干跑校验；扫描 `TechnicalDocs/Client/UIPrefab/pages/*.html` 列出可选页面 |
 
 菜单入口：`DualEnigma > UI > 从设计稿生成预制体`（EditorWindow）；同时提供 `DualEnigma > UI > 校验设计稿`（纯干跑）。
 
@@ -300,8 +300,8 @@ GameObject BuildNode(UISpecNode node, Transform parent, BuildContext ctx)
 | `UIBindingGenerator.cs`（运行时绑定规范） | m_Xxx 规范来源 | **保留**，命名规范被 UISpecViewBinder 复用 |
 | `UIAutoBinder.cs`（ViewTypeName 约定） | 根节点挂载 | **保留**，解释器照常挂载并设置 ViewTypeName |
 | `gen_ui_html.py`（预制体→HTML 反向导出） | 引导期一次性使用 | **保留并复用**为一致性校验工具（§二 能力 10） |
-| `viewer.js` / `index.html`（浏览器预览） | 设计稿渲染 | **保留**，改用抽出的 spec-core.js 公共数学（v1.2 的 scale/rotation 预览同步支持） |
-| `editor.html` + `tools/ui_editor.py`（HTML 可视化编辑器） | 布局生产环节（设计定稿待实现，见《HTML可视化编辑器.md》） | **新增**：拖拽/手柄/锚点补偿编辑布局，本地服务直写回 HTML 内嵌 JSON |
+| `viewer.js` / `index.html`（浏览器预览） | 设计稿渲染 | **保留**，改用抽出的 `assets/spec-core.js` 公共数学（v1.2 的 scale/rotation 预览同步支持） |
+| `editor/editor.html` + `tools/ui_editor.py`（HTML 可视化编辑器） | 布局生产环节（设计定稿待实现，见《HTML可视化编辑器.md》） | **新增**：拖拽/手柄/锚点补偿编辑布局，本地服务直写回 HTML 内嵌 JSON |
 | `ConfigAssetGenerator.cs` 等非 UI 生成器 | 配置资产生成 | 不受影响 |
 
 ---
@@ -312,7 +312,7 @@ GameObject BuildNode(UISpecNode node, Transform parent, BuildContext ctx)
 ① UIPanelGenerator 生成 MVC 三件套骨架（新面板一次性）
         ↓
 ② 手写 JSON 起稿（可选，只写结构不做布局）
-        ↓ editor.html 可视化编辑（python tools/ui_editor.py 启动）
+        ↓ editor/editor.html 可视化编辑（python tools/ui_editor.py 启动）
         ↓ 拖拽/手柄/锚点补偿调整布局 → Ctrl+S 写回 HTML
 ③ 「校验设计稿」干跑通过 → 设计定稿
         ↓

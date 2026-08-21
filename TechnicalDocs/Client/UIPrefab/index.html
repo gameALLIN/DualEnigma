@@ -7,35 +7,49 @@
   * { box-sizing: border-box; }
   body { background: #1a2226; font-family: "Microsoft YaHei", Consolas, monospace; color: #B0BEC5; margin: 24px; }
   h1 { color: #ECEFF1; }
+  h2 { color: #ECEFF1; font-size: 16px; margin-top: 22px; }
   table { border-collapse: collapse; margin-top: 12px; }
   td, th { border: 1px solid #546E7A; padding: 6px 14px; text-align: left; }
   a { color: #4FC3F7; text-decoration: none; }
   a:hover { text-decoration: underline; }
-  .flow { background: #202a30; border: 1px solid #4FC3F7; padding: 10px 14px; margin: 14px 0; max-width: 900px; font-size: 13px; line-height: 1.7; }
-  .legend { margin-top: 14px; font-size: 12px; color: #78909C; max-width: 900px; line-height: 1.7; }
+  code { background: #263238; padding: 1px 5px; border-radius: 3px; }
+  .flow { background: #202a30; border: 1px solid #4FC3F7; padding: 10px 14px; margin: 14px 0; max-width: 960px; font-size: 13px; line-height: 1.7; }
+  .legend { margin-top: 14px; font-size: 12px; color: #78909C; max-width: 960px; line-height: 1.7; }
 </style>
 </head>
 <body>
 <h1>UI 页面设计稿索引</h1>
 <div class="flow">
-  📐 工作流：<b>先 HTML 后代码</b> — ① 在本目录新建/迭代 &lt;页面&gt;.html（视觉稿 + 层级树 + 内嵌
-  <code>&lt;script id="ui-spec"&gt;</code> 的 JSON 规格） → ② 设计定稿 → ③ 由生成工具解析 ui-spec JSON 产出
-  预制体生成器与 View/Ctrl 代码 → ④ Unity 菜单生成预制体入库。<br>
-  每个页面 HTML 内嵌完整节点规格（名称/组件/锚点/尺寸/颜色/文案），即后续代码生成的唯一数据源。
-  预览与层级树由 <code>viewer.js</code> 在浏览器端实时渲染，<b>直接编辑页面内嵌的 ui-spec JSON 后刷新即可看到效果</b>，无需任何转换脚本。
+  📐 工作流：<b>先 HTML 后代码，设计稿（页面内嵌 ui-spec JSON）为唯一数据源</b> —<br>
+  ① <code>UIPanelGenerator</code> 生成 MVC 三件套骨架（新面板一次性）
+  → ② 手写 JSON 起稿（可选，只写结构不做布局）<br>
+  ③ <code>python tools/ui_editor.py</code> → <a href="http://localhost:8765/">可视化编辑器</a> 调布局
+  （拖拽 / 手柄 / 锚点补偿，Ctrl+S 直写回页面内嵌 ui-spec）<br>
+  ④ Unity 菜单 <code>DualEnigma &gt; UI &gt; 校验设计稿</code> 干跑 →
+  <code>DualEnigma &gt; UI &gt; 从设计稿生成预制体</code> 入库（原地覆盖，GUID 不变，场景/AB 引用不断）<br>
+  ⑤ Ctrl/Model 逻辑实现（View 字段已按命名规范自动绑定）<br>
+  ⑥ 迭代：编辑器调整 → 保存 → 重新生成
+  → ⑦ （可选）<code>python tools/gen_ui_html.py --out &lt;临时目录&gt;</code> 反向导出，与源设计稿 diff 对账。
 </div>
 <table>
   <tr><th>页面</th><th>预制体来源</th><th>说明</th></tr>
-  <tr><td><a href="UILogin.html">UILogin</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UILogin/UILogin.prefab</td><td>登录 / 注册（含隐藏昵称行、错误提示、加载态）</td></tr>
-  <tr><td><a href="UIHome.html">UIHome</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIHome/UIHome.prefab</td><td>主界面（开始游戏、功能入口、玩家卡片、邀请抽屉、标题区）</td></tr>
-  <tr><td><a href="UIFriends.html">UIFriends</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIFriends/UIFriends.prefab</td><td>好友（列表 / 搜索 / 房间邀请 / 好友申请）</td></tr>
-  <tr><td><a href="UIRoom.html">UIRoom</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIRoom/UIRoom.prefab</td><td>组队房间（房间码、邀请、开始、退出）</td></tr>
-  <tr><td><a href="UIGameHud.html">UIGameHud</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIGameHud/UIGameHud.prefab</td><td>对局 HUD（阶段进度、双角色状态、碎片计数）</td></tr>
-  <tr><td><a href="UIGameOver.html">UIGameOver</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIGameOver/UIGameOver.prefab</td><td>结算（胜利 / 失败、再来一局、返回主界面）</td></tr>
-  <tr><td><a href="UISettings.html">UISettings</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UISettings/UISettings.prefab</td><td>设置（音量、性能开关、继续 / 退出）</td></tr>
-  <tr><td><a href="UIInvitePopup.html">UIInvitePopup</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIInvitePopup/UIInvitePopup.prefab</td><td>邀请弹窗（房间邀请卡、好友申请卡，默认隐藏）</td></tr>
-  <tr><td><a href="Common.html">Common</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/Common/FriendItem.prefab</td><td>通用组件（好友列表项 FriendItem）</td></tr>
-  <tr><td><a href="UITest.html">UITest</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UITest/UITest.prefab</td><td>测试面板（计数 / 重置 / 关闭）</td></tr>
+  <tr><td><a href="pages/UILogin.html">UILogin</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UILogin/UILogin.prefab</td><td>登录 / 注册（含隐藏昵称行、错误提示、加载态）</td></tr>
+  <tr><td><a href="pages/UIHome.html">UIHome</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIHome/UIHome.prefab</td><td>主界面（开始游戏、功能入口、玩家卡片、邀请抽屉、标题区）</td></tr>
+  <tr><td><a href="pages/UIFriends.html">UIFriends</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIFriends/UIFriends.prefab</td><td>好友（列表 / 搜索 / 房间邀请 / 好友申请）</td></tr>
+  <tr><td><a href="pages/UIRoom.html">UIRoom</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIRoom/UIRoom.prefab</td><td>组队房间（房间码、邀请、开始、退出）</td></tr>
+  <tr><td><a href="pages/UIGameHud.html">UIGameHud</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIGameHud/UIGameHud.prefab</td><td>对局 HUD（阶段进度、双角色状态、碎片计数）</td></tr>
+  <tr><td><a href="pages/UIGameOver.html">UIGameOver</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIGameOver/UIGameOver.prefab</td><td>结算（胜利 / 失败、再来一局、返回主界面）</td></tr>
+  <tr><td><a href="pages/UISettings.html">UISettings</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UISettings/UISettings.prefab</td><td>设置（音量、性能开关、继续 / 退出）</td></tr>
+  <tr><td><a href="pages/UIInvitePopup.html">UIInvitePopup</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UIInvitePopup/UIInvitePopup.prefab</td><td>邀请弹窗（房间邀请卡、好友申请卡，默认隐藏）</td></tr>
+  <tr><td><a href="pages/Common.html">Common</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/Common/FriendItem.prefab</td><td>通用组件（好友列表项 FriendItem）</td></tr>
+  <tr><td><a href="pages/UITest.html">UITest</a></td><td>Client/Assets/AssetPackage/Prefabs/UI/UITest/UITest.prefab</td><td>测试面板（计数 / 重置 / 关闭）</td></tr>
+</table>
+<h2>工具与文档</h2>
+<table>
+  <tr><td><a href="editor/editor.html">editor/editor.html</a></td><td>ui-spec 可视化编辑器（先启动 <code>python tools/ui_editor.py</code> 再访问；直接双击打开无法保存）</td></tr>
+  <tr><td>assets/viewer.js · spec-core.js</td><td>设计稿浏览器端渲染（只读预览；spec-core 为预览/编辑器共享的锚点数学库）</td></tr>
+  <tr><td><a href="通用JSON预制体生成器.md">通用JSON预制体生成器.md</a></td><td>ui-spec 解释器设计文档（组件规范 / 构建流程 / 校验规则）</td></tr>
+  <tr><td><a href="HTML可视化编辑器.md">HTML可视化编辑器.md</a></td><td>可视化编辑器设计文档（交互 / 坐标数学 / 写回机制）</td></tr>
 </table>
 <div class="legend">
   图例：斜体灰字 = 动态文本占位（运行时由代码赋值）· 橙色虚线 = ✕隐藏节点（勾选「显示隐藏节点」后可见）·

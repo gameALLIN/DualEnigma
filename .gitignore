@@ -60,6 +60,13 @@ Client/build-win.log
 .mimocode/
 
 # ===========================
+# ui-spec 编辑器本地服务产物
+# ===========================
+TechnicalDocs/Client/UIPrefab/tools/__pycache__/
+TechnicalDocs/Client/UIPrefab/pages/*.html.bak
+TechnicalDocs/Client/UIPrefab/pages/*.html.tmp
+
+# ===========================
 # Server (Java / Maven / Spring Boot 多模块)
 # ===========================
 # 忽略 target 目录下所有构建产物（含 jar，jar 过大不适合进 git）

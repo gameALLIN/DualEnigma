@@ -1,11 +1,16 @@
 /* UIPrefab 设计稿查看器
  * 读取页面内嵌 <script id="ui-spec"> 的 JSON 规格，在浏览器端按 Unity 锚点规则渲染预览与层级树。
  * 数据源即设计稿：直接编辑 ui-spec JSON 后刷新页面即可看到效果。
+ * 布局数学来自 spec-core.js（与 editor.js 共享，保证预览与编辑所见一致）。
+ * 需要在 viewer.js 之前引入 spec-core.js。
  */
 (function () {
   "use strict";
 
-  var CANVAS_W = 1280, CANVAS_H = 720; // 参考分辨率
+  var Core = window.SpecCore;
+  if (!Core) return;
+  var CANVAS_W = Core.CANVAS_W, CANVAS_H = Core.CANVAS_H;
+
   var specEl = document.getElementById("ui-spec");
   if (!specEl) return;
   var spec = JSON.parse(specEl.textContent);
@@ -15,84 +20,23 @@
   var zoomSel = document.getElementById("zoom");
   var showHiddenChk = document.getElementById("showHidden");
 
-  // ---------- 布局计算（Unity RectTransform → 屏幕像素，y 轴翻转） ----------
-
-  // 水平对齐系数 / 垂直对齐系数（Unity TextAnchor / LayoutGroup ChildAlignment）
-  var HALIGN = { Left: 0, Center: 0.5, Right: 1 };
-  var VALIGN = { Upper: 1, Middle: 0.5, Lower: 0 };
-
-  function parseAlign(align) {
-    // "MiddleCenter" → { h: 0.5, v: 0.5 }
-    var v = 0.5, h = 0.5;
-    if (align) {
-      for (var vk in VALIGN) if (align.indexOf(vk) === 0) v = VALIGN[vk];
-      for (var hk in HALIGN) if (align.indexOf(hk) > 0 || align === hk) h = HALIGN[hk];
-    }
-    return { h: h, v: v };
-  }
-
-  // 计算节点在父矩形内的矩形（父矩形为 HTML 坐标系：y 向下）
-  function calcRect(node, px, py, pw, ph) {
-    var amin = node.anchors.min, amax = node.anchors.max;
-    var pos = node.position || [0, 0];
-    var size = node.size || [0, 0];
-    var pivot = node.pivot || [0.5, 0.5];
-    var x0 = px + amin[0] * pw, x1 = px + amax[0] * pw;
-    var w, cx;
-    if (Math.abs(x1 - x0) < 1e-6) { w = size[0]; cx = x0 + pos[0]; }
-    else { w = (x1 - x0) + size[0]; cx = (x0 + x1) / 2 + pos[0]; }
-    var L = cx - pivot[0] * w;
-    var ay0 = amin[1], ay1 = amax[1];
-    var h, cy;
-    if (Math.abs(ay1 - ay0) < 1e-6) { h = size[1]; cy = py + (1 - ay0) * ph - pos[1]; }
-    else { h = (ay1 - ay0) * ph + size[1]; cy = py + (1 - (ay0 + ay1) / 2) * ph - pos[1]; }
-    var T = cy - (1 - pivot[1]) * h;
-    return { L: L, T: T, w: w, h: h };
-  }
-
-  // LayoutGroup 子节点排布：返回 { childIndex: {L,T,w,h} }（父矩形坐标系）
-  function layoutChildren(node, pw, ph, includeHidden) {
-    var layout = node.layout;
-    var kids = (node.children || []).filter(function (c) { return includeHidden || c.active !== false; });
-    var pad = layout.padding || [0, 0, 0, 0]; // [左, 上, 右, 下]
-    var spacing = layout.spacing || 0;
-    var al = parseAlign(layout.align);
-    var horizontal = layout.type === "horizontal";
-    var rects = {};
-    var total = 0;
-    kids.forEach(function (c, i) {
-      var s = c.size || [0, 0];
-      total += horizontal ? s[0] : s[1];
-      if (i > 0) total += spacing;
-    });
-    // 容器尺寸为 0 时按内容撑开（如 UIInvitePopup 的 CardContainer height=0）
-    var effW = pw, effH = ph;
-    if (horizontal && effW <= 0) effW = total + pad[0] + pad[2];
-    if (!horizontal && effH <= 0) effH = total + pad[1] + pad[3];
-    var innerW = effW - pad[0] - pad[2], innerH = effH - pad[1] - pad[3];
-    var cursor;
-    if (horizontal) cursor = pad[0] + (innerW - total) * al.h;
-    else cursor = pad[1] + (innerH - total) * (1 - al.v); // HTML y 向下，Upper 对齐 = 靠上
-    kids.forEach(function (c) {
-      var idx = node.children.indexOf(c);
-      var s = c.size || [0, 0];
-      var w = s[0], h = s[1];
-      var L, T;
-      if (horizontal) {
-        L = cursor;
-        T = pad[1] + (innerH - h) * (1 - al.v);
-        cursor += w + spacing;
-      } else {
-        L = pad[0] + (innerW - w) * al.h;
-        T = cursor;
-        cursor += h + spacing;
-      }
-      rects[idx] = { L: L, T: T, w: w, h: h };
-    });
-    return rects;
-  }
+  var calcRect = Core.calcRect;
+  var layoutChildren = Core.layoutChildren;
+  var parseAlign = Core.parseAlign;
+  var findParent = Core.findParent;
 
   // ---------- 预览渲染 ----------
+
+  // 叠加 v1.2 变换（scale/rotation）到 CSS；transform-origin 对应 pivot
+  function applyTransform(el, node) {
+    var s = Core.scaleOf(node);
+    var deg = Core.rotationOf(node);
+    if (s[0] === 1 && s[1] === 1 && deg === 0) return;
+    var pivot = node.pivot || [0.5, 0.5];
+    el.style.transformOrigin = (pivot[0] * 100) + "% " + ((1 - pivot[1]) * 100) + "%";
+    // Unity 旋转逆时针为正；CSS 顺时针为正 → 取负保持视觉一致
+    el.style.transform = "scale(" + s[0] + "," + s[1] + ") rotate(" + (-deg) + "deg)";
+  }
 
   function hasPlaceholderSibling(node, siblings) {
     return siblings.some(function (s) { return s !== node && s.name === "Placeholder"; });
@@ -203,21 +147,11 @@
         el.classList.add("box");
         el.style.background = n.background || "rgba(255,255,255,0.06)";
       }
+      applyTransform(el, n);
       pageEl.appendChild(el);
     });
 
     renderTree();
-  }
-
-  function findParent(root, target) {
-    var found = null;
-    (function walk(n) {
-      (n.children || []).forEach(function (c) {
-        if (c === target) found = n;
-        else walk(c);
-      });
-    })(root);
-    return found;
   }
 
   // ---------- 层级树渲染 ----------

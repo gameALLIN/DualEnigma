@@ -41,14 +41,17 @@
 
 ```
 TechnicalDocs/Client/UIPrefab/
-├── editor.html                      # 编辑器入口（新增）
-├── editor.js / editor.css           # 编辑器前端（新增）
-├── spec-core.js                     # 从 viewer.js 抽出的公共数学（calcRect/layoutChildren/parseAlign）（新增）
-├── viewer.js                        # 保留：静态预览页复用 spec-core
-├── <页面>.html                       # 设计稿（含内嵌 ui-spec JSON，被动读写）
+├── index.html                      # 设计稿索引（入口）
+├── pages/                          # 页面设计稿（含内嵌 ui-spec JSON，被动读写）
+│   └── <页面>.html
+├── assets/                         # 共享前端资源
+│   ├── viewer.css / viewer.js      # 静态预览（viewer.js 复用 spec-core）
+│   └── spec-core.js                # 从 viewer.js 抽出的公共数学（calcRect/layoutChildren/parseAlign）
+├── editor/                         # 编辑器前端
+│   └── editor.html / editor.js / editor.css
 └── tools/
-    ├── ui_editor.py                 # 本地编辑服务（新增）
-    └── gen_ui_html.py               # 保留：反向导出/一致性校验
+    ├── ui_editor.py                # 本地编辑服务
+    └── gen_ui_html.py              # 反向导出/一致性校验
 ```
 
 > **spec-core.js 抽取原因**：viewer.js 与 editor.js 必须共享同一套「spec→屏幕矩形」数学，否则预览与编辑所见不一致。把 calcRect/layoutChildren/parseAlign 抽为公共模块，viewer.js 改为引用（行为不变）。
@@ -65,8 +68,8 @@ python tools/ui_editor.py [--port 8765]
 
 | 端点 | 方法 | 说明 |
 |------|------|------|
-| `/` | GET | 返回 editor.html |
-| `/api/pages` | GET | 扫描目录下含 `id="ui-spec"` 的 `*.html`，返回页面名列表（排除 editor.html/index.html） |
+| `/` | GET | 返回 `editor/editor.html` |
+| `/api/pages` | GET | 扫描 `pages/` 下含 `id="ui-spec"` 的 `*.html`，返回页面名列表 |
 | `/api/spec?page=UIHome` | GET | 返回该页面提取出的 ui-spec JSON |
 | `/api/save?page=UIHome` | POST | body = 新的 ui-spec JSON，写回 HTML 文件 |
 
@@ -196,7 +199,7 @@ position = (center.x - refRect.cx, refRect.cy - center.y)   // y 翻转
 ```
 ① UIPanelGenerator 生成 MVC 三件套骨架（新面板一次性）
 ② 手写 JSON 起稿（可选，只写结构不做布局）
-③ python tools/ui_editor.py → editor.html 可视化编辑布局
+③ python tools/ui_editor.py → editor/editor.html 可视化编辑布局
         拖拽/手柄/锚点补偿/属性面板 → Ctrl+S 写回 HTML
 ④ 「校验设计稿」干跑 → 「从设计稿生成预制体」
 ⑤ Ctrl/Model 逻辑实现

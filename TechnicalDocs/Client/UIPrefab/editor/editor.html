@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>ui-spec 可视化编辑器</title>
+<link rel="stylesheet" href="editor.css">
+</head>
+<body>
+<div id="app">
+  <!-- 左栏：页面列表 + 层级树 -->
+  <aside id="sidebar">
+    <div class="side-section">
+      <div class="side-title">页面</div>
+      <ul id="pageList" class="page-list"></ul>
+    </div>
+    <div class="side-section grow">
+      <div class="side-title">层级 <label class="mini"><input type="checkbox" id="showHidden"> 隐藏节点可选</label></div>
+      <div id="tree" class="tree"></div>
+    </div>
+  </aside>
+
+  <!-- 中栏：工具栏 + 画布 + 状态栏 -->
+  <main id="center">
+    <div id="toolbar">
+      <label>缩放 <select id="zoom">
+        <option value="0.25">25%</option><option value="0.5" selected>50%</option>
+        <option value="0.75">75%</option><option value="1">100%</option>
+        <option value="1.5">150%</option><option value="2">200%</option>
+      </select></label>
+      <label><input type="checkbox" id="gridOn"> 网格</label>
+      <label><input type="checkbox" id="snapOn" checked> 吸附</label>
+      <label>步长 <select id="snapStep">
+        <option value="1" selected>1px</option><option value="2">2px</option>
+        <option value="4">4px</option><option value="8">8px</option>
+      </select></label>
+      <span class="sep"></span>
+      <button id="undoBtn" title="Ctrl+Z">↶ 撤销</button>
+      <button id="redoBtn" title="Ctrl+Shift+Z / Ctrl+Y">↷ 重做</button>
+      <span class="sep"></span>
+      <button id="saveBtn" title="Ctrl+S">💾 保存</button>
+      <span id="dirtyMark" class="dirty" title="有未保存改动">●</span>
+    </div>
+    <div id="canvasWrap">
+      <div id="canvas" class="canvas">
+        <div id="canvasContent"></div>
+        <div id="selection" class="selection" hidden>
+          <div class="handle" data-dir="nw"></div><div class="handle" data-dir="n"></div>
+          <div class="handle" data-dir="ne"></div><div class="handle" data-dir="e"></div>
+          <div class="handle" data-dir="se"></div><div class="handle" data-dir="s"></div>
+          <div class="handle" data-dir="sw"></div><div class="handle" data-dir="w"></div>
+        </div>
+      </div>
+    </div>
+    <div id="statusbar"><span id="statusPath">未选择节点</span><span id="statusMsg"></span></div>
+  </main>
+
+  <!-- 右栏：属性面板 -->
+  <aside id="props">
+    <div class="side-title">属性</div>
+    <div id="propBody" class="prop-body">
+      <div class="prop-empty">未选择节点</div>
+    </div>
+  </aside>
+</div>
+<script src="../assets/spec-core.js"></script>
+<script src="editor.js"></script>
+</body>
+</html>
