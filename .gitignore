@@ -77,6 +77,7 @@ TechnicalDocs/Client/UIPrefab/pages/*.html.tmp
 # ===========================
 # 忽略 target 目录下所有构建产物（含 jar，jar 过大不适合进 git）
 Server/**/target/*
+Server/**/bin/
 Server/**/*.jar
 Server/.env
 Server/**/*.log
