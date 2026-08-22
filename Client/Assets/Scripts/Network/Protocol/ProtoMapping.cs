@@ -11,6 +11,7 @@
 using UnityEngine;
 using DualEnigma.V1;
 using DualEnigma.Core;
+using DualEnigma.Character;
 
 namespace DualEnigma.Network
 {
