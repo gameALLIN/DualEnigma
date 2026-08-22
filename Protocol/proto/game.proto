@@ -1,6 +1,9 @@
 syntax = "proto3";
 
-package dualenigma.v1;   // 版本化包名：将来不兼容演进时升 v2，双端同步切
+// C# 生成器按段 PascalCase：DualEnigma.v1 → DualEnigma.V1（与业务代码大小写一致；
+// 原小写 dualenigma 会生成 Dualenigma.V1 导致 using 失败）。
+// 版本化包名：将来不兼容演进时升 v2，双端同步切。
+package DualEnigma.v1;
 
 // Java 生成选项（服务器 Maven 管线；com.dualenigma.* 符合工程包名规范）
 option java_package = "com.dualenigma.v1";

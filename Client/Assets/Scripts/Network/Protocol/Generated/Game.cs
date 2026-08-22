@@ -10,7 +10,7 @@ using pb = global::Google.Protobuf;
 using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
 using scg = global::System.Collections.Generic;
-namespace Dualenigma.V1 {
+namespace DualEnigma.V1 {
 
   /// <summary>Holder for reflection information generated from game.proto</summary>
   public static partial class GameReflection {
@@ -25,40 +25,40 @@ namespace Dualenigma.V1 {
     static GameReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "CgpnYW1lLnByb3RvEg1kdWFsZW5pZ21hLnYxIoAKCghFbnZlbG9wZRIRCgl0",
+            "CgpnYW1lLnByb3RvEg1EdWFsRW5pZ21hLnYxIoAKCghFbnZlbG9wZRIRCgl0",
             "aW1lc3RhbXAYASABKAMSEQoJcGxheWVyX2lkGAIgASgFEg4KBnJlcV9pZBgD",
-            "IAEoBRItCgdjb25uZWN0GAogASgLMhouZHVhbGVuaWdtYS52MS5DMlNfQ29u",
-            "bmVjdEgAEjEKCWhlYXJ0YmVhdBgLIAEoCzIcLmR1YWxlbmlnbWEudjEuQzJT",
-            "X0hlYXJ0YmVhdEgAEjIKCnN0YXJ0X2dhbWUYDCABKAsyHC5kdWFsZW5pZ21h",
+            "IAEoBRItCgdjb25uZWN0GAogASgLMhouRHVhbEVuaWdtYS52MS5DMlNfQ29u",
+            "bmVjdEgAEjEKCWhlYXJ0YmVhdBgLIAEoCzIcLkR1YWxFbmlnbWEudjEuQzJT",
+            "X0hlYXJ0YmVhdEgAEjIKCnN0YXJ0X2dhbWUYDCABKAsyHC5EdWFsRW5pZ21h",
             "LnYxLkMyU19TdGFydEdhbWVIABI7Cg9oaWdoX2ZyZXFfc3RhdGUYDSABKAsy",
-            "IC5kdWFsZW5pZ21hLnYxLkMyU19IaWdoRnJlcVN0YXRlSAASPAoPZnJhZ21l",
-            "bnRfY2F1Z2h0GA4gASgLMiEuZHVhbGVuaWdtYS52MS5DMlNfRnJhZ21lbnRD",
-            "YXVnaHRIABI6Cg5idWlsZGluZ19wbGFjZRgPIAEoCzIgLmR1YWxlbmlnbWEu",
+            "IC5EdWFsRW5pZ21hLnYxLkMyU19IaWdoRnJlcVN0YXRlSAASPAoPZnJhZ21l",
+            "bnRfY2F1Z2h0GA4gASgLMiEuRHVhbEVuaWdtYS52MS5DMlNfRnJhZ21lbnRD",
+            "YXVnaHRIABI6Cg5idWlsZGluZ19wbGFjZRgPIAEoCzIgLkR1YWxFbmlnbWEu",
             "djEuQzJTX0J1aWxkaW5nUGxhY2VIABI8Cg9idWlsZGluZ19yZW1vdmUYECAB",
-            "KAsyIS5kdWFsZW5pZ21hLnYxLkMyU19CdWlsZGluZ1JlbW92ZUgAEjMKCnN5",
-            "bnRoZXNpemUYESABKAsyHS5kdWFsZW5pZ21hLnYxLkMyU19TeW50aGVzaXpl",
-            "SAASOgoOc2tpbGxfYWN0aXZhdGUYEiABKAsyIC5kdWFsZW5pZ21hLnYxLkMy",
-            "U19Ta2lsbEFjdGl2YXRlSAASOAoNdGFsZW50X3NlbGVjdBgTIAEoCzIfLmR1",
-            "YWxlbmlnbWEudjEuQzJTX1RhbGVudFNlbGVjdEgAEicKBHJlc3AYHiABKAsy",
-            "Fy5kdWFsZW5pZ21hLnYxLlMyQ19SZXNwSAASNAoLY29ubmVjdF9hY2sYHyAB",
-            "KAsyHS5kdWFsZW5pZ21hLnYxLlMyQ19Db25uZWN0QWNrSAASMgoKZ2FtZV9z",
-            "dGFydBggIAEoCzIcLmR1YWxlbmlnbWEudjEuUzJDX0dhbWVTdGFydEgAEjgK",
-            "DXBsYXllcl9qb2luZWQYISABKAsyHy5kdWFsZW5pZ21hLnYxLlMyQ19QbGF5",
-            "ZXJKb2luZWRIABI2CgxwaGFzZV9jaGFuZ2UYIiABKAsyHi5kdWFsZW5pZ21h",
+            "KAsyIS5EdWFsRW5pZ21hLnYxLkMyU19CdWlsZGluZ1JlbW92ZUgAEjMKCnN5",
+            "bnRoZXNpemUYESABKAsyHS5EdWFsRW5pZ21hLnYxLkMyU19TeW50aGVzaXpl",
+            "SAASOgoOc2tpbGxfYWN0aXZhdGUYEiABKAsyIC5EdWFsRW5pZ21hLnYxLkMy",
+            "U19Ta2lsbEFjdGl2YXRlSAASOAoNdGFsZW50X3NlbGVjdBgTIAEoCzIfLkR1",
+            "YWxFbmlnbWEudjEuQzJTX1RhbGVudFNlbGVjdEgAEicKBHJlc3AYHiABKAsy",
+            "Fy5EdWFsRW5pZ21hLnYxLlMyQ19SZXNwSAASNAoLY29ubmVjdF9hY2sYHyAB",
+            "KAsyHS5EdWFsRW5pZ21hLnYxLlMyQ19Db25uZWN0QWNrSAASMgoKZ2FtZV9z",
+            "dGFydBggIAEoCzIcLkR1YWxFbmlnbWEudjEuUzJDX0dhbWVTdGFydEgAEjgK",
+            "DXBsYXllcl9qb2luZWQYISABKAsyHy5EdWFsRW5pZ21hLnYxLlMyQ19QbGF5",
+            "ZXJKb2luZWRIABI2CgxwaGFzZV9jaGFuZ2UYIiABKAsyHi5EdWFsRW5pZ21h",
             "LnYxLlMyQ19QaGFzZUNoYW5nZUgAEj8KE2hpZ2hfZnJlcV9zdGF0ZV9zMmMY",
-            "IyABKAsyIC5kdWFsZW5pZ21hLnYxLlMyQ19IaWdoRnJlcVN0YXRlSAASOQoO",
-            "bWlkX2ZyZXFfc3RhdGUYJCABKAsyHy5kdWFsZW5pZ21hLnYxLlMyQ19NaWRG",
-            "cmVxU3RhdGVIABJEChNvcHBvbmVudF9kaXNjb25uZWN0GCUgASgLMiUuZHVh",
-            "bGVuaWdtYS52MS5TMkNfT3Bwb25lbnREaXNjb25uZWN0SAASQQoSZnJhZ21l",
-            "bnRfZHJvcF9wbGFuGCYgASgLMiMuZHVhbGVuaWdtYS52MS5TMkNfRnJhZ21l",
-            "bnREcm9wUGxhbkgAEjwKD2ZyYWdtZW50X3Jlc3VsdBgnIAEoCzIhLmR1YWxl",
+            "IyABKAsyIC5EdWFsRW5pZ21hLnYxLlMyQ19IaWdoRnJlcVN0YXRlSAASOQoO",
+            "bWlkX2ZyZXFfc3RhdGUYJCABKAsyHy5EdWFsRW5pZ21hLnYxLlMyQ19NaWRG",
+            "cmVxU3RhdGVIABJEChNvcHBvbmVudF9kaXNjb25uZWN0GCUgASgLMiUuRHVh",
+            "bEVuaWdtYS52MS5TMkNfT3Bwb25lbnREaXNjb25uZWN0SAASQQoSZnJhZ21l",
+            "bnRfZHJvcF9wbGFuGCYgASgLMiMuRHVhbEVuaWdtYS52MS5TMkNfRnJhZ21l",
+            "bnREcm9wUGxhbkgAEjwKD2ZyYWdtZW50X3Jlc3VsdBgnIAEoCzIhLkR1YWxF",
             "bmlnbWEudjEuUzJDX0ZyYWdtZW50UmVzdWx0SAASOAoNaGVhcnRiZWF0X2Fj",
-            "axgoIAEoCzIfLmR1YWxlbmlnbWEudjEuUzJDX0hlYXJ0YmVhdEFja0gAQgYK",
+            "axgoIAEoCzIfLkR1YWxFbmlnbWEudjEuUzJDX0hlYXJ0YmVhdEFja0gAQgYK",
             "BGJvZHkiHAoEVmVjMhIJCgF4GAEgASgCEgkKAXkYAiABKAIiLwoLQzJTX0Nv",
             "bm5lY3QSEQoJcm9vbV9jb2RlGAEgASgJEg0KBXRva2VuGAIgASgJIg8KDUMy",
             "U19IZWFydGJlYXQiDwoNQzJTX1N0YXJ0R2FtZSKpAQoRQzJTX0hpZ2hGcmVx",
-            "U3RhdGUSJQoIcG9zaXRpb24YASABKAsyEy5kdWFsZW5pZ21hLnYxLlZlYzIS",
-            "JQoIdmVsb2NpdHkYAiABKAsyEy5kdWFsZW5pZ21hLnYxLlZlYzISEgoKYW5p",
+            "U3RhdGUSJQoIcG9zaXRpb24YASABKAsyEy5EdWFsRW5pZ21hLnYxLlZlYzIS",
+            "JQoIdmVsb2NpdHkYAiABKAsyEy5EdWFsRW5pZ21hLnYxLlZlYzISEgoKYW5p",
             "bV9zdGF0ZRgDIAEoCRIOCgZmYWNpbmcYBCABKAgSCgoCaHAYBSABKAUSFgoO",
             "c2hlbHRlcl9lbmVyZ3kYBiABKAIiRwoSQzJTX0ZyYWdtZW50Q2F1Z2h0EhMK",
             "C2ZyYWdtZW50X2lkGAEgASgFEg0KBXBvc194GAIgASgCEg0KBXBvc195GAMg",
@@ -75,21 +75,21 @@ namespace Dualenigma.V1 {
             "QAoNUzJDX0dhbWVTdGFydBIPCgdjaGFwdGVyGAEgASgFEg8KB3NlY3Rpb24Y",
             "AiABKAUSDQoFcm91bmQYAyABKAUiOwoQUzJDX1BsYXllckpvaW5lZBIRCglw",
             "bGF5ZXJfaWQYASABKAUSFAoMcGxheWVyX2NvdW50GAIgASgFImkKD1MyQ19Q",
-            "aGFzZUNoYW5nZRIpCgVwaGFzZRgBIAEoDjIaLmR1YWxlbmlnbWEudjEuR2Ft",
+            "aGFzZUNoYW5nZRIpCgVwaGFzZRgBIAEoDjIaLkR1YWxFbmlnbWEudjEuR2Ft",
             "ZVBoYXNlUGISEwoLZHVyYXRpb25fbXMYAiABKAUSFgoOcGhhc2VfZW5kX3Rp",
             "bWUYAyABKAMivAEKEVMyQ19IaWdoRnJlcVN0YXRlEhEKCXBsYXllcl9pZBgB",
-            "IAEoBRIlCghwb3NpdGlvbhgCIAEoCzITLmR1YWxlbmlnbWEudjEuVmVjMhIl",
-            "Cgh2ZWxvY2l0eRgDIAEoCzITLmR1YWxlbmlnbWEudjEuVmVjMhISCgphbmlt",
+            "IAEoBRIlCghwb3NpdGlvbhgCIAEoCzITLkR1YWxFbmlnbWEudjEuVmVjMhIl",
+            "Cgh2ZWxvY2l0eRgDIAEoCzITLkR1YWxFbmlnbWEudjEuVmVjMhISCgphbmlt",
             "X3N0YXRlGAQgASgJEg4KBmZhY2luZxgFIAEoCBIKCgJocBgGIAEoBRIWCg5z",
             "aGVsdGVyX2VuZXJneRgHIAEoAiK1AQoQUzJDX01pZEZyZXFTdGF0ZRI+Cgdw",
-            "bGF5ZXJzGAEgAygLMi0uZHVhbGVuaWdtYS52MS5TMkNfTWlkRnJlcVN0YXRl",
+            "bGF5ZXJzGAEgAygLMi0uRHVhbEVuaWdtYS52MS5TMkNfTWlkRnJlcVN0YXRl",
             "LlBsYXllck1pZEZyZXEaYQoNUGxheWVyTWlkRnJlcRIRCglwbGF5ZXJfaWQY",
             "ASABKAUSCgoCaHAYAiABKAUSFgoOc2hlbHRlcl9lbmVyZ3kYAyABKAISGQoR",
             "Y2FycmllZF9mcmFnbWVudHMYBCADKAUiJwoWUzJDX09wcG9uZW50RGlzY29u",
             "bmVjdBINCgVzdGF0ZRgBIAEoCSLJAQoUUzJDX0ZyYWdtZW50RHJvcFBsYW4S",
-            "OgoEcGxhbhgBIAMoCzIsLmR1YWxlbmlnbWEudjEuUzJDX0ZyYWdtZW50RHJv",
+            "OgoEcGxhbhgBIAMoCzIsLkR1YWxFbmlnbWEudjEuUzJDX0ZyYWdtZW50RHJv",
             "cFBsYW4uUGxhbkl0ZW0adQoIUGxhbkl0ZW0SEwoLZnJhZ21lbnRfaWQYASAB",
-            "KAUSDAoEdHlwZRgCIAEoBRIlCghwb3NpdGlvbhgDIAEoCzITLmR1YWxlbmln",
+            "KAUSDAoEdHlwZRgCIAEoBRIlCghwb3NpdGlvbhgDIAEoCzITLkR1YWxFbmln",
             "bWEudjEuVmVjMhIRCglkcm9wX3RpbWUYBCABKAISDAoEc2VlZBgFIAEoAyJp",
             "ChJTMkNfRnJhZ21lbnRSZXN1bHQSEwoLZnJhZ21lbnRfaWQYASABKAUSEQoJ",
             "cGxheWVyX2lkGAIgASgFEhIKCm11bHRpcGxpZXIYAyABKAUSFwoPaXNfc2lt",
@@ -101,30 +101,30 @@ namespace Dualenigma.V1 {
             "ZHVhbGVuaWdtYS52MVABYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Dualenigma.V1.GamePhasePb), }, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.Envelope), global::Dualenigma.V1.Envelope.Parser, new[]{ "Timestamp", "PlayerId", "ReqId", "Connect", "Heartbeat", "StartGame", "HighFreqState", "FragmentCaught", "BuildingPlace", "BuildingRemove", "Synthesize", "SkillActivate", "TalentSelect", "Resp", "ConnectAck", "GameStart", "PlayerJoined", "PhaseChange", "HighFreqStateS2C", "MidFreqState", "OpponentDisconnect", "FragmentDropPlan", "FragmentResult", "HeartbeatAck" }, new[]{ "Body" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.Vec2), global::Dualenigma.V1.Vec2.Parser, new[]{ "X", "Y" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.C2S_Connect), global::Dualenigma.V1.C2S_Connect.Parser, new[]{ "RoomCode", "Token" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.C2S_Heartbeat), global::Dualenigma.V1.C2S_Heartbeat.Parser, null, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.C2S_StartGame), global::Dualenigma.V1.C2S_StartGame.Parser, null, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.C2S_HighFreqState), global::Dualenigma.V1.C2S_HighFreqState.Parser, new[]{ "Position", "Velocity", "AnimState", "Facing", "Hp", "ShelterEnergy" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.C2S_FragmentCaught), global::Dualenigma.V1.C2S_FragmentCaught.Parser, new[]{ "FragmentId", "PosX", "PosY" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.C2S_BuildingPlace), global::Dualenigma.V1.C2S_BuildingPlace.Parser, new[]{ "BuildingType", "Material", "GridX", "GridY", "Facing" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.C2S_BuildingRemove), global::Dualenigma.V1.C2S_BuildingRemove.Parser, new[]{ "BuildingId" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.C2S_Synthesize), global::Dualenigma.V1.C2S_Synthesize.Parser, new[]{ "FragmentIds", "DesiredOutput" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.C2S_SkillActivate), global::Dualenigma.V1.C2S_SkillActivate.Parser, new[]{ "SkillId", "TargetX", "TargetY" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.C2S_TalentSelect), global::Dualenigma.V1.C2S_TalentSelect.Parser, new[]{ "TalentId" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.S2C_Resp), global::Dualenigma.V1.S2C_Resp.Parser, new[]{ "ReqId", "Code", "Message" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.S2C_ConnectAck), global::Dualenigma.V1.S2C_ConnectAck.Parser, new[]{ "PlayerId", "RoomCode" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.S2C_GameStart), global::Dualenigma.V1.S2C_GameStart.Parser, new[]{ "Chapter", "Section", "Round" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.S2C_PlayerJoined), global::Dualenigma.V1.S2C_PlayerJoined.Parser, new[]{ "PlayerId", "PlayerCount" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.S2C_PhaseChange), global::Dualenigma.V1.S2C_PhaseChange.Parser, new[]{ "Phase", "DurationMs", "PhaseEndTime" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.S2C_HighFreqState), global::Dualenigma.V1.S2C_HighFreqState.Parser, new[]{ "PlayerId", "Position", "Velocity", "AnimState", "Facing", "Hp", "ShelterEnergy" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.S2C_MidFreqState), global::Dualenigma.V1.S2C_MidFreqState.Parser, new[]{ "Players" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.S2C_MidFreqState.Types.PlayerMidFreq), global::Dualenigma.V1.S2C_MidFreqState.Types.PlayerMidFreq.Parser, new[]{ "PlayerId", "Hp", "ShelterEnergy", "CarriedFragments" }, null, null, null, null)}),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.S2C_OpponentDisconnect), global::Dualenigma.V1.S2C_OpponentDisconnect.Parser, new[]{ "State" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.S2C_FragmentDropPlan), global::Dualenigma.V1.S2C_FragmentDropPlan.Parser, new[]{ "Plan" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.S2C_FragmentDropPlan.Types.PlanItem), global::Dualenigma.V1.S2C_FragmentDropPlan.Types.PlanItem.Parser, new[]{ "FragmentId", "Type", "Position", "DropTime", "Seed" }, null, null, null, null)}),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.S2C_FragmentResult), global::Dualenigma.V1.S2C_FragmentResult.Parser, new[]{ "FragmentId", "PlayerId", "Multiplier", "IsSimultaneous" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Dualenigma.V1.S2C_HeartbeatAck), global::Dualenigma.V1.S2C_HeartbeatAck.Parser, new[]{ "ServerTimestamp" }, null, null, null, null)
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::DualEnigma.V1.GamePhasePb), }, null, new pbr::GeneratedClrTypeInfo[] {
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.Envelope), global::DualEnigma.V1.Envelope.Parser, new[]{ "Timestamp", "PlayerId", "ReqId", "Connect", "Heartbeat", "StartGame", "HighFreqState", "FragmentCaught", "BuildingPlace", "BuildingRemove", "Synthesize", "SkillActivate", "TalentSelect", "Resp", "ConnectAck", "GameStart", "PlayerJoined", "PhaseChange", "HighFreqStateS2C", "MidFreqState", "OpponentDisconnect", "FragmentDropPlan", "FragmentResult", "HeartbeatAck" }, new[]{ "Body" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.Vec2), global::DualEnigma.V1.Vec2.Parser, new[]{ "X", "Y" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.C2S_Connect), global::DualEnigma.V1.C2S_Connect.Parser, new[]{ "RoomCode", "Token" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.C2S_Heartbeat), global::DualEnigma.V1.C2S_Heartbeat.Parser, null, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.C2S_StartGame), global::DualEnigma.V1.C2S_StartGame.Parser, null, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.C2S_HighFreqState), global::DualEnigma.V1.C2S_HighFreqState.Parser, new[]{ "Position", "Velocity", "AnimState", "Facing", "Hp", "ShelterEnergy" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.C2S_FragmentCaught), global::DualEnigma.V1.C2S_FragmentCaught.Parser, new[]{ "FragmentId", "PosX", "PosY" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.C2S_BuildingPlace), global::DualEnigma.V1.C2S_BuildingPlace.Parser, new[]{ "BuildingType", "Material", "GridX", "GridY", "Facing" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.C2S_BuildingRemove), global::DualEnigma.V1.C2S_BuildingRemove.Parser, new[]{ "BuildingId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.C2S_Synthesize), global::DualEnigma.V1.C2S_Synthesize.Parser, new[]{ "FragmentIds", "DesiredOutput" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.C2S_SkillActivate), global::DualEnigma.V1.C2S_SkillActivate.Parser, new[]{ "SkillId", "TargetX", "TargetY" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.C2S_TalentSelect), global::DualEnigma.V1.C2S_TalentSelect.Parser, new[]{ "TalentId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.S2C_Resp), global::DualEnigma.V1.S2C_Resp.Parser, new[]{ "ReqId", "Code", "Message" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.S2C_ConnectAck), global::DualEnigma.V1.S2C_ConnectAck.Parser, new[]{ "PlayerId", "RoomCode" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.S2C_GameStart), global::DualEnigma.V1.S2C_GameStart.Parser, new[]{ "Chapter", "Section", "Round" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.S2C_PlayerJoined), global::DualEnigma.V1.S2C_PlayerJoined.Parser, new[]{ "PlayerId", "PlayerCount" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.S2C_PhaseChange), global::DualEnigma.V1.S2C_PhaseChange.Parser, new[]{ "Phase", "DurationMs", "PhaseEndTime" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.S2C_HighFreqState), global::DualEnigma.V1.S2C_HighFreqState.Parser, new[]{ "PlayerId", "Position", "Velocity", "AnimState", "Facing", "Hp", "ShelterEnergy" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.S2C_MidFreqState), global::DualEnigma.V1.S2C_MidFreqState.Parser, new[]{ "Players" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.S2C_MidFreqState.Types.PlayerMidFreq), global::DualEnigma.V1.S2C_MidFreqState.Types.PlayerMidFreq.Parser, new[]{ "PlayerId", "Hp", "ShelterEnergy", "CarriedFragments" }, null, null, null, null)}),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.S2C_OpponentDisconnect), global::DualEnigma.V1.S2C_OpponentDisconnect.Parser, new[]{ "State" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.S2C_FragmentDropPlan), global::DualEnigma.V1.S2C_FragmentDropPlan.Parser, new[]{ "Plan" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.S2C_FragmentDropPlan.Types.PlanItem), global::DualEnigma.V1.S2C_FragmentDropPlan.Types.PlanItem.Parser, new[]{ "FragmentId", "Type", "Position", "DropTime", "Seed" }, null, null, null, null)}),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.S2C_FragmentResult), global::DualEnigma.V1.S2C_FragmentResult.Parser, new[]{ "FragmentId", "PlayerId", "Multiplier", "IsSimultaneous" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::DualEnigma.V1.S2C_HeartbeatAck), global::DualEnigma.V1.S2C_HeartbeatAck.Parser, new[]{ "ServerTimestamp" }, null, null, null, null)
           }));
     }
     #endregion
@@ -168,7 +168,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[0]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -318,8 +318,8 @@ namespace Dualenigma.V1 {
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.C2S_Connect Connect {
-      get { return bodyCase_ == BodyOneofCase.Connect ? (global::Dualenigma.V1.C2S_Connect) body_ : null; }
+    public global::DualEnigma.V1.C2S_Connect Connect {
+      get { return bodyCase_ == BodyOneofCase.Connect ? (global::DualEnigma.V1.C2S_Connect) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.Connect;
@@ -330,8 +330,8 @@ namespace Dualenigma.V1 {
     public const int HeartbeatFieldNumber = 11;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.C2S_Heartbeat Heartbeat {
-      get { return bodyCase_ == BodyOneofCase.Heartbeat ? (global::Dualenigma.V1.C2S_Heartbeat) body_ : null; }
+    public global::DualEnigma.V1.C2S_Heartbeat Heartbeat {
+      get { return bodyCase_ == BodyOneofCase.Heartbeat ? (global::DualEnigma.V1.C2S_Heartbeat) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.Heartbeat;
@@ -342,8 +342,8 @@ namespace Dualenigma.V1 {
     public const int StartGameFieldNumber = 12;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.C2S_StartGame StartGame {
-      get { return bodyCase_ == BodyOneofCase.StartGame ? (global::Dualenigma.V1.C2S_StartGame) body_ : null; }
+    public global::DualEnigma.V1.C2S_StartGame StartGame {
+      get { return bodyCase_ == BodyOneofCase.StartGame ? (global::DualEnigma.V1.C2S_StartGame) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.StartGame;
@@ -354,8 +354,8 @@ namespace Dualenigma.V1 {
     public const int HighFreqStateFieldNumber = 13;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.C2S_HighFreqState HighFreqState {
-      get { return bodyCase_ == BodyOneofCase.HighFreqState ? (global::Dualenigma.V1.C2S_HighFreqState) body_ : null; }
+    public global::DualEnigma.V1.C2S_HighFreqState HighFreqState {
+      get { return bodyCase_ == BodyOneofCase.HighFreqState ? (global::DualEnigma.V1.C2S_HighFreqState) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.HighFreqState;
@@ -366,8 +366,8 @@ namespace Dualenigma.V1 {
     public const int FragmentCaughtFieldNumber = 14;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.C2S_FragmentCaught FragmentCaught {
-      get { return bodyCase_ == BodyOneofCase.FragmentCaught ? (global::Dualenigma.V1.C2S_FragmentCaught) body_ : null; }
+    public global::DualEnigma.V1.C2S_FragmentCaught FragmentCaught {
+      get { return bodyCase_ == BodyOneofCase.FragmentCaught ? (global::DualEnigma.V1.C2S_FragmentCaught) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.FragmentCaught;
@@ -381,8 +381,8 @@ namespace Dualenigma.V1 {
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.C2S_BuildingPlace BuildingPlace {
-      get { return bodyCase_ == BodyOneofCase.BuildingPlace ? (global::Dualenigma.V1.C2S_BuildingPlace) body_ : null; }
+    public global::DualEnigma.V1.C2S_BuildingPlace BuildingPlace {
+      get { return bodyCase_ == BodyOneofCase.BuildingPlace ? (global::DualEnigma.V1.C2S_BuildingPlace) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.BuildingPlace;
@@ -396,8 +396,8 @@ namespace Dualenigma.V1 {
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.C2S_BuildingRemove BuildingRemove {
-      get { return bodyCase_ == BodyOneofCase.BuildingRemove ? (global::Dualenigma.V1.C2S_BuildingRemove) body_ : null; }
+    public global::DualEnigma.V1.C2S_BuildingRemove BuildingRemove {
+      get { return bodyCase_ == BodyOneofCase.BuildingRemove ? (global::DualEnigma.V1.C2S_BuildingRemove) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.BuildingRemove;
@@ -411,8 +411,8 @@ namespace Dualenigma.V1 {
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.C2S_Synthesize Synthesize {
-      get { return bodyCase_ == BodyOneofCase.Synthesize ? (global::Dualenigma.V1.C2S_Synthesize) body_ : null; }
+    public global::DualEnigma.V1.C2S_Synthesize Synthesize {
+      get { return bodyCase_ == BodyOneofCase.Synthesize ? (global::DualEnigma.V1.C2S_Synthesize) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.Synthesize;
@@ -426,8 +426,8 @@ namespace Dualenigma.V1 {
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.C2S_SkillActivate SkillActivate {
-      get { return bodyCase_ == BodyOneofCase.SkillActivate ? (global::Dualenigma.V1.C2S_SkillActivate) body_ : null; }
+    public global::DualEnigma.V1.C2S_SkillActivate SkillActivate {
+      get { return bodyCase_ == BodyOneofCase.SkillActivate ? (global::DualEnigma.V1.C2S_SkillActivate) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.SkillActivate;
@@ -441,8 +441,8 @@ namespace Dualenigma.V1 {
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.C2S_TalentSelect TalentSelect {
-      get { return bodyCase_ == BodyOneofCase.TalentSelect ? (global::Dualenigma.V1.C2S_TalentSelect) body_ : null; }
+    public global::DualEnigma.V1.C2S_TalentSelect TalentSelect {
+      get { return bodyCase_ == BodyOneofCase.TalentSelect ? (global::DualEnigma.V1.C2S_TalentSelect) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.TalentSelect;
@@ -456,8 +456,8 @@ namespace Dualenigma.V1 {
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.S2C_Resp Resp {
-      get { return bodyCase_ == BodyOneofCase.Resp ? (global::Dualenigma.V1.S2C_Resp) body_ : null; }
+    public global::DualEnigma.V1.S2C_Resp Resp {
+      get { return bodyCase_ == BodyOneofCase.Resp ? (global::DualEnigma.V1.S2C_Resp) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.Resp;
@@ -468,8 +468,8 @@ namespace Dualenigma.V1 {
     public const int ConnectAckFieldNumber = 31;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.S2C_ConnectAck ConnectAck {
-      get { return bodyCase_ == BodyOneofCase.ConnectAck ? (global::Dualenigma.V1.S2C_ConnectAck) body_ : null; }
+    public global::DualEnigma.V1.S2C_ConnectAck ConnectAck {
+      get { return bodyCase_ == BodyOneofCase.ConnectAck ? (global::DualEnigma.V1.S2C_ConnectAck) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.ConnectAck;
@@ -480,8 +480,8 @@ namespace Dualenigma.V1 {
     public const int GameStartFieldNumber = 32;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.S2C_GameStart GameStart {
-      get { return bodyCase_ == BodyOneofCase.GameStart ? (global::Dualenigma.V1.S2C_GameStart) body_ : null; }
+    public global::DualEnigma.V1.S2C_GameStart GameStart {
+      get { return bodyCase_ == BodyOneofCase.GameStart ? (global::DualEnigma.V1.S2C_GameStart) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.GameStart;
@@ -492,8 +492,8 @@ namespace Dualenigma.V1 {
     public const int PlayerJoinedFieldNumber = 33;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.S2C_PlayerJoined PlayerJoined {
-      get { return bodyCase_ == BodyOneofCase.PlayerJoined ? (global::Dualenigma.V1.S2C_PlayerJoined) body_ : null; }
+    public global::DualEnigma.V1.S2C_PlayerJoined PlayerJoined {
+      get { return bodyCase_ == BodyOneofCase.PlayerJoined ? (global::DualEnigma.V1.S2C_PlayerJoined) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.PlayerJoined;
@@ -504,8 +504,8 @@ namespace Dualenigma.V1 {
     public const int PhaseChangeFieldNumber = 34;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.S2C_PhaseChange PhaseChange {
-      get { return bodyCase_ == BodyOneofCase.PhaseChange ? (global::Dualenigma.V1.S2C_PhaseChange) body_ : null; }
+    public global::DualEnigma.V1.S2C_PhaseChange PhaseChange {
+      get { return bodyCase_ == BodyOneofCase.PhaseChange ? (global::DualEnigma.V1.S2C_PhaseChange) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.PhaseChange;
@@ -516,8 +516,8 @@ namespace Dualenigma.V1 {
     public const int HighFreqStateS2CFieldNumber = 35;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.S2C_HighFreqState HighFreqStateS2C {
-      get { return bodyCase_ == BodyOneofCase.HighFreqStateS2C ? (global::Dualenigma.V1.S2C_HighFreqState) body_ : null; }
+    public global::DualEnigma.V1.S2C_HighFreqState HighFreqStateS2C {
+      get { return bodyCase_ == BodyOneofCase.HighFreqStateS2C ? (global::DualEnigma.V1.S2C_HighFreqState) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.HighFreqStateS2C;
@@ -528,8 +528,8 @@ namespace Dualenigma.V1 {
     public const int MidFreqStateFieldNumber = 36;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.S2C_MidFreqState MidFreqState {
-      get { return bodyCase_ == BodyOneofCase.MidFreqState ? (global::Dualenigma.V1.S2C_MidFreqState) body_ : null; }
+    public global::DualEnigma.V1.S2C_MidFreqState MidFreqState {
+      get { return bodyCase_ == BodyOneofCase.MidFreqState ? (global::DualEnigma.V1.S2C_MidFreqState) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.MidFreqState;
@@ -540,8 +540,8 @@ namespace Dualenigma.V1 {
     public const int OpponentDisconnectFieldNumber = 37;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.S2C_OpponentDisconnect OpponentDisconnect {
-      get { return bodyCase_ == BodyOneofCase.OpponentDisconnect ? (global::Dualenigma.V1.S2C_OpponentDisconnect) body_ : null; }
+    public global::DualEnigma.V1.S2C_OpponentDisconnect OpponentDisconnect {
+      get { return bodyCase_ == BodyOneofCase.OpponentDisconnect ? (global::DualEnigma.V1.S2C_OpponentDisconnect) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.OpponentDisconnect;
@@ -552,8 +552,8 @@ namespace Dualenigma.V1 {
     public const int FragmentDropPlanFieldNumber = 38;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.S2C_FragmentDropPlan FragmentDropPlan {
-      get { return bodyCase_ == BodyOneofCase.FragmentDropPlan ? (global::Dualenigma.V1.S2C_FragmentDropPlan) body_ : null; }
+    public global::DualEnigma.V1.S2C_FragmentDropPlan FragmentDropPlan {
+      get { return bodyCase_ == BodyOneofCase.FragmentDropPlan ? (global::DualEnigma.V1.S2C_FragmentDropPlan) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.FragmentDropPlan;
@@ -564,8 +564,8 @@ namespace Dualenigma.V1 {
     public const int FragmentResultFieldNumber = 39;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.S2C_FragmentResult FragmentResult {
-      get { return bodyCase_ == BodyOneofCase.FragmentResult ? (global::Dualenigma.V1.S2C_FragmentResult) body_ : null; }
+    public global::DualEnigma.V1.S2C_FragmentResult FragmentResult {
+      get { return bodyCase_ == BodyOneofCase.FragmentResult ? (global::DualEnigma.V1.S2C_FragmentResult) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.FragmentResult;
@@ -579,8 +579,8 @@ namespace Dualenigma.V1 {
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.S2C_HeartbeatAck HeartbeatAck {
-      get { return bodyCase_ == BodyOneofCase.HeartbeatAck ? (global::Dualenigma.V1.S2C_HeartbeatAck) body_ : null; }
+    public global::DualEnigma.V1.S2C_HeartbeatAck HeartbeatAck {
+      get { return bodyCase_ == BodyOneofCase.HeartbeatAck ? (global::DualEnigma.V1.S2C_HeartbeatAck) body_ : null; }
       set {
         body_ = value;
         bodyCase_ = value == null ? BodyOneofCase.None : BodyOneofCase.HeartbeatAck;
@@ -1025,127 +1025,127 @@ namespace Dualenigma.V1 {
       switch (other.BodyCase) {
         case BodyOneofCase.Connect:
           if (Connect == null) {
-            Connect = new global::Dualenigma.V1.C2S_Connect();
+            Connect = new global::DualEnigma.V1.C2S_Connect();
           }
           Connect.MergeFrom(other.Connect);
           break;
         case BodyOneofCase.Heartbeat:
           if (Heartbeat == null) {
-            Heartbeat = new global::Dualenigma.V1.C2S_Heartbeat();
+            Heartbeat = new global::DualEnigma.V1.C2S_Heartbeat();
           }
           Heartbeat.MergeFrom(other.Heartbeat);
           break;
         case BodyOneofCase.StartGame:
           if (StartGame == null) {
-            StartGame = new global::Dualenigma.V1.C2S_StartGame();
+            StartGame = new global::DualEnigma.V1.C2S_StartGame();
           }
           StartGame.MergeFrom(other.StartGame);
           break;
         case BodyOneofCase.HighFreqState:
           if (HighFreqState == null) {
-            HighFreqState = new global::Dualenigma.V1.C2S_HighFreqState();
+            HighFreqState = new global::DualEnigma.V1.C2S_HighFreqState();
           }
           HighFreqState.MergeFrom(other.HighFreqState);
           break;
         case BodyOneofCase.FragmentCaught:
           if (FragmentCaught == null) {
-            FragmentCaught = new global::Dualenigma.V1.C2S_FragmentCaught();
+            FragmentCaught = new global::DualEnigma.V1.C2S_FragmentCaught();
           }
           FragmentCaught.MergeFrom(other.FragmentCaught);
           break;
         case BodyOneofCase.BuildingPlace:
           if (BuildingPlace == null) {
-            BuildingPlace = new global::Dualenigma.V1.C2S_BuildingPlace();
+            BuildingPlace = new global::DualEnigma.V1.C2S_BuildingPlace();
           }
           BuildingPlace.MergeFrom(other.BuildingPlace);
           break;
         case BodyOneofCase.BuildingRemove:
           if (BuildingRemove == null) {
-            BuildingRemove = new global::Dualenigma.V1.C2S_BuildingRemove();
+            BuildingRemove = new global::DualEnigma.V1.C2S_BuildingRemove();
           }
           BuildingRemove.MergeFrom(other.BuildingRemove);
           break;
         case BodyOneofCase.Synthesize:
           if (Synthesize == null) {
-            Synthesize = new global::Dualenigma.V1.C2S_Synthesize();
+            Synthesize = new global::DualEnigma.V1.C2S_Synthesize();
           }
           Synthesize.MergeFrom(other.Synthesize);
           break;
         case BodyOneofCase.SkillActivate:
           if (SkillActivate == null) {
-            SkillActivate = new global::Dualenigma.V1.C2S_SkillActivate();
+            SkillActivate = new global::DualEnigma.V1.C2S_SkillActivate();
           }
           SkillActivate.MergeFrom(other.SkillActivate);
           break;
         case BodyOneofCase.TalentSelect:
           if (TalentSelect == null) {
-            TalentSelect = new global::Dualenigma.V1.C2S_TalentSelect();
+            TalentSelect = new global::DualEnigma.V1.C2S_TalentSelect();
           }
           TalentSelect.MergeFrom(other.TalentSelect);
           break;
         case BodyOneofCase.Resp:
           if (Resp == null) {
-            Resp = new global::Dualenigma.V1.S2C_Resp();
+            Resp = new global::DualEnigma.V1.S2C_Resp();
           }
           Resp.MergeFrom(other.Resp);
           break;
         case BodyOneofCase.ConnectAck:
           if (ConnectAck == null) {
-            ConnectAck = new global::Dualenigma.V1.S2C_ConnectAck();
+            ConnectAck = new global::DualEnigma.V1.S2C_ConnectAck();
           }
           ConnectAck.MergeFrom(other.ConnectAck);
           break;
         case BodyOneofCase.GameStart:
           if (GameStart == null) {
-            GameStart = new global::Dualenigma.V1.S2C_GameStart();
+            GameStart = new global::DualEnigma.V1.S2C_GameStart();
           }
           GameStart.MergeFrom(other.GameStart);
           break;
         case BodyOneofCase.PlayerJoined:
           if (PlayerJoined == null) {
-            PlayerJoined = new global::Dualenigma.V1.S2C_PlayerJoined();
+            PlayerJoined = new global::DualEnigma.V1.S2C_PlayerJoined();
           }
           PlayerJoined.MergeFrom(other.PlayerJoined);
           break;
         case BodyOneofCase.PhaseChange:
           if (PhaseChange == null) {
-            PhaseChange = new global::Dualenigma.V1.S2C_PhaseChange();
+            PhaseChange = new global::DualEnigma.V1.S2C_PhaseChange();
           }
           PhaseChange.MergeFrom(other.PhaseChange);
           break;
         case BodyOneofCase.HighFreqStateS2C:
           if (HighFreqStateS2C == null) {
-            HighFreqStateS2C = new global::Dualenigma.V1.S2C_HighFreqState();
+            HighFreqStateS2C = new global::DualEnigma.V1.S2C_HighFreqState();
           }
           HighFreqStateS2C.MergeFrom(other.HighFreqStateS2C);
           break;
         case BodyOneofCase.MidFreqState:
           if (MidFreqState == null) {
-            MidFreqState = new global::Dualenigma.V1.S2C_MidFreqState();
+            MidFreqState = new global::DualEnigma.V1.S2C_MidFreqState();
           }
           MidFreqState.MergeFrom(other.MidFreqState);
           break;
         case BodyOneofCase.OpponentDisconnect:
           if (OpponentDisconnect == null) {
-            OpponentDisconnect = new global::Dualenigma.V1.S2C_OpponentDisconnect();
+            OpponentDisconnect = new global::DualEnigma.V1.S2C_OpponentDisconnect();
           }
           OpponentDisconnect.MergeFrom(other.OpponentDisconnect);
           break;
         case BodyOneofCase.FragmentDropPlan:
           if (FragmentDropPlan == null) {
-            FragmentDropPlan = new global::Dualenigma.V1.S2C_FragmentDropPlan();
+            FragmentDropPlan = new global::DualEnigma.V1.S2C_FragmentDropPlan();
           }
           FragmentDropPlan.MergeFrom(other.FragmentDropPlan);
           break;
         case BodyOneofCase.FragmentResult:
           if (FragmentResult == null) {
-            FragmentResult = new global::Dualenigma.V1.S2C_FragmentResult();
+            FragmentResult = new global::DualEnigma.V1.S2C_FragmentResult();
           }
           FragmentResult.MergeFrom(other.FragmentResult);
           break;
         case BodyOneofCase.HeartbeatAck:
           if (HeartbeatAck == null) {
-            HeartbeatAck = new global::Dualenigma.V1.S2C_HeartbeatAck();
+            HeartbeatAck = new global::DualEnigma.V1.S2C_HeartbeatAck();
           }
           HeartbeatAck.MergeFrom(other.HeartbeatAck);
           break;
@@ -1179,7 +1179,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 82: {
-            global::Dualenigma.V1.C2S_Connect subBuilder = new global::Dualenigma.V1.C2S_Connect();
+            global::DualEnigma.V1.C2S_Connect subBuilder = new global::DualEnigma.V1.C2S_Connect();
             if (bodyCase_ == BodyOneofCase.Connect) {
               subBuilder.MergeFrom(Connect);
             }
@@ -1188,7 +1188,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 90: {
-            global::Dualenigma.V1.C2S_Heartbeat subBuilder = new global::Dualenigma.V1.C2S_Heartbeat();
+            global::DualEnigma.V1.C2S_Heartbeat subBuilder = new global::DualEnigma.V1.C2S_Heartbeat();
             if (bodyCase_ == BodyOneofCase.Heartbeat) {
               subBuilder.MergeFrom(Heartbeat);
             }
@@ -1197,7 +1197,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 98: {
-            global::Dualenigma.V1.C2S_StartGame subBuilder = new global::Dualenigma.V1.C2S_StartGame();
+            global::DualEnigma.V1.C2S_StartGame subBuilder = new global::DualEnigma.V1.C2S_StartGame();
             if (bodyCase_ == BodyOneofCase.StartGame) {
               subBuilder.MergeFrom(StartGame);
             }
@@ -1206,7 +1206,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 106: {
-            global::Dualenigma.V1.C2S_HighFreqState subBuilder = new global::Dualenigma.V1.C2S_HighFreqState();
+            global::DualEnigma.V1.C2S_HighFreqState subBuilder = new global::DualEnigma.V1.C2S_HighFreqState();
             if (bodyCase_ == BodyOneofCase.HighFreqState) {
               subBuilder.MergeFrom(HighFreqState);
             }
@@ -1215,7 +1215,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 114: {
-            global::Dualenigma.V1.C2S_FragmentCaught subBuilder = new global::Dualenigma.V1.C2S_FragmentCaught();
+            global::DualEnigma.V1.C2S_FragmentCaught subBuilder = new global::DualEnigma.V1.C2S_FragmentCaught();
             if (bodyCase_ == BodyOneofCase.FragmentCaught) {
               subBuilder.MergeFrom(FragmentCaught);
             }
@@ -1224,7 +1224,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 122: {
-            global::Dualenigma.V1.C2S_BuildingPlace subBuilder = new global::Dualenigma.V1.C2S_BuildingPlace();
+            global::DualEnigma.V1.C2S_BuildingPlace subBuilder = new global::DualEnigma.V1.C2S_BuildingPlace();
             if (bodyCase_ == BodyOneofCase.BuildingPlace) {
               subBuilder.MergeFrom(BuildingPlace);
             }
@@ -1233,7 +1233,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 130: {
-            global::Dualenigma.V1.C2S_BuildingRemove subBuilder = new global::Dualenigma.V1.C2S_BuildingRemove();
+            global::DualEnigma.V1.C2S_BuildingRemove subBuilder = new global::DualEnigma.V1.C2S_BuildingRemove();
             if (bodyCase_ == BodyOneofCase.BuildingRemove) {
               subBuilder.MergeFrom(BuildingRemove);
             }
@@ -1242,7 +1242,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 138: {
-            global::Dualenigma.V1.C2S_Synthesize subBuilder = new global::Dualenigma.V1.C2S_Synthesize();
+            global::DualEnigma.V1.C2S_Synthesize subBuilder = new global::DualEnigma.V1.C2S_Synthesize();
             if (bodyCase_ == BodyOneofCase.Synthesize) {
               subBuilder.MergeFrom(Synthesize);
             }
@@ -1251,7 +1251,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 146: {
-            global::Dualenigma.V1.C2S_SkillActivate subBuilder = new global::Dualenigma.V1.C2S_SkillActivate();
+            global::DualEnigma.V1.C2S_SkillActivate subBuilder = new global::DualEnigma.V1.C2S_SkillActivate();
             if (bodyCase_ == BodyOneofCase.SkillActivate) {
               subBuilder.MergeFrom(SkillActivate);
             }
@@ -1260,7 +1260,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 154: {
-            global::Dualenigma.V1.C2S_TalentSelect subBuilder = new global::Dualenigma.V1.C2S_TalentSelect();
+            global::DualEnigma.V1.C2S_TalentSelect subBuilder = new global::DualEnigma.V1.C2S_TalentSelect();
             if (bodyCase_ == BodyOneofCase.TalentSelect) {
               subBuilder.MergeFrom(TalentSelect);
             }
@@ -1269,7 +1269,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 242: {
-            global::Dualenigma.V1.S2C_Resp subBuilder = new global::Dualenigma.V1.S2C_Resp();
+            global::DualEnigma.V1.S2C_Resp subBuilder = new global::DualEnigma.V1.S2C_Resp();
             if (bodyCase_ == BodyOneofCase.Resp) {
               subBuilder.MergeFrom(Resp);
             }
@@ -1278,7 +1278,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 250: {
-            global::Dualenigma.V1.S2C_ConnectAck subBuilder = new global::Dualenigma.V1.S2C_ConnectAck();
+            global::DualEnigma.V1.S2C_ConnectAck subBuilder = new global::DualEnigma.V1.S2C_ConnectAck();
             if (bodyCase_ == BodyOneofCase.ConnectAck) {
               subBuilder.MergeFrom(ConnectAck);
             }
@@ -1287,7 +1287,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 258: {
-            global::Dualenigma.V1.S2C_GameStart subBuilder = new global::Dualenigma.V1.S2C_GameStart();
+            global::DualEnigma.V1.S2C_GameStart subBuilder = new global::DualEnigma.V1.S2C_GameStart();
             if (bodyCase_ == BodyOneofCase.GameStart) {
               subBuilder.MergeFrom(GameStart);
             }
@@ -1296,7 +1296,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 266: {
-            global::Dualenigma.V1.S2C_PlayerJoined subBuilder = new global::Dualenigma.V1.S2C_PlayerJoined();
+            global::DualEnigma.V1.S2C_PlayerJoined subBuilder = new global::DualEnigma.V1.S2C_PlayerJoined();
             if (bodyCase_ == BodyOneofCase.PlayerJoined) {
               subBuilder.MergeFrom(PlayerJoined);
             }
@@ -1305,7 +1305,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 274: {
-            global::Dualenigma.V1.S2C_PhaseChange subBuilder = new global::Dualenigma.V1.S2C_PhaseChange();
+            global::DualEnigma.V1.S2C_PhaseChange subBuilder = new global::DualEnigma.V1.S2C_PhaseChange();
             if (bodyCase_ == BodyOneofCase.PhaseChange) {
               subBuilder.MergeFrom(PhaseChange);
             }
@@ -1314,7 +1314,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 282: {
-            global::Dualenigma.V1.S2C_HighFreqState subBuilder = new global::Dualenigma.V1.S2C_HighFreqState();
+            global::DualEnigma.V1.S2C_HighFreqState subBuilder = new global::DualEnigma.V1.S2C_HighFreqState();
             if (bodyCase_ == BodyOneofCase.HighFreqStateS2C) {
               subBuilder.MergeFrom(HighFreqStateS2C);
             }
@@ -1323,7 +1323,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 290: {
-            global::Dualenigma.V1.S2C_MidFreqState subBuilder = new global::Dualenigma.V1.S2C_MidFreqState();
+            global::DualEnigma.V1.S2C_MidFreqState subBuilder = new global::DualEnigma.V1.S2C_MidFreqState();
             if (bodyCase_ == BodyOneofCase.MidFreqState) {
               subBuilder.MergeFrom(MidFreqState);
             }
@@ -1332,7 +1332,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 298: {
-            global::Dualenigma.V1.S2C_OpponentDisconnect subBuilder = new global::Dualenigma.V1.S2C_OpponentDisconnect();
+            global::DualEnigma.V1.S2C_OpponentDisconnect subBuilder = new global::DualEnigma.V1.S2C_OpponentDisconnect();
             if (bodyCase_ == BodyOneofCase.OpponentDisconnect) {
               subBuilder.MergeFrom(OpponentDisconnect);
             }
@@ -1341,7 +1341,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 306: {
-            global::Dualenigma.V1.S2C_FragmentDropPlan subBuilder = new global::Dualenigma.V1.S2C_FragmentDropPlan();
+            global::DualEnigma.V1.S2C_FragmentDropPlan subBuilder = new global::DualEnigma.V1.S2C_FragmentDropPlan();
             if (bodyCase_ == BodyOneofCase.FragmentDropPlan) {
               subBuilder.MergeFrom(FragmentDropPlan);
             }
@@ -1350,7 +1350,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 314: {
-            global::Dualenigma.V1.S2C_FragmentResult subBuilder = new global::Dualenigma.V1.S2C_FragmentResult();
+            global::DualEnigma.V1.S2C_FragmentResult subBuilder = new global::DualEnigma.V1.S2C_FragmentResult();
             if (bodyCase_ == BodyOneofCase.FragmentResult) {
               subBuilder.MergeFrom(FragmentResult);
             }
@@ -1359,7 +1359,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 322: {
-            global::Dualenigma.V1.S2C_HeartbeatAck subBuilder = new global::Dualenigma.V1.S2C_HeartbeatAck();
+            global::DualEnigma.V1.S2C_HeartbeatAck subBuilder = new global::DualEnigma.V1.S2C_HeartbeatAck();
             if (bodyCase_ == BodyOneofCase.HeartbeatAck) {
               subBuilder.MergeFrom(HeartbeatAck);
             }
@@ -1395,7 +1395,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 82: {
-            global::Dualenigma.V1.C2S_Connect subBuilder = new global::Dualenigma.V1.C2S_Connect();
+            global::DualEnigma.V1.C2S_Connect subBuilder = new global::DualEnigma.V1.C2S_Connect();
             if (bodyCase_ == BodyOneofCase.Connect) {
               subBuilder.MergeFrom(Connect);
             }
@@ -1404,7 +1404,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 90: {
-            global::Dualenigma.V1.C2S_Heartbeat subBuilder = new global::Dualenigma.V1.C2S_Heartbeat();
+            global::DualEnigma.V1.C2S_Heartbeat subBuilder = new global::DualEnigma.V1.C2S_Heartbeat();
             if (bodyCase_ == BodyOneofCase.Heartbeat) {
               subBuilder.MergeFrom(Heartbeat);
             }
@@ -1413,7 +1413,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 98: {
-            global::Dualenigma.V1.C2S_StartGame subBuilder = new global::Dualenigma.V1.C2S_StartGame();
+            global::DualEnigma.V1.C2S_StartGame subBuilder = new global::DualEnigma.V1.C2S_StartGame();
             if (bodyCase_ == BodyOneofCase.StartGame) {
               subBuilder.MergeFrom(StartGame);
             }
@@ -1422,7 +1422,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 106: {
-            global::Dualenigma.V1.C2S_HighFreqState subBuilder = new global::Dualenigma.V1.C2S_HighFreqState();
+            global::DualEnigma.V1.C2S_HighFreqState subBuilder = new global::DualEnigma.V1.C2S_HighFreqState();
             if (bodyCase_ == BodyOneofCase.HighFreqState) {
               subBuilder.MergeFrom(HighFreqState);
             }
@@ -1431,7 +1431,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 114: {
-            global::Dualenigma.V1.C2S_FragmentCaught subBuilder = new global::Dualenigma.V1.C2S_FragmentCaught();
+            global::DualEnigma.V1.C2S_FragmentCaught subBuilder = new global::DualEnigma.V1.C2S_FragmentCaught();
             if (bodyCase_ == BodyOneofCase.FragmentCaught) {
               subBuilder.MergeFrom(FragmentCaught);
             }
@@ -1440,7 +1440,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 122: {
-            global::Dualenigma.V1.C2S_BuildingPlace subBuilder = new global::Dualenigma.V1.C2S_BuildingPlace();
+            global::DualEnigma.V1.C2S_BuildingPlace subBuilder = new global::DualEnigma.V1.C2S_BuildingPlace();
             if (bodyCase_ == BodyOneofCase.BuildingPlace) {
               subBuilder.MergeFrom(BuildingPlace);
             }
@@ -1449,7 +1449,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 130: {
-            global::Dualenigma.V1.C2S_BuildingRemove subBuilder = new global::Dualenigma.V1.C2S_BuildingRemove();
+            global::DualEnigma.V1.C2S_BuildingRemove subBuilder = new global::DualEnigma.V1.C2S_BuildingRemove();
             if (bodyCase_ == BodyOneofCase.BuildingRemove) {
               subBuilder.MergeFrom(BuildingRemove);
             }
@@ -1458,7 +1458,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 138: {
-            global::Dualenigma.V1.C2S_Synthesize subBuilder = new global::Dualenigma.V1.C2S_Synthesize();
+            global::DualEnigma.V1.C2S_Synthesize subBuilder = new global::DualEnigma.V1.C2S_Synthesize();
             if (bodyCase_ == BodyOneofCase.Synthesize) {
               subBuilder.MergeFrom(Synthesize);
             }
@@ -1467,7 +1467,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 146: {
-            global::Dualenigma.V1.C2S_SkillActivate subBuilder = new global::Dualenigma.V1.C2S_SkillActivate();
+            global::DualEnigma.V1.C2S_SkillActivate subBuilder = new global::DualEnigma.V1.C2S_SkillActivate();
             if (bodyCase_ == BodyOneofCase.SkillActivate) {
               subBuilder.MergeFrom(SkillActivate);
             }
@@ -1476,7 +1476,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 154: {
-            global::Dualenigma.V1.C2S_TalentSelect subBuilder = new global::Dualenigma.V1.C2S_TalentSelect();
+            global::DualEnigma.V1.C2S_TalentSelect subBuilder = new global::DualEnigma.V1.C2S_TalentSelect();
             if (bodyCase_ == BodyOneofCase.TalentSelect) {
               subBuilder.MergeFrom(TalentSelect);
             }
@@ -1485,7 +1485,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 242: {
-            global::Dualenigma.V1.S2C_Resp subBuilder = new global::Dualenigma.V1.S2C_Resp();
+            global::DualEnigma.V1.S2C_Resp subBuilder = new global::DualEnigma.V1.S2C_Resp();
             if (bodyCase_ == BodyOneofCase.Resp) {
               subBuilder.MergeFrom(Resp);
             }
@@ -1494,7 +1494,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 250: {
-            global::Dualenigma.V1.S2C_ConnectAck subBuilder = new global::Dualenigma.V1.S2C_ConnectAck();
+            global::DualEnigma.V1.S2C_ConnectAck subBuilder = new global::DualEnigma.V1.S2C_ConnectAck();
             if (bodyCase_ == BodyOneofCase.ConnectAck) {
               subBuilder.MergeFrom(ConnectAck);
             }
@@ -1503,7 +1503,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 258: {
-            global::Dualenigma.V1.S2C_GameStart subBuilder = new global::Dualenigma.V1.S2C_GameStart();
+            global::DualEnigma.V1.S2C_GameStart subBuilder = new global::DualEnigma.V1.S2C_GameStart();
             if (bodyCase_ == BodyOneofCase.GameStart) {
               subBuilder.MergeFrom(GameStart);
             }
@@ -1512,7 +1512,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 266: {
-            global::Dualenigma.V1.S2C_PlayerJoined subBuilder = new global::Dualenigma.V1.S2C_PlayerJoined();
+            global::DualEnigma.V1.S2C_PlayerJoined subBuilder = new global::DualEnigma.V1.S2C_PlayerJoined();
             if (bodyCase_ == BodyOneofCase.PlayerJoined) {
               subBuilder.MergeFrom(PlayerJoined);
             }
@@ -1521,7 +1521,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 274: {
-            global::Dualenigma.V1.S2C_PhaseChange subBuilder = new global::Dualenigma.V1.S2C_PhaseChange();
+            global::DualEnigma.V1.S2C_PhaseChange subBuilder = new global::DualEnigma.V1.S2C_PhaseChange();
             if (bodyCase_ == BodyOneofCase.PhaseChange) {
               subBuilder.MergeFrom(PhaseChange);
             }
@@ -1530,7 +1530,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 282: {
-            global::Dualenigma.V1.S2C_HighFreqState subBuilder = new global::Dualenigma.V1.S2C_HighFreqState();
+            global::DualEnigma.V1.S2C_HighFreqState subBuilder = new global::DualEnigma.V1.S2C_HighFreqState();
             if (bodyCase_ == BodyOneofCase.HighFreqStateS2C) {
               subBuilder.MergeFrom(HighFreqStateS2C);
             }
@@ -1539,7 +1539,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 290: {
-            global::Dualenigma.V1.S2C_MidFreqState subBuilder = new global::Dualenigma.V1.S2C_MidFreqState();
+            global::DualEnigma.V1.S2C_MidFreqState subBuilder = new global::DualEnigma.V1.S2C_MidFreqState();
             if (bodyCase_ == BodyOneofCase.MidFreqState) {
               subBuilder.MergeFrom(MidFreqState);
             }
@@ -1548,7 +1548,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 298: {
-            global::Dualenigma.V1.S2C_OpponentDisconnect subBuilder = new global::Dualenigma.V1.S2C_OpponentDisconnect();
+            global::DualEnigma.V1.S2C_OpponentDisconnect subBuilder = new global::DualEnigma.V1.S2C_OpponentDisconnect();
             if (bodyCase_ == BodyOneofCase.OpponentDisconnect) {
               subBuilder.MergeFrom(OpponentDisconnect);
             }
@@ -1557,7 +1557,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 306: {
-            global::Dualenigma.V1.S2C_FragmentDropPlan subBuilder = new global::Dualenigma.V1.S2C_FragmentDropPlan();
+            global::DualEnigma.V1.S2C_FragmentDropPlan subBuilder = new global::DualEnigma.V1.S2C_FragmentDropPlan();
             if (bodyCase_ == BodyOneofCase.FragmentDropPlan) {
               subBuilder.MergeFrom(FragmentDropPlan);
             }
@@ -1566,7 +1566,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 314: {
-            global::Dualenigma.V1.S2C_FragmentResult subBuilder = new global::Dualenigma.V1.S2C_FragmentResult();
+            global::DualEnigma.V1.S2C_FragmentResult subBuilder = new global::DualEnigma.V1.S2C_FragmentResult();
             if (bodyCase_ == BodyOneofCase.FragmentResult) {
               subBuilder.MergeFrom(FragmentResult);
             }
@@ -1575,7 +1575,7 @@ namespace Dualenigma.V1 {
             break;
           }
           case 322: {
-            global::Dualenigma.V1.S2C_HeartbeatAck subBuilder = new global::Dualenigma.V1.S2C_HeartbeatAck();
+            global::DualEnigma.V1.S2C_HeartbeatAck subBuilder = new global::DualEnigma.V1.S2C_HeartbeatAck();
             if (bodyCase_ == BodyOneofCase.HeartbeatAck) {
               subBuilder.MergeFrom(HeartbeatAck);
             }
@@ -1610,7 +1610,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[1]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1842,7 +1842,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[2]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[2]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2075,7 +2075,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[3]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2228,7 +2228,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[4]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2381,7 +2381,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[5]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[5]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2418,10 +2418,10 @@ namespace Dualenigma.V1 {
 
     /// <summary>Field number for the "position" field.</summary>
     public const int PositionFieldNumber = 1;
-    private global::Dualenigma.V1.Vec2 position_;
+    private global::DualEnigma.V1.Vec2 position_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.Vec2 Position {
+    public global::DualEnigma.V1.Vec2 Position {
       get { return position_; }
       set {
         position_ = value;
@@ -2430,10 +2430,10 @@ namespace Dualenigma.V1 {
 
     /// <summary>Field number for the "velocity" field.</summary>
     public const int VelocityFieldNumber = 2;
-    private global::Dualenigma.V1.Vec2 velocity_;
+    private global::DualEnigma.V1.Vec2 velocity_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.Vec2 Velocity {
+    public global::DualEnigma.V1.Vec2 Velocity {
       get { return velocity_; }
       set {
         velocity_ = value;
@@ -2643,13 +2643,13 @@ namespace Dualenigma.V1 {
       }
       if (other.position_ != null) {
         if (position_ == null) {
-          Position = new global::Dualenigma.V1.Vec2();
+          Position = new global::DualEnigma.V1.Vec2();
         }
         Position.MergeFrom(other.Position);
       }
       if (other.velocity_ != null) {
         if (velocity_ == null) {
-          Velocity = new global::Dualenigma.V1.Vec2();
+          Velocity = new global::DualEnigma.V1.Vec2();
         }
         Velocity.MergeFrom(other.Velocity);
       }
@@ -2682,14 +2682,14 @@ namespace Dualenigma.V1 {
             break;
           case 10: {
             if (position_ == null) {
-              Position = new global::Dualenigma.V1.Vec2();
+              Position = new global::DualEnigma.V1.Vec2();
             }
             input.ReadMessage(Position);
             break;
           }
           case 18: {
             if (velocity_ == null) {
-              Velocity = new global::Dualenigma.V1.Vec2();
+              Velocity = new global::DualEnigma.V1.Vec2();
             }
             input.ReadMessage(Velocity);
             break;
@@ -2727,14 +2727,14 @@ namespace Dualenigma.V1 {
             break;
           case 10: {
             if (position_ == null) {
-              Position = new global::Dualenigma.V1.Vec2();
+              Position = new global::DualEnigma.V1.Vec2();
             }
             input.ReadMessage(Position);
             break;
           }
           case 18: {
             if (velocity_ == null) {
-              Velocity = new global::Dualenigma.V1.Vec2();
+              Velocity = new global::DualEnigma.V1.Vec2();
             }
             input.ReadMessage(Velocity);
             break;
@@ -2777,7 +2777,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[6]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[6]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3047,7 +3047,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[7]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[7]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3385,7 +3385,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[8]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[8]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3575,7 +3575,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[9]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[9]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3793,7 +3793,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[10]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[10]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4057,7 +4057,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[11]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[11]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4252,7 +4252,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[12]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[12]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4525,7 +4525,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[13]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[13]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4755,7 +4755,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[14]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[14]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5019,7 +5019,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[15]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[15]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5246,7 +5246,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[16]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[16]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5280,10 +5280,10 @@ namespace Dualenigma.V1 {
 
     /// <summary>Field number for the "phase" field.</summary>
     public const int PhaseFieldNumber = 1;
-    private global::Dualenigma.V1.GamePhasePb phase_ = global::Dualenigma.V1.GamePhasePb.GamePhaseUnspecified;
+    private global::DualEnigma.V1.GamePhasePb phase_ = global::DualEnigma.V1.GamePhasePb.GamePhaseUnspecified;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.GamePhasePb Phase {
+    public global::DualEnigma.V1.GamePhasePb Phase {
       get { return phase_; }
       set {
         phase_ = value;
@@ -5342,7 +5342,7 @@ namespace Dualenigma.V1 {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Phase != global::Dualenigma.V1.GamePhasePb.GamePhaseUnspecified) hash ^= Phase.GetHashCode();
+      if (Phase != global::DualEnigma.V1.GamePhasePb.GamePhaseUnspecified) hash ^= Phase.GetHashCode();
       if (DurationMs != 0) hash ^= DurationMs.GetHashCode();
       if (PhaseEndTime != 0L) hash ^= PhaseEndTime.GetHashCode();
       if (_unknownFields != null) {
@@ -5363,7 +5363,7 @@ namespace Dualenigma.V1 {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Phase != global::Dualenigma.V1.GamePhasePb.GamePhaseUnspecified) {
+      if (Phase != global::DualEnigma.V1.GamePhasePb.GamePhaseUnspecified) {
         output.WriteRawTag(8);
         output.WriteEnum((int) Phase);
       }
@@ -5385,7 +5385,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Phase != global::Dualenigma.V1.GamePhasePb.GamePhaseUnspecified) {
+      if (Phase != global::DualEnigma.V1.GamePhasePb.GamePhaseUnspecified) {
         output.WriteRawTag(8);
         output.WriteEnum((int) Phase);
       }
@@ -5407,7 +5407,7 @@ namespace Dualenigma.V1 {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Phase != global::Dualenigma.V1.GamePhasePb.GamePhaseUnspecified) {
+      if (Phase != global::DualEnigma.V1.GamePhasePb.GamePhaseUnspecified) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Phase);
       }
       if (DurationMs != 0) {
@@ -5428,7 +5428,7 @@ namespace Dualenigma.V1 {
       if (other == null) {
         return;
       }
-      if (other.Phase != global::Dualenigma.V1.GamePhasePb.GamePhaseUnspecified) {
+      if (other.Phase != global::DualEnigma.V1.GamePhasePb.GamePhaseUnspecified) {
         Phase = other.Phase;
       }
       if (other.DurationMs != 0) {
@@ -5453,7 +5453,7 @@ namespace Dualenigma.V1 {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            Phase = (global::Dualenigma.V1.GamePhasePb) input.ReadEnum();
+            Phase = (global::DualEnigma.V1.GamePhasePb) input.ReadEnum();
             break;
           }
           case 16: {
@@ -5480,7 +5480,7 @@ namespace Dualenigma.V1 {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            Phase = (global::Dualenigma.V1.GamePhasePb) input.ReadEnum();
+            Phase = (global::DualEnigma.V1.GamePhasePb) input.ReadEnum();
             break;
           }
           case 16: {
@@ -5513,7 +5513,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[17]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[17]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5563,10 +5563,10 @@ namespace Dualenigma.V1 {
 
     /// <summary>Field number for the "position" field.</summary>
     public const int PositionFieldNumber = 2;
-    private global::Dualenigma.V1.Vec2 position_;
+    private global::DualEnigma.V1.Vec2 position_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.Vec2 Position {
+    public global::DualEnigma.V1.Vec2 Position {
       get { return position_; }
       set {
         position_ = value;
@@ -5575,10 +5575,10 @@ namespace Dualenigma.V1 {
 
     /// <summary>Field number for the "velocity" field.</summary>
     public const int VelocityFieldNumber = 3;
-    private global::Dualenigma.V1.Vec2 velocity_;
+    private global::DualEnigma.V1.Vec2 velocity_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Dualenigma.V1.Vec2 Velocity {
+    public global::DualEnigma.V1.Vec2 Velocity {
       get { return velocity_; }
       set {
         velocity_ = value;
@@ -5801,13 +5801,13 @@ namespace Dualenigma.V1 {
       }
       if (other.position_ != null) {
         if (position_ == null) {
-          Position = new global::Dualenigma.V1.Vec2();
+          Position = new global::DualEnigma.V1.Vec2();
         }
         Position.MergeFrom(other.Position);
       }
       if (other.velocity_ != null) {
         if (velocity_ == null) {
-          Velocity = new global::Dualenigma.V1.Vec2();
+          Velocity = new global::DualEnigma.V1.Vec2();
         }
         Velocity.MergeFrom(other.Velocity);
       }
@@ -5844,14 +5844,14 @@ namespace Dualenigma.V1 {
           }
           case 18: {
             if (position_ == null) {
-              Position = new global::Dualenigma.V1.Vec2();
+              Position = new global::DualEnigma.V1.Vec2();
             }
             input.ReadMessage(Position);
             break;
           }
           case 26: {
             if (velocity_ == null) {
-              Velocity = new global::Dualenigma.V1.Vec2();
+              Velocity = new global::DualEnigma.V1.Vec2();
             }
             input.ReadMessage(Velocity);
             break;
@@ -5893,14 +5893,14 @@ namespace Dualenigma.V1 {
           }
           case 18: {
             if (position_ == null) {
-              Position = new global::Dualenigma.V1.Vec2();
+              Position = new global::DualEnigma.V1.Vec2();
             }
             input.ReadMessage(Position);
             break;
           }
           case 26: {
             if (velocity_ == null) {
-              Velocity = new global::Dualenigma.V1.Vec2();
+              Velocity = new global::DualEnigma.V1.Vec2();
             }
             input.ReadMessage(Velocity);
             break;
@@ -5943,7 +5943,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[18]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[18]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5975,12 +5975,12 @@ namespace Dualenigma.V1 {
 
     /// <summary>Field number for the "players" field.</summary>
     public const int PlayersFieldNumber = 1;
-    private static readonly pb::FieldCodec<global::Dualenigma.V1.S2C_MidFreqState.Types.PlayerMidFreq> _repeated_players_codec
-        = pb::FieldCodec.ForMessage(10, global::Dualenigma.V1.S2C_MidFreqState.Types.PlayerMidFreq.Parser);
-    private readonly pbc::RepeatedField<global::Dualenigma.V1.S2C_MidFreqState.Types.PlayerMidFreq> players_ = new pbc::RepeatedField<global::Dualenigma.V1.S2C_MidFreqState.Types.PlayerMidFreq>();
+    private static readonly pb::FieldCodec<global::DualEnigma.V1.S2C_MidFreqState.Types.PlayerMidFreq> _repeated_players_codec
+        = pb::FieldCodec.ForMessage(10, global::DualEnigma.V1.S2C_MidFreqState.Types.PlayerMidFreq.Parser);
+    private readonly pbc::RepeatedField<global::DualEnigma.V1.S2C_MidFreqState.Types.PlayerMidFreq> players_ = new pbc::RepeatedField<global::DualEnigma.V1.S2C_MidFreqState.Types.PlayerMidFreq>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<global::Dualenigma.V1.S2C_MidFreqState.Types.PlayerMidFreq> Players {
+    public pbc::RepeatedField<global::DualEnigma.V1.S2C_MidFreqState.Types.PlayerMidFreq> Players {
       get { return players_; }
     }
 
@@ -6125,7 +6125,7 @@ namespace Dualenigma.V1 {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public static pbr::MessageDescriptor Descriptor {
-          get { return global::Dualenigma.V1.S2C_MidFreqState.Descriptor.NestedTypes[0]; }
+          get { return global::DualEnigma.V1.S2C_MidFreqState.Descriptor.NestedTypes[0]; }
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6425,7 +6425,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[19]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[19]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6618,7 +6618,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[20]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[20]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6650,12 +6650,12 @@ namespace Dualenigma.V1 {
 
     /// <summary>Field number for the "plan" field.</summary>
     public const int PlanFieldNumber = 1;
-    private static readonly pb::FieldCodec<global::Dualenigma.V1.S2C_FragmentDropPlan.Types.PlanItem> _repeated_plan_codec
-        = pb::FieldCodec.ForMessage(10, global::Dualenigma.V1.S2C_FragmentDropPlan.Types.PlanItem.Parser);
-    private readonly pbc::RepeatedField<global::Dualenigma.V1.S2C_FragmentDropPlan.Types.PlanItem> plan_ = new pbc::RepeatedField<global::Dualenigma.V1.S2C_FragmentDropPlan.Types.PlanItem>();
+    private static readonly pb::FieldCodec<global::DualEnigma.V1.S2C_FragmentDropPlan.Types.PlanItem> _repeated_plan_codec
+        = pb::FieldCodec.ForMessage(10, global::DualEnigma.V1.S2C_FragmentDropPlan.Types.PlanItem.Parser);
+    private readonly pbc::RepeatedField<global::DualEnigma.V1.S2C_FragmentDropPlan.Types.PlanItem> plan_ = new pbc::RepeatedField<global::DualEnigma.V1.S2C_FragmentDropPlan.Types.PlanItem>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<global::Dualenigma.V1.S2C_FragmentDropPlan.Types.PlanItem> Plan {
+    public pbc::RepeatedField<global::DualEnigma.V1.S2C_FragmentDropPlan.Types.PlanItem> Plan {
       get { return plan_; }
     }
 
@@ -6800,7 +6800,7 @@ namespace Dualenigma.V1 {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
         public static pbr::MessageDescriptor Descriptor {
-          get { return global::Dualenigma.V1.S2C_FragmentDropPlan.Descriptor.NestedTypes[0]; }
+          get { return global::DualEnigma.V1.S2C_FragmentDropPlan.Descriptor.NestedTypes[0]; }
         }
 
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6863,10 +6863,10 @@ namespace Dualenigma.V1 {
 
         /// <summary>Field number for the "position" field.</summary>
         public const int PositionFieldNumber = 3;
-        private global::Dualenigma.V1.Vec2 position_;
+        private global::DualEnigma.V1.Vec2 position_;
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
         [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-        public global::Dualenigma.V1.Vec2 Position {
+        public global::DualEnigma.V1.Vec2 Position {
           get { return position_; }
           set {
             position_ = value;
@@ -7042,7 +7042,7 @@ namespace Dualenigma.V1 {
           }
           if (other.position_ != null) {
             if (position_ == null) {
-              Position = new global::Dualenigma.V1.Vec2();
+              Position = new global::DualEnigma.V1.Vec2();
             }
             Position.MergeFrom(other.Position);
           }
@@ -7077,7 +7077,7 @@ namespace Dualenigma.V1 {
               }
               case 26: {
                 if (position_ == null) {
-                  Position = new global::Dualenigma.V1.Vec2();
+                  Position = new global::DualEnigma.V1.Vec2();
                 }
                 input.ReadMessage(Position);
                 break;
@@ -7115,7 +7115,7 @@ namespace Dualenigma.V1 {
               }
               case 26: {
                 if (position_ == null) {
-                  Position = new global::Dualenigma.V1.Vec2();
+                  Position = new global::DualEnigma.V1.Vec2();
                 }
                 input.ReadMessage(Position);
                 break;
@@ -7155,7 +7155,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[21]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[21]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7459,7 +7459,7 @@ namespace Dualenigma.V1 {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Dualenigma.V1.GameReflection.Descriptor.MessageTypes[22]; }
+      get { return global::DualEnigma.V1.GameReflection.Descriptor.MessageTypes[22]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
