@@ -11,7 +11,7 @@ namespace DualEnigma.Art
     /// 点击特效类型（10种）。
     /// 覆盖屏幕点击、按钮点击等点击反馈场景：
     /// 元素主题（水/火/冰/岩/温）+ 通用主题（脉冲/星光/聚拢/烟雾/冲击波）。
-    /// 引用：ClickEffectFactory.cs
+    /// 引用：ClickEffectPrefabGenerator.cs（预制体生成顺序与此枚举一致）, ClickEffectInput.cs
     /// </summary>
     public enum ClickEffectType
     {
@@ -39,7 +39,9 @@ namespace DualEnigma.Art
 
     /// <summary>
     /// 粒子贴图类型（白色+Alpha，可被 startColor 任意染色）。
-    /// 引用：ParticleTextureGenerator.cs
+    /// Soft/Dot 直接使用 Unity 自带 Default-Particle 材质；
+    /// Ring/Spark/Chip 由程序化贴图生成（自带材质无法表现环形/星形/方形）。
+    /// 引用：ParticleTextureGenerator.cs, ClickEffectPrefabGenerator.cs
     /// </summary>
     public enum ParticleTextureType
     {

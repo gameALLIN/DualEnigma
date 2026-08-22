@@ -1,25 +1,32 @@
 /// ============================================================
+/// ============================================================
 /// 文件名: GameConnection.cs
 /// 创建时间: 2026-08-22
+/// 最后更新: 2026-08-22（PC-1 切换 Protobuf 二进制协议）
 /// 作者: DualEnigma
-/// 描述: 游戏连接组装层：WebSocketConnection（传输）+ NetMessageRegistry（分发）
-///       + ThrottledSender（高频限频）+ 进房看门狗。对外发送 API 与旧
-///       GameServerClient 同名同签名（ConnectToRoom 除外，语义更明确）。
-///       消息处理逻辑自 GameServerClient.DispatchMessage 逐行搬运（R3 不改逻辑）。
-/// 引用：Framework/Network/*, Protocol/*, RoomSession.cs, NetworkEvents.cs
+/// 描述: 游戏连接组装层：WebSocketConnection（二进制传输）+ ThrottledSender
+///       （高频限频）+ RequestTracker（reqId 回执）+ 进房看门狗。
+///       协议为 Protobuf Envelope oneof（Generated/Game.cs，Dualenigma.V1）：
+///       接收 ParseFrom → BodyCase switch 分发（注册表退役）；
+///       发送构造 Envelope → ToByteArray 二进制帧。
+///       消息处理逻辑自 JSON 版逐行搬运（语义零变化：reqId/看门狗/RTT/时钟差值法）。
+/// 引用：Framework/Network/*, Protocol/Generated/*, ProtoMapping.cs, RoomSession.cs
 /// ============================================================
 
 using System;
 using System.Collections.Generic;
+using Google.Protobuf;
 using UnityEngine;
 using DualEnigma.Framework.Core;
 using DualEnigma.Framework.Network;
 using DualEnigma.Core;
 using DualEnigma.Data;
+using DualEnigma.V1;
+using Pb = DualEnigma.V1;
 
 namespace DualEnigma.Network
 {
-    /// <summary>游戏连接（组装框架件 + 业务消息注册 + 发送 API）</summary>
+    /// <summary>游戏连接（组装框架件 + 协议分发 + 发送 API）</summary>
     public class GameConnection : Singleton<GameConnection>
     {
         /// <summary>进房 Ack 看门狗（秒）：握手成功但未收到 ConnectAck（房满/房不存在/已开局被拒）</summary>
@@ -32,7 +39,6 @@ namespace DualEnigma.Network
         private const float REQUEST_TIMEOUT = 5f;
 
         private WebSocketConnection _conn;
-        private NetMessageRegistry _registry;
         private ThrottledSender _highFreqThrottle;
         private RequestTracker _tracker;
 
@@ -57,15 +63,13 @@ namespace DualEnigma.Network
         {
             _config = DataManager.Instance.LoadConfig<NetworkConfig>("NetworkConfig");
 
-            // 框架件组装
+            // 框架件组装（协议分发为 Envelope.BodyCase switch，注册表已退役）
             _conn = gameObject.AddComponent<WebSocketConnection>();
             _conn.OnMessageReceived += OnRawMessage;
             _conn.OnAbnormalDisconnected += OnAbnormalDisconnected;
-            _registry = new NetMessageRegistry();
             _highFreqThrottle = new ThrottledSender(_config != null ? _config.HighFrequencyRate : 20f);
             _tracker = new RequestTracker();
 
-            RegisterHandlers();
             Debug.Log("[GameConnection] 游戏连接初始化完成");
         }
 
@@ -114,18 +118,19 @@ namespace DualEnigma.Network
             // reqId 登记：成功 resp(0) 紧邻 ConnectAck 前；失败 2001/2002/2003 回执后服务器关闭会话
             string token = AuthService.HasInstance && AuthService.Instance.IsLoggedIn
                 ? AuthService.Instance.Token : "";
-            C2S_Connect connectMsg = new C2S_Connect
+            var connectEnv = new Envelope
             {
-                data = new C2S_Connect.Data { roomCode = roomCode ?? "", token = token }
+                ReqId = _tracker.Register(NetProto.Connect, REQUEST_TIMEOUT, (code, message) =>
+                    OnConnectResp(code, message)),
+                Connect = new Pb.C2S_Connect { RoomCode = roomCode ?? "", Token = token },
             };
-            connectMsg.reqId = _tracker.Register(NetProto.Connect, REQUEST_TIMEOUT, (code, message) =>
-                OnConnectResp(code, message));
-            await _conn.SendAsync(NetJson.ToJson(connectMsg));
+            await _conn.SendAsync(connectEnv.ToByteArray());
 
             // 进房看门狗：握手成功但无 ConnectAck → ConnectTimeout 兜底（审查报告 J）
             _ackWatchdog = 0f;
 
-            _conn.StartHeartbeat(HEARTBEAT_INTERVAL, () => NetJson.ToJson(new C2S_Heartbeat()));
+            _conn.StartHeartbeat(HEARTBEAT_INTERVAL,
+                () => new Envelope { Heartbeat = new Pb.C2S_Heartbeat() }.ToByteArray());
         }
 
         /// <summary>
@@ -183,10 +188,13 @@ namespace DualEnigma.Network
                 return;
             }
 
-            C2S_StartGame msg = new C2S_StartGame();
-            msg.reqId = _tracker.Register(NetProto.StartGame, REQUEST_TIMEOUT, (code, message) =>
-                OnStartGameResp(code, message));
-            _ = _conn.SendAsync(NetJson.ToJson(msg));
+            var env = new Envelope
+            {
+                ReqId = _tracker.Register(NetProto.StartGame, REQUEST_TIMEOUT, (code, message) =>
+                    OnStartGameResp(code, message)),
+                StartGame = new Pb.C2S_StartGame(),
+            };
+            _ = _conn.SendAsync(env.ToByteArray());
         }
 
         /// <summary>开局回执：成功只进日志（UI 仍由 S2C_GameStart 事件驱动）；失败发布 NetworkErrorEvent</summary>
@@ -207,7 +215,7 @@ namespace DualEnigma.Network
             Debug.LogWarning($"[GameConnection] 开局失败 resp({code}): {message}");
         }
 
-        /// <summary>上报本地角色高频状态（内部 20Hz 节流，ThrottledSender）</summary>
+        /// <summary>上报本地角色高频状态（内部 20Hz 节流，ThrottledSender；reqId 豁免恒 0）</summary>
         public void SendHighFreqState(Vector2 position, Vector2 velocity, string animState, bool facing, int hp, float shelterEnergy)
         {
             if (!_conn.IsConnected) return;
@@ -215,18 +223,19 @@ namespace DualEnigma.Network
             if (_highFreqThrottle != null && !_highFreqThrottle.Tick(Time.deltaTime))
                 return;
 
-            _ = _conn.SendAsync(NetJson.ToJson(new C2S_HighFreqState
+            var env = new Envelope
             {
-                data = new C2S_HighFreqState.Data
+                HighFreqState = new Pb.C2S_HighFreqState
                 {
-                    position = new NetVec2 { x = position.x, y = position.y },
-                    velocity = new NetVec2 { x = velocity.x, y = velocity.y },
-                    animState = animState,
-                    facing = facing,
-                    hp = hp,
-                    shelterEnergy = shelterEnergy
-                }
-            }));
+                    Position = new Pb.Vec2 { X = position.x, Y = position.y },
+                    Velocity = new Pb.Vec2 { X = velocity.x, Y = velocity.y },
+                    AnimState = animState,
+                    Facing = facing,
+                    Hp = hp,
+                    ShelterEnergy = shelterEnergy,
+                },
+            };
+            _ = _conn.SendAsync(env.ToByteArray());
         }
 
         /// <summary>上报碎片接住（携带碰撞瞬间碎片坐标供服务器几何判定同接；resp(0) 为服务器权威确认锚点）</summary>
@@ -234,13 +243,16 @@ namespace DualEnigma.Network
         {
             if (!_conn.IsConnected) return;
 
-            C2S_FragmentCaught msg = new C2S_FragmentCaught
+            var env = new Envelope
             {
-                data = new C2S_FragmentCaught.Data { fragmentId = fragmentId, posX = posX, posY = posY }
+                ReqId = _tracker.Register(NetProto.FragmentCaught, REQUEST_TIMEOUT, (code, message) =>
+                    OnFragmentCaughtResp(code, message)),
+                FragmentCaught = new Pb.C2S_FragmentCaught
+                {
+                    FragmentId = fragmentId, PosX = posX, PosY = posY,
+                },
             };
-            msg.reqId = _tracker.Register(NetProto.FragmentCaught, REQUEST_TIMEOUT, (code, message) =>
-                OnFragmentCaughtResp(code, message));
-            _ = _conn.SendAsync(NetJson.ToJson(msg));
+            _ = _conn.SendAsync(env.ToByteArray());
         }
 
         /// <summary>碎片上报回执：成功=权威确认锚点（日志）；被拒(4002)=警告日志，对局不中断</summary>
@@ -297,136 +309,146 @@ namespace DualEnigma.Network
         }
 
         // ============================================================
-        //  消息注册（自 GameServerClient.DispatchMessage 逐行搬运，逻辑不变）
+        //  协议分发（Protobuf Envelope.BodyCase switch；逻辑自 JSON 版逐行搬运）
         // ============================================================
 
-        private void OnRawMessage(string json)
+        /// <summary>接收一帧二进制信封：ParseFrom（坏帧丢弃）→ BodyCase 路由</summary>
+        private void OnRawMessage(byte[] payload)
         {
-            _registry.Dispatch(json);
-        }
-
-        private void RegisterHandlers()
-        {
-            // 阶段切换：需要信封 timestamp（时钟差值法：剩余 = phaseEndTime - timestamp）
-            _registry.Register<S2C_PhaseChange>(NetProto.PhaseChange, (envelope, msg) =>
+            Envelope env;
+            try
             {
-                if (msg?.data == null) return;
-                if (Enum.TryParse(msg.data.phase, out GamePhase phase))
+                env = Envelope.Parser.ParseFrom(payload);
+            }
+            catch (InvalidProtocolBufferException e)
+            {
+                Debug.LogWarning($"[GameConnection] 坏帧丢弃（{payload.Length}B）: {e.Message}");
+                return;
+            }
+
+            switch (env.BodyCase)
+            {
+                case Envelope.BodyOneofCase.PhaseChange:
                 {
-                    float remaining = (msg.data.phaseEndTime - msg.timestamp) / 1000f;
+                    // 时钟差值法：剩余 = phaseEndTime - 信封 timestamp（同为服务器时钟）
+                    GamePhase phase = ProtoMapping.ToGamePhase(env.PhaseChange.Phase);
+                    float remaining = (env.PhaseChange.PhaseEndTime - env.Timestamp) / 1000f;
                     GameStateMachine.Instance.ApplyServerPhase(phase, remaining);
+                    break;
                 }
-            });
 
-            _registry.Register<S2C_ConnectAck>(NetProto.ConnectAck, msg =>
-            {
-                string roomCode = msg.data != null ? msg.data.roomCode : "";
-                int playerId = msg.data != null ? msg.data.playerId : 0;
-
-                _ackWatchdog = -1f; // 进房成功，取消看门狗
-                RoomSession.Instance.EnterRoom(playerId, roomCode);
-            });
-
-            _registry.Register<S2C_GameStart>(NetProto.GameStart, msg =>
-            {
-                EventBus.Instance.Publish(new RoomGameStartEvent
+                case Envelope.BodyOneofCase.ConnectAck:
                 {
-                    chapter = msg.data?.chapter ?? 1,
-                    section = msg.data?.section ?? 1,
-                    round = msg.data?.round ?? 1
-                });
-            });
-
-            _registry.Register<S2C_PlayerJoined>(NetProto.PlayerJoined, msg =>
-            {
-                EventBus.Instance.Publish(new PlayerJoinedRoomEvent
-                {
-                    playerId = msg.data?.playerId ?? 0,
-                    playerCount = msg.data?.playerCount ?? 1
-                });
-            });
-
-            _registry.Register<S2C_HighFreqState>(NetProto.HighFreqStateS2C, msg =>
-            {
-                if (msg?.data == null) return;
-                EventBus.Instance.Publish(new HighFreqStateReceivedEvent
-                {
-                    playerId = (byte)msg.data.playerId,
-                    position = msg.data.position != null
-                        ? new Vector2(msg.data.position.x, msg.data.position.y) : Vector2.zero,
-                    velocity = msg.data.velocity != null
-                        ? new Vector2(msg.data.velocity.x, msg.data.velocity.y) : Vector2.zero,
-                    animState = msg.data.animState,
-                    facing = msg.data.facing
-                });
-            });
-
-            _registry.Register<S2C_MidFreqState>(NetProto.MidFreqState, msg =>
-            {
-                if (msg?.data?.players == null) return;
-                byte opponent = RoomSession.Instance.OpponentId;
-                foreach (S2C_MidFreqState.PlayerData p in msg.data.players)
-                {
-                    if (p.playerId == opponent)
-                        RoomSession.Instance.UpdateOpponentStats(p.hp, p.shelterEnergy);
+                    _ackWatchdog = -1f; // 进房成功，取消看门狗
+                    RoomSession.Instance.EnterRoom(env.ConnectAck.PlayerId, env.ConnectAck.RoomCode);
+                    break;
                 }
-            });
 
-            _registry.Register<S2C_OpponentDisconnect>(NetProto.OpponentDisconnect, msg =>
-            {
-                EventBus.Instance.Publish(new OpponentDisconnectEvent
+                case Envelope.BodyOneofCase.GameStart:
                 {
-                    playerId = msg.playerId,
-                    state = msg.data?.state ?? ""
-                });
-            });
-
-            _registry.Register<S2C_FragmentDropPlan>(NetProto.FragmentDropPlan, msg =>
-            {
-                if (msg?.data?.plan == null || msg.data.plan.Count == 0) return;
-
-                var plan = new List<DualEnigma.Fragment.FragmentDropPlan>(msg.data.plan.Count);
-                foreach (S2C_FragmentDropPlan.PlanItem item in msg.data.plan)
-                {
-                    plan.Add(new DualEnigma.Fragment.FragmentDropPlan
+                    EventBus.Instance.Publish(new RoomGameStartEvent
                     {
-                        FragmentId = item.fragmentId,
-                        Type = (DualEnigma.Fragment.FragmentType)item.type, // 0/1/2 顺序已核对一致
-                        Position = item.position != null
-                            ? new Vector2(item.position.x, item.position.y) : Vector2.zero,
-                        DropTime = item.dropTime,
-                        Seed = unchecked((uint)item.seed) // long→uint 截断，两端一致即可保证确定性
+                        chapter = env.GameStart.Chapter,
+                        section = env.GameStart.Section,
+                        round = env.GameStart.Round,
                     });
+                    break;
                 }
 
-                if (DualEnigma.Fragment.FragmentSystem.HasInstance)
-                    DualEnigma.Fragment.FragmentSystem.Instance.ExecuteDropPlan(plan);
-            });
-
-            _registry.Register<S2C_FragmentResult>(NetProto.FragmentResult, msg =>
-            {
-                if (msg?.data == null) return;
-
-                // 只处理对方接住：自己接住的本地已完成（上报发生在收集完成之后）
-                if (msg.data.playerId != RoomSession.Instance.LocalPlayerId
-                    && DualEnigma.Fragment.FragmentSystem.HasInstance)
+                case Envelope.BodyOneofCase.PlayerJoined:
                 {
-                    DualEnigma.Fragment.FragmentSystem.Instance.OnFragmentCollected(
-                        msg.data.fragmentId, (byte)msg.data.playerId, false);
+                    EventBus.Instance.Publish(new PlayerJoinedRoomEvent
+                    {
+                        playerId = env.PlayerJoined.PlayerId,
+                        playerCount = env.PlayerJoined.PlayerCount,
+                    });
+                    break;
                 }
-            });
 
-            _registry.Register<S2C_HeartbeatAck>(NetProto.HeartbeatAck, msg =>
-            {
-                _conn.NotifyHeartbeatAck(); // RTT 刷新（传输层）
-            });
+                case Envelope.BodyOneofCase.HighFreqStateS2C:
+                {
+                    EventBus.Instance.Publish(new HighFreqStateReceivedEvent
+                    {
+                        playerId = (byte)env.HighFreqStateS2C.PlayerId,
+                        position = ProtoMapping.ToVector2(env.HighFreqStateS2C.Position),
+                        velocity = ProtoMapping.ToVector2(env.HighFreqStateS2C.Velocity),
+                        animState = env.HighFreqStateS2C.AnimState,
+                        facing = env.HighFreqStateS2C.Facing,
+                    });
+                    break;
+                }
 
-            // 统一回执派发（R5）：reqId → RequestTracker 回调
-            _registry.Register<S2C_Resp>(NetProto.Resp, msg =>
-            {
-                if (msg?.data == null) return;
-                _tracker.OnResp(msg.data.reqId, msg.data.code, msg.data.message);
-            });
+                case Envelope.BodyOneofCase.MidFreqState:
+                {
+                    byte opponent = RoomSession.Instance.OpponentId;
+                    foreach (var p in env.MidFreqState.Players)
+                    {
+                        if (p.PlayerId == opponent)
+                            RoomSession.Instance.UpdateOpponentStats(p.Hp, p.ShelterEnergy); // float（proto 精度升级）
+                    }
+                    break;
+                }
+
+                case Envelope.BodyOneofCase.OpponentDisconnect:
+                {
+                    EventBus.Instance.Publish(new OpponentDisconnectEvent
+                    {
+                        playerId = env.PlayerId, // 离开者在信封层
+                        state = env.OpponentDisconnect.State,
+                    });
+                    break;
+                }
+
+                case Envelope.BodyOneofCase.FragmentDropPlan:
+                {
+                    if (env.FragmentDropPlan.Plan.Count == 0) break;
+
+                    var plan = new List<DualEnigma.Fragment.FragmentDropPlan>(env.FragmentDropPlan.Plan.Count);
+                    foreach (var item in env.FragmentDropPlan.Plan)
+                    {
+                        plan.Add(new DualEnigma.Fragment.FragmentDropPlan
+                        {
+                            FragmentId = item.FragmentId,
+                            Type = (DualEnigma.Fragment.FragmentType)item.Type, // 0/1/2 顺序已核对一致
+                            Position = ProtoMapping.ToVector2(item.Position),
+                            DropTime = item.DropTime,
+                            Seed = unchecked((uint)item.Seed), // long→uint 截断，两端一致即可保证确定性
+                        });
+                    }
+
+                    if (DualEnigma.Fragment.FragmentSystem.HasInstance)
+                        DualEnigma.Fragment.FragmentSystem.Instance.ExecuteDropPlan(plan);
+                    break;
+                }
+
+                case Envelope.BodyOneofCase.FragmentResult:
+                {
+                    // 只处理对方接住：自己接住的本地已完成（上报发生在收集完成之后）
+                    if (env.FragmentResult.PlayerId != RoomSession.Instance.LocalPlayerId
+                        && DualEnigma.Fragment.FragmentSystem.HasInstance)
+                    {
+                        DualEnigma.Fragment.FragmentSystem.Instance.OnFragmentCollected(
+                            env.FragmentResult.FragmentId, (byte)env.FragmentResult.PlayerId, false);
+                    }
+                    break;
+                }
+
+                case Envelope.BodyOneofCase.HeartbeatAck:
+                {
+                    _conn.NotifyHeartbeatAck(); // RTT 刷新（传输层）
+                    break;
+                }
+
+                case Envelope.BodyOneofCase.Resp:
+                {
+                    _tracker.OnResp(env.Resp.ReqId, env.Resp.Code, env.Resp.Message);
+                    break;
+                }
+
+                default:
+                    // 预留消息（BuildingPlace 等）与未知 case：静默忽略
+                    break;
+            }
         }
     }
 }

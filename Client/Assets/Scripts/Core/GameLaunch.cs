@@ -87,6 +87,9 @@ namespace DualEnigma.Core
             // 对局流程编排器（阶段驱动：蓝图/灾害/胜负/进度）
             _ = GameplayDriver.Instance;
 
+            // 点击反馈系统（全局点击特效 + 程序化音效）
+            _ = DualEnigma.Art.ClickEffectSystem.Instance;
+
             // 局内常驻 UI（HUD/设置弹窗/结算面板，仿 UIInvitePopup 常驻模式，默认隐藏）
             UIGameHudCtrl.Ensure();
             UISettingsCtrl.Ensure();

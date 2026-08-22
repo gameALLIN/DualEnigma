@@ -13,7 +13,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -28,14 +27,14 @@ namespace DualEnigma.Framework.Network
         private readonly SemaphoreSlim _sendLock = new SemaphoreSlim(1, 1);
 
         /// <summary>接收线程 → 主线程 的消息队列（null = 断线标记）</summary>
-        private readonly ConcurrentQueue<string> _receiveQueue = new ConcurrentQueue<string>();
+        private readonly ConcurrentQueue<byte[]> _receiveQueue = new ConcurrentQueue<byte[]>();
 
         /// <summary>主动关闭标记：断线路径不触发异常事件</summary>
         private bool _manualClose;
 
         private float _heartbeatTimer;
         private float _heartbeatInterval = -1f;
-        private Func<string> _heartbeatPayloadFactory;
+        private Func<byte[]> _heartbeatPayloadFactory;
 
         /// <summary>心跳发送时刻（Time.realtimeSinceStartup，Ack 时求差得 RTT）</summary>
         private float _lastHeartbeatSendTime = -1f;
@@ -46,8 +45,8 @@ namespace DualEnigma.Framework.Network
         /// <summary>最近一次心跳往返延迟（毫秒）；-1 = 未知（尚无样本）</summary>
         public float RttMs { get; private set; } = -1f;
 
-        /// <summary>收到完整消息（主线程，已拆包的 JSON 文本）</summary>
-        public event Action<string> OnMessageReceived;
+        /// <summary>收到完整消息（主线程，已拆包的二进制帧）</summary>
+        public event Action<byte[]> OnMessageReceived;
 
         /// <summary>异常断开（主线程，reason；主动 CloseAsync 不触发）</summary>
         public event Action<string> OnAbnormalDisconnected;
@@ -128,8 +127,8 @@ namespace DualEnigma.Framework.Network
         //  发送
         // ============================================================
 
-        /// <summary>发送一行 JSON 文本（线程安全，同一时刻仅一个 SendAsync）</summary>
-        public async Task SendAsync(string text)
+        /// <summary>发送二进制帧（线程安全，同一时刻仅一个 SendAsync）</summary>
+        public async Task SendAsync(byte[] payload)
         {
             ClientWebSocket socket = _socket;
             CancellationTokenSource cts = _cts;
@@ -138,8 +137,7 @@ namespace DualEnigma.Framework.Network
             await _sendLock.WaitAsync();
             try
             {
-                byte[] bytes = Encoding.UTF8.GetBytes(text);
-                await socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, cts.Token);
+                await socket.SendAsync(new ArraySegment<byte>(payload), WebSocketMessageType.Binary, true, cts.Token);
             }
             catch (Exception e)
             {
@@ -156,8 +154,8 @@ namespace DualEnigma.Framework.Network
         //  心跳
         // ============================================================
 
-        /// <summary>启动应用层心跳（interval 秒一次，包内容由 payloadFactory 提供）</summary>
-        public void StartHeartbeat(float intervalSec, Func<string> payloadFactory)
+        /// <summary>启动应用层心跳（interval 秒一次，帧内容由 payloadFactory 提供）</summary>
+        public void StartHeartbeat(float intervalSec, Func<byte[]> payloadFactory)
         {
             _heartbeatInterval = intervalSec;
             _heartbeatPayloadFactory = payloadFactory;
@@ -181,27 +179,36 @@ namespace DualEnigma.Framework.Network
         private async Task ReceiveLoopAsync(CancellationToken token)
         {
             byte[] buffer = new byte[8192];
-            StringBuilder sb = new StringBuilder();
 
             try
             {
                 while (!token.IsCancellationRequested && _socket.State == WebSocketState.Open)
                 {
-                    sb.Clear();
-                    WebSocketReceiveResult result;
-                    do
+                    // 二进制协议：整帧缓冲（Envelope 小帧 <MTU，整帧到达一次收完）
+                    using (var ms = new System.IO.MemoryStream())
                     {
-                        result = await _socket.ReceiveAsync(new ArraySegment<byte>(buffer), token);
-                        if (result.MessageType == WebSocketMessageType.Close)
+                        WebSocketReceiveResult result;
+                        do
                         {
-                            Debug.Log("[WebSocketConnection] 服务端关闭连接");
-                            _receiveQueue.Enqueue(null); // 断线标记
-                            return;
-                        }
-                        sb.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
-                    } while (!result.EndOfMessage);
+                            result = await _socket.ReceiveAsync(new ArraySegment<byte>(buffer), token);
+                            if (result.MessageType == WebSocketMessageType.Close)
+                            {
+                                Debug.Log("[WebSocketConnection] 服务端关闭连接");
+                                _receiveQueue.Enqueue(null); // 断线标记
+                                return;
+                            }
+                            if (result.MessageType == WebSocketMessageType.Text)
+                            {
+                                // 协议已切换为二进制帧——文本帧视为协议错误
+                                Debug.LogWarning("[WebSocketConnection] 收到意外文本帧，丢弃");
+                                break;
+                            }
+                            ms.Write(buffer, 0, result.Count);
+                        } while (!result.EndOfMessage);
 
-                    _receiveQueue.Enqueue(sb.ToString());
+                        if (ms.Length > 0)
+                            _receiveQueue.Enqueue(ms.ToArray());
+                    }
                 }
             }
             catch (OperationCanceledException)
@@ -222,14 +229,14 @@ namespace DualEnigma.Framework.Network
         private void Update()
         {
             // null = 连接断开标记
-            while (_receiveQueue.TryDequeue(out string json))
+            while (_receiveQueue.TryDequeue(out byte[] payload))
             {
-                if (json == null)
+                if (payload == null)
                 {
                     HandleDisconnected("连接已断开");
                     continue;
                 }
-                OnMessageReceived?.Invoke(json);
+                OnMessageReceived?.Invoke(payload);
             }
 
             // 应用层心跳

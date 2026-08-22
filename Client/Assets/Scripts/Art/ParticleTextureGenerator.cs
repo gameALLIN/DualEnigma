@@ -2,44 +2,27 @@
 /// 文件名: ParticleTextureGenerator.cs
 /// 创建时间: 2026-08-22
 /// 作者: DualEnigma
-/// 描述: 粒子贴图生成器。运行时程序化生成白色+Alpha粒子贴图并缓存，
-///       供 ParticleSystem 材质使用，零外部资源依赖。
-///       贴图为纯白 RGB + Alpha 渐变，可被 startColor 任意染色复用。
+/// 描述: 粒子贴图生成器。程序化生成白色+Alpha粒子贴图，
+///       供 ParticleSystem 材质使用（Editor 工具保存为 .asset），
+///       零外部资源依赖。贴图为纯白 RGB + Alpha 渐变，
+///       可被 startColor 任意染色复用。
 /// ============================================================
 
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace DualEnigma.Art
 {
     /// <summary>
     /// 粒子贴图生成器。
-    /// 首次获取时在内存中绘制并缓存（Dictionary），全游戏共用 5 张贴图。
-    /// 引用：ClickEffectEnums.cs (ParticleTextureType), ClickEffectFactory.cs
+    /// 每次调用生成全新 Texture2D 实例（无缓存），供 Editor 工具持久化为资产。
+    /// 引用：ClickEffectEnums.cs (ParticleTextureType), ClickEffectPrefabGenerator.cs
     /// </summary>
     public static class ParticleTextureGenerator
     {
-        /// <summary>贴图缓存（域重载后自动重建）</summary>
-        private static readonly Dictionary<ParticleTextureType, Texture2D> _textureCache =
-            new Dictionary<ParticleTextureType, Texture2D>();
-
         /// <summary>
-        /// 获取指定类型的粒子贴图（不存在则生成）。
+        /// 生成指定类型的全新粒子贴图（每次调用返回新实例）。
         /// </summary>
-        public static Texture2D GetTexture(ParticleTextureType type)
-        {
-            if (_textureCache.TryGetValue(type, out Texture2D cached) && cached != null)
-                return cached;
-
-            Texture2D tex = GenerateTexture(type);
-            _textureCache[type] = tex;
-            return tex;
-        }
-
-        /// <summary>
-        /// 按类型分发绘制。
-        /// </summary>
-        private static Texture2D GenerateTexture(ParticleTextureType type)
+        public static Texture2D CreateTexture(ParticleTextureType type)
         {
             switch (type)
             {

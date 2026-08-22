@@ -41,7 +41,7 @@ namespace DualEnigma.Character
             GameConnection.Instance.SendHighFreqState(
                 _rb.position,
                 _rb.velocity,
-                _controller.CurrentAnimState,
+                _controller.CurrentAnimState.ToString(),
                 _controller.FacingRight,
                 hp,
                 energy);

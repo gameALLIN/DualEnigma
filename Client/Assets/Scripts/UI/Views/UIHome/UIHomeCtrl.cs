@@ -241,6 +241,7 @@ namespace DualEnigma.UI
             }
 
             _view.SetDrawerStatus("正在开始对局...");
+            DualEnigma.Art.ClickEffectSystem.Play(DualEnigma.Art.ClickEffectType.Shockwave, _view.StartBtn);
             GameConnection.Instance.RequestStartGame();
         }
 
@@ -488,6 +489,7 @@ namespace DualEnigma.UI
             }
 
             _view.SetDrawerStatus($"已邀请 {friend.displayName}，等待对方接受...");
+            DualEnigma.Art.ClickEffectSystem.Play(DualEnigma.Art.ClickEffectType.ElementMix, _view.DrawerToggleBtn);
             _api.CreateInvite(friend.accountId, roomCode,
                 _ => _view.SetDrawerStatus($"已邀请 {friend.displayName}，等待对方接受..."),
                 error => _view.SetDrawerStatus(error));

@@ -92,7 +92,7 @@ namespace DualEnigma.Framework.Network
             RemoveIfType<T>(messageType);
         }
 
-        private void RemoveIfType<T>(string messageType)
+        private void RemoveIfType<T>(string messageType) where T : class, INetMessage
         {
             if (_entries.TryGetValue(messageType, out Entry entry) && entry is Entry<T>)
                 _entries.Remove(messageType);
