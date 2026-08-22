@@ -1,0 +1,21 @@
+﻿{
+    "name": "DualEnigma.Network.Tests",
+    "rootNamespace": "DualEnigma.Network.Tests",
+    "references": ["DualEnigma", "DualEnigma.Framework"],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Google.Protobuf.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

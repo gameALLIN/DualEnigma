@@ -1,0 +1,19 @@
+﻿{
+    "name": "DualEnigma.Framework.Core.Tests",
+    "rootNamespace": "DualEnigma.Framework.Core.Tests",
+    "references": ["DualEnigma.Framework"],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}
