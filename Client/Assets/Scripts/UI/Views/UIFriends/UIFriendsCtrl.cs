@@ -329,7 +329,7 @@ namespace DualEnigma.UI
         {
             if (_api == null) return;
 
-            string roomCode = NetworkSystem.HasInstance ? NetworkSystem.Instance.CurrentRoomCode : "";
+            string roomCode = RoomSession.HasInstance ? RoomSession.Instance.CurrentRoomCode : "";
             if (!string.IsNullOrEmpty(roomCode))
             {
                 SendInvite(friend, roomCode);
@@ -337,14 +337,14 @@ namespace DualEnigma.UI
             }
 
             // 未在房：静默连接 game-server 自动建房（主界面开始按钮同一链路）
-            if (GameServerClient.Instance.IsConnected)
+            if (GameConnection.Instance.RttMs >= 0f && RoomSession.Instance.IsConnected)
             {
                 _view.SetStatus("房间建立中，请稍候再邀请");
                 return;
             }
             _pendingInvite = friend;
             _view.SetStatus($"正在创建房间，完成后将自动邀请 {friend.displayName}");
-            GameServerClient.Instance.Connect("");
+            GameConnection.Instance.ConnectToRoom("");
         }
 
         /// <summary>发出 REST 邀请</summary>

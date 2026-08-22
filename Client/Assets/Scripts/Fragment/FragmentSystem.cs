@@ -1,8 +1,11 @@
 /// ============================================================
 /// 文件名: FragmentSystem.cs
 /// 创建时间: 2026-07-13
+/// 最后更新: 2026-08-22
 /// 作者: DualEnigma
 /// 描述: 碎片系统管理器，管理碎片掉落、收集、存续和对象池。
+///       碎片视觉：每次生成按类型赋程序化 Sprite（FragmentSpriteGenerator，
+///       按类型缓存），模板缺失时程序化构建（与 CharacterSystem 同一模式）。
 /// ============================================================
 
 using System.Collections;
@@ -13,6 +16,7 @@ using DualEnigma.Framework.Core;
 using DualEnigma.Data;
 using DualEnigma.Skill;
 using DualEnigma.Building;
+using DualEnigma.Art;
 
 namespace DualEnigma.Fragment
 {
@@ -31,8 +35,14 @@ namespace DualEnigma.Fragment
         /// <summary>被动技能触发概率（0-1）</summary>
         [SerializeField] private float _passiveTriggerChance = 0.3f;
 
-        /// <summary>碎片预制体（待赋值）</summary>
+        /// <summary>碎片预制体（可选：Inspector 赋值；缺省程序化构建模板）</summary>
         [SerializeField] private FragmentController _fragmentPrefab;
+
+        /// <summary>实际用于对象池的模板（Inspector 预制体或程序化构建）</summary>
+        private FragmentController _template;
+
+        /// <summary>按类型缓存的程序化碎片 Sprite（避免每次生成重复建纹理）</summary>
+        private readonly Dictionary<FragmentType, Sprite> _spriteCache = new Dictionary<FragmentType, Sprite>();
 
         /// <summary>碎片配置</summary>
         [SerializeField] private FragmentConfig _config;
@@ -57,6 +67,9 @@ namespace DualEnigma.Fragment
 
         /// <summary>碎片ID自增计数器</summary>
         private int _nextFragmentId;
+
+        /// <summary>掉落计划执行协程句柄（新计划/对局结束时取消）</summary>
+        private Coroutine _dropPlanCoroutine;
 
         /// <summary>OnUpdate 超时碎片ID缓存（复用避免每帧分配）</summary>
         private readonly List<int> _timedOutCache = new List<int>();
@@ -116,11 +129,15 @@ namespace DualEnigma.Fragment
             _poolRoot.SetParent(transform);
 
 
-            if (_fragmentPrefab != null)
+            if (_template == null)
+
+                _template = _fragmentPrefab != null ? _fragmentPrefab : BuildCodeTemplate();
+
+            if (_template != null)
 
             {
 
-                _fragmentPool = new ObjectPool<FragmentController>(_fragmentPrefab, 40, _poolRoot);
+                _fragmentPool = new ObjectPool<FragmentController>(_template, 40, _poolRoot);
 
             }
 
@@ -128,7 +145,7 @@ namespace DualEnigma.Fragment
 
             {
 
-                Debug.LogWarning("[FragmentSystem] 碎片预制体未赋值，对象池未初始化");
+                Debug.LogWarning("[FragmentSystem] 碎片模板构建失败，对象池未初始化");
 
             }
 
@@ -159,6 +176,10 @@ namespace DualEnigma.Fragment
             if (EventBus.HasInstance)
                 EventBus.Instance.Subscribe<FragmentDespawnedEvent>(OnFragmentDespawnedEvent);
 
+            // 对局结束：停掉落协程并清场（防止 DontDestroyOnLoad 单例跨对局残留旧计划）
+            if (EventBus.HasInstance)
+                EventBus.Instance.Subscribe<GameEndEvent>(OnGameEndStopDropPlan);
+
 
             Debug.Log("[FragmentSystem] 碎片系统初始化完成");
 
@@ -168,7 +189,24 @@ namespace DualEnigma.Fragment
         {
             base.OnDestroy();
             if (EventBus.HasInstance)
+            {
                 EventBus.Instance.Unsubscribe<FragmentDespawnedEvent>(OnFragmentDespawnedEvent);
+                EventBus.Instance.Unsubscribe<GameEndEvent>(OnGameEndStopDropPlan);
+            }
+        }
+
+        /// <summary>对局结束：停止掉落协程 + 清空活跃碎片与类型记录（含 P3-W 内存缓增修复）</summary>
+        private void OnGameEndStopDropPlan(GameEndEvent e)
+        {
+            if (_dropPlanCoroutine != null)
+            {
+                StopCoroutine(_dropPlanCoroutine);
+                _dropPlanCoroutine = null;
+            }
+
+            _activeFragments.Clear();
+            _pendingCollects.Clear();
+            _collectedFragmentTypes.Clear();
         }
 
         /// <summary>设置当前轮次（影响存续时间）</summary>
@@ -223,10 +261,17 @@ namespace DualEnigma.Fragment
 
         /// <summary>
         /// 执行掉落计划（双方各自调用）。
+        /// 新计划到达时自动停掉旧协程（防新旧两份计划并行掉落）。
         /// </summary>
         public void ExecuteDropPlan(List<FragmentDropPlan> plan)
         {
-            StartCoroutine(ExecuteDropPlanCoroutine(plan));
+            if (_dropPlanCoroutine != null)
+            {
+                StopCoroutine(_dropPlanCoroutine);
+                _dropPlanCoroutine = null;
+            }
+
+            _dropPlanCoroutine = StartCoroutine(ExecuteDropPlanCoroutine(plan));
         }
 
         private IEnumerator ExecuteDropPlanCoroutine(List<FragmentDropPlan> plan)
@@ -243,6 +288,8 @@ namespace DualEnigma.Fragment
 
                 SpawnFragment(item);
             }
+
+            _dropPlanCoroutine = null;
         }
 
         /// <summary>
@@ -290,8 +337,8 @@ namespace DualEnigma.Fragment
                 });
 
                 // 被动技能检查（双方均触发，同时接住概率100%）
-                CheckPassiveSkills(pending.playerId, pending.type, pending.fragment.transform.position, pending.isJumping, true);
-                CheckPassiveSkills(playerId, fragment.Type, fragment.transform.position, isJumping, true);
+                CheckPassiveSkills(pending.playerId, pending.type, pending.fragment.transform.position, pending.isJumping, true, fragmentId);
+                CheckPassiveSkills(playerId, fragment.Type, fragment.transform.position, isJumping, true, fragmentId);
 
                 fragment.SetState(FragmentState.Collected);
                 _collectedFragmentTypes[fragmentId] = fragment.Type;
@@ -373,7 +420,7 @@ namespace DualEnigma.Fragment
             });
 
             // 被动技能检查（地面接住概率30%，跳跃接住概率50%）
-            CheckPassiveSkills(pending.playerId, pending.type, pending.fragment.transform.position, pending.isJumping, false);
+            CheckPassiveSkills(pending.playerId, pending.type, pending.fragment.transform.position, pending.isJumping, false, fragmentId);
 
             if (pending.fragment != null)
             {
@@ -428,7 +475,11 @@ namespace DualEnigma.Fragment
         /// - FlameAura（烈焰体质）：收集熔岩碎片时有概率点燃周围碎片
         /// 引用：技能系统.md §4.2 被动技能触发时机
         /// </summary>
-        private void CheckPassiveSkills(byte playerId, FragmentType collectedType, Vector2 position, bool isJumping, bool isSimultaneous)
+        /// <summary>
+        /// 被动技能触发判定。随机源以碎片ID为种子（联机双端对同一碎片判定结果一致，
+        /// 避免冻结/点燃/温砖转换只在一端发生）。
+        /// </summary>
+        private void CheckPassiveSkills(byte playerId, FragmentType collectedType, Vector2 position, bool isJumping, bool isSimultaneous, int seedFragmentId = 0)
         {
             ISkillSystem skillSys = ServiceLocator.Get<ISkillSystem>();
             if (skillSys == null)
@@ -446,17 +497,27 @@ namespace DualEnigma.Fragment
             triggerChance += passiveBonus;
             triggerChance = Mathf.Clamp01(triggerChance);
 
-            if (collectedType == FragmentType.IceCrystal
-                && skillSys.IsPassiveActive(playerId, PassiveSkillType.FrostAura)
-                && Random.Range(0f, 1f) <= triggerChance)
+            if (collectedType != FragmentType.IceCrystal && collectedType != FragmentType.Lava)
+                return;
+
+            bool hasFrost = collectedType == FragmentType.IceCrystal
+                && skillSys.IsPassiveActive(playerId, PassiveSkillType.FrostAura);
+            bool hasFlame = collectedType == FragmentType.Lava
+                && skillSys.IsPassiveActive(playerId, PassiveSkillType.FlameAura);
+            if (!hasFrost && !hasFlame)
+                return;
+
+            // 确定性掷骰：种子=碎片ID（双端一致；同碎片对两玩家的判定用不同扰动避免完全同结果）
+            System.Random rng = new System.Random(seedFragmentId * 31 + playerId + 7);
+            if ((float)rng.NextDouble() > triggerChance)
+                return;
+
+            if (hasFrost)
             {
                 FreezeNearbyFragments(position, PassiveTriggerRadius);
                 Debug.Log($"[FragmentSystem] 玩家{playerId} 寒霜体质触发 (概率{triggerChance:F2})");
             }
-
-            if (collectedType == FragmentType.Lava
-                && skillSys.IsPassiveActive(playerId, PassiveSkillType.FlameAura)
-                && Random.Range(0f, 1f) <= triggerChance)
+            else
             {
                 IgniteNearbyFragments(position, PassiveTriggerRadius);
                 Debug.Log($"[FragmentSystem] 玩家{playerId} 烈焰体质触发 (概率{triggerChance:F2})");
@@ -598,14 +659,73 @@ namespace DualEnigma.Fragment
             else
             {
                 GameObject go = new GameObject($"Fragment_{plan.FragmentId}");
+                go.AddComponent<SpriteRenderer>();
                 go.AddComponent<BoxCollider2D>().isTrigger = true;
                 go.AddComponent<Rigidbody2D>();
                 fragment = go.AddComponent<FragmentController>();
             }
 
+            // 按类型应用视觉（Sprite + 碰撞体尺寸），池化对象复用时也会被正确覆盖
+            fragment.name = $"Fragment_{plan.FragmentId}";
+            ApplyFragmentVisuals(fragment, plan.Type);
+
             float lifetime = _config != null ? _config.GetLifetime(_currentRound) : 3.0f;
             fragment.Initialize(plan, lifetime);
             _activeFragments[plan.FragmentId] = fragment;
+        }
+
+        /// <summary>按碎片类型应用视觉：程序化 Sprite（缓存）+ 碰撞体尺寸（与 FragmentPrefabGenerator 规格一致）</summary>
+        private void ApplyFragmentVisuals(FragmentController fragment, FragmentType type)
+        {
+            SpriteRenderer sr = fragment.GetComponent<SpriteRenderer>();
+            if (sr != null)
+                sr.sprite = GetFragmentSprite(type);
+
+            BoxCollider2D col = fragment.GetComponent<BoxCollider2D>();
+            if (col != null)
+                col.size = GetColliderSize(type);
+        }
+
+        /// <summary>获取碎片 Sprite（程序化生成，按类型缓存；与 CharacterSystem 同一模式）</summary>
+        private Sprite GetFragmentSprite(FragmentType type)
+        {
+            if (!_spriteCache.TryGetValue(type, out Sprite sprite))
+            {
+                sprite = FragmentSpriteGenerator.GenerateFragmentSprite(type);
+                _spriteCache[type] = sprite;
+            }
+            return sprite;
+        }
+
+        /// <summary>碰撞体尺寸按视觉体量配置（世界单位，1格=1单位）</summary>
+        private static Vector2 GetColliderSize(FragmentType type)
+        {
+            switch (type)
+            {
+                case FragmentType.IceCrystal: return new Vector2(0.4f, 0.6f);
+                case FragmentType.Lava: return new Vector2(0.5f, 0.5f);
+                case FragmentType.Rock: return new Vector2(0.55f, 0.55f);
+                default: return new Vector2(0.5f, 0.5f);
+            }
+        }
+
+        /// <summary>程序化构建碎片模板：SpriteRenderer + Rigidbody2D + BoxCollider2D(Trigger) + FragmentController（隐藏挂池根节点下）</summary>
+        private FragmentController BuildCodeTemplate()
+        {
+            GameObject go = new GameObject("FragmentTemplate");
+            go.transform.SetParent(_poolRoot, false);
+
+            go.AddComponent<SpriteRenderer>();
+            Rigidbody2D rb = go.AddComponent<Rigidbody2D>();
+            rb.gravityScale = 1f;
+            rb.freezeRotation = true;
+            BoxCollider2D col = go.AddComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            col.size = new Vector2(0.5f, 0.5f);
+            go.AddComponent<FragmentController>();
+
+            go.SetActive(false);
+            return go.GetComponent<FragmentController>();
         }
 
         private void ReleaseFragment(int fragmentId)

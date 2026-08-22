@@ -250,10 +250,10 @@ namespace DualEnigma.UI
             string text = $"FPS {fps}";
 
             // 联机时附带应用层 RTT（心跳往返，1Hz 更新）
-            if (NetworkSystem.HasInstance && NetworkSystem.Instance.IsConnected
-                && GameServerClient.HasInstance && GameServerClient.Instance.RttMs > 0f)
+            if (RoomSession.HasInstance && RoomSession.Instance.IsConnected
+                && GameConnection.HasInstance && GameConnection.Instance.RttMs > 0f)
             {
-                text += $"  PING {Mathf.RoundToInt(GameServerClient.Instance.RttMs)}ms";
+                text += $"  PING {Mathf.RoundToInt(GameConnection.Instance.RttMs)}ms";
             }
 
             _view.PerfText.text = text;
@@ -292,13 +292,13 @@ namespace DualEnigma.UI
             if (_view.AquaHPFill == null) return;
 
             // 联机模式：对手数值以服务器 10Hz 快照为准（本地 ShelterSystem 对对手的模拟不可信）
-            bool networked = NetworkSystem.HasInstance && NetworkSystem.Instance.IsConnected;
-            byte localId = networked ? NetworkSystem.Instance.LocalPlayerId : (byte)0;
+            bool networked = RoomSession.HasInstance && RoomSession.Instance.IsConnected;
+            byte localId = networked ? RoomSession.Instance.LocalPlayerId : (byte)0;
 
-            int aquaHP = networked && localId != 0 ? NetworkSystem.Instance.OpponentHP : GameManager.Instance.AquaHP;
-            int ignisHP = networked && localId != 1 ? NetworkSystem.Instance.OpponentHP : GameManager.Instance.IgnisHP;
-            float aquaEnergy = networked && localId != 0 ? NetworkSystem.Instance.OpponentShelterEnergy : ShelterSystem.Instance.AquaEnergy;
-            float ignisEnergy = networked && localId != 1 ? NetworkSystem.Instance.OpponentShelterEnergy : ShelterSystem.Instance.IgnisEnergy;
+            int aquaHP = networked && localId != 0 ? RoomSession.Instance.OpponentHP : GameManager.Instance.AquaHP;
+            int ignisHP = networked && localId != 1 ? RoomSession.Instance.OpponentHP : GameManager.Instance.IgnisHP;
+            float aquaEnergy = networked && localId != 0 ? RoomSession.Instance.OpponentShelterEnergy : ShelterSystem.Instance.AquaEnergy;
+            float ignisEnergy = networked && localId != 1 ? RoomSession.Instance.OpponentShelterEnergy : ShelterSystem.Instance.IgnisEnergy;
 
             ApplyVitals(_view.AquaHPFill, _view.AquaHPText, _view.AquaEnergyFill, _view.AquaEnergyText,
                 aquaHP, aquaEnergy, AQUA_HP_COLOR);

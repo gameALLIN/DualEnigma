@@ -90,7 +90,7 @@ namespace DualEnigma.UI
 
             // 单机模式：打开设置即暂停；联机模式不可暂停（服务器权威计时）
             if (GameManager.HasInstance && !GameManager.Instance.State.IsGameOver
-                && !(NetworkSystem.HasInstance && NetworkSystem.Instance.IsConnected))
+                && !(RoomSession.HasInstance && RoomSession.Instance.IsConnected))
             {
                 GameManager.Instance.PauseGame();
             }
@@ -107,7 +107,7 @@ namespace DualEnigma.UI
             // 单机模式且对局仍在进行 → 恢复（对局结束场景下不恢复）
             if (GameManager.HasInstance && GameManager.Instance.State.IsPaused
                 && !GameManager.Instance.State.IsGameOver
-                && !(NetworkSystem.HasInstance && NetworkSystem.Instance.IsConnected))
+                && !(RoomSession.HasInstance && RoomSession.Instance.IsConnected))
             {
                 GameManager.Instance.ResumeGame();
             }
@@ -226,10 +226,9 @@ namespace DualEnigma.UI
         {
             HidePanel();
 
-            // 主界面即大厅：退出前断开可能持有的房间连接
-            GameServerClient client = GameServerClient.Instance;
-            if (client != null && client.IsConnected)
-                client.Disconnect();
+            // 主界面即大厅：退出前断开可能持有的房间连接（会话状态经统一出口清零）
+            if (RoomSession.HasInstance && RoomSession.Instance.IsConnected)
+                GameConnection.Instance.Disconnect();
 
             if (AuthService.HasInstance)
                 AuthService.Instance.Logout();

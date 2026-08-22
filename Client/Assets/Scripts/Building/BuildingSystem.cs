@@ -53,6 +53,9 @@ namespace DualEnigma.Building
         /// <summary>灾难来源方向（网格方向向量），用于朝向抗性判断</summary>
         private Vector2Int _disasterDirection = Vector2Int.up;
 
+        /// <summary>建造视觉层（蓝图/建筑 SpriteRenderer）</summary>
+        private readonly BuildingVisualizer _visualizer = new BuildingVisualizer();
+
         protected override void OnSingletonInitialized()
         {
             ServiceLocator.Register<IBuildSystem>(this);
@@ -107,6 +110,22 @@ namespace DualEnigma.Building
             }
 
             Debug.Log($"[BuildingSystem] 生成蓝图: {CurrentBlueprint.Count}块 (灾难类别={disasterType}, 环境={env}, 轮次={round})");
+
+            // 蓝图视觉（半透明占位块）
+            _visualizer.RenderBlueprint(CurrentBlueprint);
+        }
+
+        /// <summary>
+        /// 清空蓝图与全部建筑（新局开始时由流程驱动调用）。
+        /// </summary>
+        public void ClearAll()
+        {
+            CurrentBlueprint.Clear();
+            _grid.Clear();
+            Buildings.Clear();
+            _nextBuildingId = 0;
+            _visualizer.ClearAll();
+            Debug.Log("[BuildingSystem] 蓝图与建筑已清空");
         }
 
         /// <summary>
@@ -187,6 +206,10 @@ namespace DualEnigma.Building
         {
             yield return new WaitForSeconds(0.5f);
 
+            // 对局已结束（退出/结算）则放弃放置
+            if (GameManager.HasInstance && GameManager.Instance.State.IsGameOver)
+                yield break;
+
             // 再次检查位置是否被占用（等待期间可能被其他操作占用）
             if (_grid.IsOccupied(gridPos))
             {
@@ -218,8 +241,12 @@ namespace DualEnigma.Building
                     var b = CurrentBlueprint[idx];
                     b.IsCompleted = true;
                     CurrentBlueprint[idx] = b;
+                    _visualizer.MarkBlueprintCompleted(b.GridPosition, b.RequiredMaterial);
                 }
             }
+
+            // 建筑视觉（实心材料色块）
+            _visualizer.ShowBuilding(building.BuildingId, gridPos, material);
 
             EventBus.Instance.Publish(new BuildingPlacedEvent
             {
@@ -262,10 +289,14 @@ namespace DualEnigma.Building
         {
             yield return new WaitForSeconds(1f);
 
+            if (GameManager.HasInstance && GameManager.Instance.State.IsGameOver)
+                yield break;
+
             BuildingData building = Buildings.Find(b => b.BuildingId == buildingId);
             if (building == null) yield break;
 
             building.CurrentHP = building.BaseHP;
+            _visualizer.UpdateBuildingVisual(buildingId, 1f);
             Debug.Log($"[BuildingSystem] 建筑修补完成: ID={buildingId}, HP={building.CurrentHP}/{building.BaseHP}");
         }
 
@@ -294,11 +325,15 @@ namespace DualEnigma.Building
         {
             yield return new WaitForSeconds(1f);
 
+            if (GameManager.HasInstance && GameManager.Instance.State.IsGameOver)
+                yield break;
+
             BuildingData building = Buildings.Find(b => b.BuildingId == buildingId);
             if (building == null) yield break;
 
             _grid.ClearOccupied(building.GridPosition);
             Buildings.Remove(building);
+            _visualizer.RemoveBuilding(buildingId);
 
             ICharacterSystem charSystem = ServiceLocator.Get<ICharacterSystem>();
             if (charSystem != null)
@@ -334,6 +369,7 @@ namespace DualEnigma.Building
                 building.CurrentHP = 0f;
                 _grid.ClearOccupied(building.GridPosition);
                 Buildings.Remove(building);
+                _visualizer.RemoveBuilding(buildingId);
 
                 EventBus.Instance.Publish(new BuildingDestroyedEvent
                 {
@@ -344,6 +380,7 @@ namespace DualEnigma.Building
             }
             else
             {
+                _visualizer.UpdateBuildingVisual(buildingId, building.CurrentHP / building.BaseHP);
                 Debug.Log($"[BuildingSystem] 建筑受损: ID={buildingId}, 伤害={finalDamage}(抗性={resistanceCoeff}, 朝向={facingMultiplier}, 安全区={zoneMultiplier}), HP={building.CurrentHP}/{building.BaseHP}");
             }
         }
@@ -433,13 +470,13 @@ namespace DualEnigma.Building
 
         /// <summary>
         /// 判断角色是否在安全区范围内。
-        /// 将角色世界坐标与安全区中心（网格坐标）进行比较。
+        /// 角色为世界坐标，安全区中心为网格坐标——统一经 GridCoord 换算到世界系再比较。
         /// </summary>
         private bool IsCharacterInSafeZone(CharacterController character)
         {
             if (character == null) return false;
             Vector2 charPos = character.transform.position;
-            Vector2 center = new Vector2(_safeZoneCenter.x, _safeZoneCenter.y);
+            Vector2 center = GridCoord.WorldFromGrid(_safeZoneCenter);
             float distance = Vector2.Distance(charPos, center);
             return distance <= _safeZoneRadius;
         }

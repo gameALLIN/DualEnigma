@@ -10,6 +10,7 @@ using DualEnigma.Core;
 using DualEnigma.Framework.Core;
 using DualEnigma.Art;
 using DualEnigma.Network;
+using DualEnigma.Synthesis;
 
 namespace DualEnigma.Character
 {
@@ -33,7 +34,47 @@ namespace DualEnigma.Character
         protected override void OnSingletonInitialized()
         {
             ServiceLocator.Register<ICharacterSystem>(this);
+
+            // 经济链事件：碎片接住 → 入背包；材料产出 → 入背包
+            EventBus.Instance.Subscribe<FragmentCollectedEvent>(OnFragmentCollected);
+            EventBus.Instance.Subscribe<MaterialProducedEvent>(OnMaterialProduced);
+
             Debug.Log("[CharacterSystem] 角色系统初始化完成");
+        }
+
+        protected override void OnDestroy()
+        {
+            if (EventBus.HasInstance)
+            {
+                EventBus.Instance.Unsubscribe<FragmentCollectedEvent>(OnFragmentCollected);
+                EventBus.Instance.Unsubscribe<MaterialProducedEvent>(OnMaterialProduced);
+            }
+            base.OnDestroy();
+        }
+
+        /// <summary>
+        /// 碎片收集完成（本地判定/同接仲裁后由 FragmentSystem 发布）→ 加入对应玩家背包。
+        /// 联机双端各自跑同一份判定（对方接住经 S2C_FragmentResult 驱动本地发布），背包双端一致。
+        /// </summary>
+        private void OnFragmentCollected(FragmentCollectedEvent e)
+        {
+            CharacterController character = GetCharacter((CharacterType)e.playerId);
+            if (character == null) return;
+
+            if (!character.AddFragment(e.fragmentId))
+            {
+                // 背包满：倍率合成前置约束，保持与打断返还一致的告警级别
+                Debug.Log($"[CharacterSystem] 玩家{e.playerId}背包已满，碎片{e.fragmentId}未入包（倍率×{e.multiplier}）");
+            }
+        }
+
+        /// <summary>合成产出（SynthesisSystem 发布）→ 加入对应玩家材料背包</summary>
+        private void OnMaterialProduced(MaterialProducedEvent e)
+        {
+            CharacterController character = GetCharacter((CharacterType)e.playerId);
+            if (character == null) return;
+
+            character.AddMaterial((MaterialType)e.materialType, e.count);
         }
 
         /// <summary>
@@ -95,8 +136,8 @@ namespace DualEnigma.Character
             controller.Initialize(stats, playerId);
 
             // 网络模式下按 本地/远程 区分挂载：本地=输入+上报，远程=插值驱动
-            bool networked = NetworkSystem.HasInstance && NetworkSystem.Instance.IsConnected;
-            bool isLocal = !networked || playerId == NetworkSystem.Instance.LocalPlayerId;
+            bool networked = RoomSession.HasInstance && RoomSession.Instance.IsConnected;
+            bool isLocal = !networked || playerId == RoomSession.Instance.LocalPlayerId;
 
             if (isLocal)
             {

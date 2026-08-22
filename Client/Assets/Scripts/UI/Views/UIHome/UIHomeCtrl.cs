@@ -50,7 +50,7 @@ namespace DualEnigma.UI
         private bool _refreshing;
 
         /// <summary>是否房主（playerId=0 创建房间者）</summary>
-        private bool IsHost => NetworkSystem.HasInstance && NetworkSystem.Instance.LocalPlayerId == 0;
+        private bool IsHost => RoomSession.HasInstance && RoomSession.Instance.LocalPlayerId == 0;
 
         protected override void OnCreate()
         {
@@ -70,6 +70,7 @@ namespace DualEnigma.UI
             EventBus.Instance.Subscribe<RoomGameStartEvent>(OnGameStart);
             EventBus.Instance.Subscribe<OpponentDisconnectEvent>(OnOpponentDisconnected);
             EventBus.Instance.Subscribe<ServerDisconnectedEvent>(OnServerDisconnected);
+            EventBus.Instance.Subscribe<NetworkErrorEvent>(OnNetworkError);
         }
 
         protected override void OnDestroy()
@@ -81,6 +82,7 @@ namespace DualEnigma.UI
                 EventBus.Instance.Unsubscribe<RoomGameStartEvent>(OnGameStart);
                 EventBus.Instance.Unsubscribe<OpponentDisconnectEvent>(OnOpponentDisconnected);
                 EventBus.Instance.Unsubscribe<ServerDisconnectedEvent>(OnServerDisconnected);
+                EventBus.Instance.Unsubscribe<NetworkErrorEvent>(OnNetworkError);
             }
             base.OnDestroy();
         }
@@ -106,11 +108,11 @@ namespace DualEnigma.UI
             _view.SetVersion($"v{Application.version} · 本地开发版");
 
             // 已在房间（对局结束返回）→ 恢复大厅就绪态；否则回到初始态
-            if (NetworkSystem.HasInstance && !string.IsNullOrEmpty(NetworkSystem.Instance.CurrentRoomCode))
+            if (RoomSession.HasInstance && !string.IsNullOrEmpty(RoomSession.Instance.CurrentRoomCode))
             {
                 _roomReady = true;
                 _connecting = false;
-                _view.SetRoomCode(NetworkSystem.Instance.CurrentRoomCode);
+                _view.SetRoomCode(RoomSession.Instance.CurrentRoomCode);
                 UpdateStartButton();
             }
             else
@@ -239,7 +241,7 @@ namespace DualEnigma.UI
             }
 
             _view.SetDrawerStatus("正在开始对局...");
-            GameServerClient.Instance.RequestStartGame();
+            GameConnection.Instance.RequestStartGame();
         }
 
         /// <summary>静默连接 game-server（空房间码=自动建房）；完成后自动发出待发邀请</summary>
@@ -248,7 +250,7 @@ namespace DualEnigma.UI
             _connecting = true;
             _pendingInvite = pendingInvite;
             UpdateStartButton();
-            GameServerClient.Instance.Connect("");
+            GameConnection.Instance.ConnectToRoom("");
         }
 
         private void OnRoomConnected(RoomConnectedEvent e)
@@ -313,6 +315,22 @@ namespace DualEnigma.UI
         {
             ResetRoomUi();
             _view.SetDrawerStatus(string.IsNullOrEmpty(e.reason) ? "与服务器断开连接" : e.reason);
+        }
+
+        /// <summary>
+        /// 请求回执失败（R5）：进房失败已由 GameConnection 自动断开回初始态，此处仅显示文案；
+        /// 开局失败（非房主/未满员等）显示文案，界面无其他变化。
+        /// </summary>
+        private void OnNetworkError(NetworkErrorEvent e)
+        {
+            string prefix;
+            switch (e.source)
+            {
+                case "C2S_Connect": prefix = "加入房间失败"; break;
+                case "C2S_StartGame": prefix = "无法开始对局"; break;
+                default: prefix = "操作失败"; break;
+            }
+            _view.SetDrawerStatus($"{prefix}：{e.message}");
         }
 
         private void ResetRoomUi()
@@ -380,13 +398,27 @@ namespace DualEnigma.UI
 
         private void ClearChildren(Transform content)
         {
+            // 行模板（m_FriendRowTemplate）常驻 Content 下，按引用跳过避免被销毁导致后续 Instantiate null
+            GameObject template = _view != null && _view.FriendRowTemplate != null
+                ? _view.FriendRowTemplate.gameObject
+                : null;
+
             for (int i = content.childCount - 1; i >= 0; i--)
-                Destroy(content.GetChild(i).gameObject);
+            {
+                GameObject child = content.GetChild(i).gameObject;
+                if (child == template) continue;
+                Destroy(child);
+            }
         }
 
         private void RenderFriends()
         {
             if (_view.FriendListContent == null) return;
+
+            // 模板保持隐藏（引用页与 Common 生成顺序错开时激活覆盖可能失效，运行时兜底）
+            if (_view.FriendRowTemplate != null)
+                _view.FriendRowTemplate.gameObject.SetActive(false);
+
             ClearChildren(_view.FriendListContent);
 
             if (_friends.Count == 0)
@@ -429,7 +461,7 @@ namespace DualEnigma.UI
         {
             if (_api == null) return;
 
-            string roomCode = NetworkSystem.HasInstance ? NetworkSystem.Instance.CurrentRoomCode : "";
+            string roomCode = RoomSession.HasInstance ? RoomSession.Instance.CurrentRoomCode : "";
             if (_roomReady && !string.IsNullOrEmpty(roomCode))
             {
                 SendInvite(friend, roomCode);
@@ -437,7 +469,7 @@ namespace DualEnigma.UI
             }
 
             // 未在房：静默自动建房，拿到房间码后补发邀请（任务 A.1/A.2）
-            if (_connecting || GameServerClient.Instance.IsConnected)
+            if (_connecting || GameConnection.Instance.RttMs >= 0f && RoomSession.Instance.IsConnected)
             {
                 _view.SetDrawerStatus("房间正在建立，请稍候...");
                 return;

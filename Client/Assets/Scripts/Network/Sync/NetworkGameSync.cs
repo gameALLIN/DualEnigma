@@ -24,10 +24,10 @@ namespace DualEnigma.Network
         private void OnFragmentCollected(DualEnigma.Core.FragmentCollectedEvent e)
         {
             // 只上报自己接住的；对方接住的由 S2C_FragmentResult 驱动本地移除（防止回环）
-            if (!NetworkSystem.HasInstance || !NetworkSystem.Instance.IsConnected) return;
-            if (e.playerId != NetworkSystem.Instance.LocalPlayerId) return;
+            if (!RoomSession.HasInstance || !RoomSession.Instance.IsConnected) return;
+            if (e.playerId != RoomSession.Instance.LocalPlayerId) return;
 
-            GameServerClient.Instance.SendFragmentCaught(e.fragmentId, e.posX, e.posY);
+            GameConnection.Instance.SendFragmentCaught(e.fragmentId, e.posX, e.posY);
         }
 
         protected override void OnDestroy()

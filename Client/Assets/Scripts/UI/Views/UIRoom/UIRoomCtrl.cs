@@ -1,11 +1,12 @@
 /// ============================================================
 /// 文件名: UIRoomCtrl.cs
 /// 创建时间: 2026-08-15
+/// 最后更新: 2026-08-22
 /// 作者: DualEnigma
-/// 描述: 房间等待面板控制器。打开时连接 game-server
-///       （空 roomCode = 创建房间，非空 = 加入好友房间），
-///       ConnectAck 后显示真实房间码，此时好友面板可发起邀请；
-///       满员收到 GameStart 关闭全部 UI 并开始对局。
+/// 描述: [已停用] 房间等待面板控制器。联机开局流程改造后主界面（UIHome）
+///       为唯一房间入口，本面板不再被 Push。开局/阶段逻辑已移除（防复用
+///       时与 UIHomeCtrl 双订阅同事件导致 StartGame 双触发）；文件保留
+///       仅为兼容旧场景引用，勿在新流程中使用。
 /// ============================================================
 
 using UnityEngine;
@@ -38,25 +39,13 @@ namespace DualEnigma.UI
             _model = new UIRoomModel();
             _view = GetComponent<UIRoomView>();
 
-            // 网络事件挂在整个生命周期：好友面板叠在上方时（OnHide）也不能错过开局消息
-            EventBus.Instance.Subscribe<RoomConnectedEvent>(OnRoomConnected);
-            EventBus.Instance.Subscribe<RoomGameStartEvent>(OnGameStart);
-            EventBus.Instance.Subscribe<PlayerJoinedRoomEvent>(OnPlayerJoined);
-            EventBus.Instance.Subscribe<OpponentDisconnectEvent>(OnOpponentDisconnected);
-            EventBus.Instance.Subscribe<ServerDisconnectedEvent>(OnServerDisconnected);
+            // [已停用] 不再订阅任何网络/阶段事件：开局逻辑由 UIHomeCtrl + GameplayDriver 承担。
+            // 若误被 Push，仅作静态展示，不参与流程（防止 StartGame 双触发）。
         }
 
         protected override void OnDestroy()
         {
-            // 场景卸载时 EventBus 单例可能已先被销毁
-            if (EventBus.HasInstance)
-            {
-                EventBus.Instance.Unsubscribe<RoomConnectedEvent>(OnRoomConnected);
-                EventBus.Instance.Unsubscribe<RoomGameStartEvent>(OnGameStart);
-                EventBus.Instance.Unsubscribe<PlayerJoinedRoomEvent>(OnPlayerJoined);
-                EventBus.Instance.Unsubscribe<OpponentDisconnectEvent>(OnOpponentDisconnected);
-                EventBus.Instance.Unsubscribe<ServerDisconnectedEvent>(OnServerDisconnected);
-            }
+            // [已停用] 无订阅需要注销（OnCreate 不再订阅）
             base.OnDestroy();
         }
 
@@ -98,11 +87,10 @@ namespace DualEnigma.UI
 
         private void ConnectToServer()
         {
-            GameServerClient client = GameServerClient.Instance;
-            if (client.IsConnected)
+            if (RoomSession.HasInstance && RoomSession.Instance.IsConnected)
             {
                 // 已在房间（如从全局邀请弹窗再次进入）→ 直接展示现有状态
-                _model.RoomCode = NetworkSystem.Instance.CurrentRoomCode;
+                _model.RoomCode = RoomSession.Instance.CurrentRoomCode;
                 RefreshDisplay();
                 return;
             }
@@ -112,7 +100,7 @@ namespace DualEnigma.UI
                 : $"正在加入房间 {_model.RoomCode}...");
 
             // 空 roomCode = 创建房间（服务端自动分配房间码）
-            client.Connect(_model.RoomCode);
+            GameConnection.Instance.ConnectToRoom(_model.RoomCode);
         }
 
         private void OnRoomConnected(RoomConnectedEvent e)
@@ -125,23 +113,6 @@ namespace DualEnigma.UI
         {
             _model.PlayerCount = Mathf.Max(1, e.playerCount);
             RefreshDisplay();
-        }
-
-        private void OnGameStart(RoomGameStartEvent e)
-        {
-            // 两人满员 → 隐藏栈内全部面板（保留栈结构，对局结束后恢复）并开始对局
-            UIManager.Instance.SetPanelsVisible(false);
-            GameManager.Instance.StartGame();
-        }
-
-        private void OnOpponentDisconnected(OpponentDisconnectEvent e)
-        {
-            SetStatus("对方连接中断，等待重连...");
-        }
-
-        private void OnServerDisconnected(ServerDisconnectedEvent e)
-        {
-            SetStatus(string.IsNullOrEmpty(e.reason) ? "与服务器断开连接" : e.reason);
         }
 
         // ============================================================
@@ -197,14 +168,13 @@ namespace DualEnigma.UI
                 return;
             }
             SetStatus("正在开始对局...");
-            GameServerClient.Instance.RequestStartGame();
+            GameConnection.Instance.RequestStartGame();
         }
 
-        /// <summary>退出房间：断开连接并返回主界面</summary>
+        /// <summary>退出房间：断开连接并返回主界面（会话状态经统一出口清零）</summary>
         private void OnLeaveClicked()
         {
-            GameServerClient.Instance.Disconnect();
-            NetworkSystem.Instance.SetRoomCode("");
+            GameConnection.Instance.Disconnect();
             UIManager.Instance.Pop();
         }
     }

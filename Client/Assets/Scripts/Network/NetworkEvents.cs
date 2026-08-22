@@ -2,7 +2,7 @@
 /// 文件名: NetworkEvents.cs
 /// 创建时间: 2026-08-15
 /// 作者: DualEnigma
-/// 描述: 联机房间事件定义。由 GameServerClient 发布，
+/// 描述: 联机房间事件定义。由 GameConnection（R3 前 GameServerClient）发布，
 ///       UIRoom / 全局弹窗等 UI 订阅。
 /// ============================================================
 
@@ -56,7 +56,7 @@ namespace DualEnigma.Network
         public string reason;
     }
 
-    /// <summary>收到对方高频状态（20Hz，GameServerClient 发布）</summary>
+    /// <summary>收到对方高频状态（20Hz，GameConnection 发布）</summary>
     public struct HighFreqStateReceivedEvent : IEventData
     {
         public byte playerId;
@@ -64,5 +64,21 @@ namespace DualEnigma.Network
         public Vector2 velocity;
         public string animState;
         public bool facing;
+    }
+
+    /// <summary>
+    /// 请求回执失败（R5：S2C_Resp.code != 0 或本地超时 -1，由 GameConnection 发布）。
+    /// code 取 NetErrorCode；与 ServerDisconnectedEvent（连接层）严格分层。
+    /// </summary>
+    public struct NetworkErrorEvent : IEventData
+    {
+        /// <summary>失败码（NetErrorCode；-1=本地回执超时）</summary>
+        public int code;
+
+        /// <summary>服务器文案（本地超时为客户端兜底文案）</summary>
+        public string message;
+
+        /// <summary>来源请求类型（如 "C2S_Connect" / "C2S_StartGame"）</summary>
+        public string source;
     }
 }

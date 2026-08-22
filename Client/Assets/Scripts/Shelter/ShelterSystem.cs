@@ -194,6 +194,10 @@ namespace DualEnigma.Shelter
                 UpdateEnergy(ref _aquaEnergy, inRange, deltaTime, consumptionRate);
                 UpdateEnergy(ref _ignisEnergy, inRange, deltaTime, consumptionRate);
 
+                // 地震冲击波计时器按帧累计一次（两角色同帧更新时不再重复加速）
+                if (CurrentEnvironment == ShelterEnvironment.Earthquake)
+                    _earthquakeShockwaveTimer += deltaTime;
+
                 UpdateBufferAndDamage(
                     _aquaEnergy, ref _aquaBuffering, ref _aquaBufferTimer,
                     deltaTime, CharacterType.Aqua, true, aquaPos);
@@ -325,7 +329,7 @@ namespace DualEnigma.Shelter
 
             if (CurrentEnvironment == ShelterEnvironment.Earthquake)
             {
-                _earthquakeShockwaveTimer += dt;
+                // 计时器已在 OnUpdate 按帧累计（本方法每角色各调一次，不再重复加 dt）
                 if (_earthquakeShockwaveTimer >= EARTHQUAKE_SHOCKWAVE_INTERVAL)
                 {
                     _earthquakeShockwaveTimer = 0f;
@@ -432,7 +436,7 @@ namespace DualEnigma.Shelter
 
         /// <summary>
         /// 检查角色是否在建筑区域内（靠近任意已放置建筑）。
-        /// 通过 IBuildSystem 查询建筑列表，判断角色世界坐标是否在建筑附近。
+        /// 建筑为网格坐标、角色为世界坐标——统一经 GridCoord 换算到世界系比较。
         /// </summary>
         private bool IsInBuildingZone(Vector2 worldPos)
         {
@@ -443,22 +447,12 @@ namespace DualEnigma.Shelter
                 return false;
 
             const float proximityThreshold = 2.5f;
-            int radius = Mathf.CeilToInt(proximityThreshold);
-            int centerX = Mathf.RoundToInt(worldPos.x);
-            int centerY = Mathf.RoundToInt(worldPos.y);
 
-            for (int dx = -radius; dx <= radius; dx++)
+            foreach (var gridPos in _buildingGridPositions)
             {
-                for (int dy = -radius; dy <= radius; dy++)
-                {
-                    var gridPos = new Vector2Int(centerX + dx, centerY + dy);
-                    if (_buildingGridPositions.Contains(gridPos))
-                    {
-                        float dist = Vector2.Distance(worldPos, new Vector2(gridPos.x, gridPos.y));
-                        if (dist < proximityThreshold)
-                            return true;
-                    }
-                }
+                float dist = Vector2.Distance(worldPos, Building.GridCoord.WorldFromGrid(gridPos));
+                if (dist < proximityThreshold)
+                    return true;
             }
             return false;
         }

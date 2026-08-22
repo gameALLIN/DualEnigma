@@ -76,6 +76,8 @@ namespace DualEnigma.Core
         public bool IsPaused;
         /// <summary>游戏是否结束</summary>
         public bool IsGameOver;
+        /// <summary>是否在对局中（StartGame→EndGame/ExitToHome 之间为 true；各系统帧更新据此收口）</summary>
+        public bool IsInGame;
         /// <summary>是否为 Host（房主）</summary>
         public bool IsHost;
     }
@@ -109,7 +111,8 @@ namespace DualEnigma.Core
         /// </summary>
         private void Update()
         {
-            if (State.IsPaused || State.IsGameOver)
+            // 未在对局中（登录/主界面阶段）不驱动业务系统，避免 Preview 阶段逻辑在局外误触发
+            if (!State.IsInGame || State.IsPaused || State.IsGameOver)
                 return;
 
             float dt = Time.deltaTime;
@@ -142,13 +145,14 @@ namespace DualEnigma.Core
         {
             State.IsGameOver = false;
             State.IsPaused = false;
+            State.IsInGame = true;
             _exitToHomeInvoked = false;
             ShelterSystem.Instance.ResetHP();
 
-            if (NetworkSystem.HasInstance && NetworkSystem.Instance.IsConnected)
+            if (RoomSession.HasInstance && RoomSession.Instance.IsConnected)
             {
                 // 联机模式：角色按 本地/远程 重建，阶段由服务器权威驱动
-                State.IsHost = NetworkSystem.Instance.LocalPlayerId == 0;
+                State.IsHost = RoomSession.Instance.LocalPlayerId == 0;
                 CharacterSystem.Instance.RebuildForNetwork();
                 _ = NetworkGameSync.Instance;
                 GameStateMachine.Instance.SetNetworkDriven(true);
@@ -173,6 +177,7 @@ namespace DualEnigma.Core
                 return;
 
             State.IsGameOver = true;
+            State.IsInGame = false;
             GameStateMachine.Instance.SetNetworkDriven(false);
             GameStateMachine.Instance.Stop();
             EventBus.Instance.Publish(new GameEndEvent { isVictory = isVictory, isManualExit = false });
@@ -193,15 +198,15 @@ namespace DualEnigma.Core
 
             State.IsPaused = false;
             State.IsGameOver = true;
+            State.IsInGame = false;
 
             GameStateMachine.Instance.SetNetworkDriven(false);
             GameStateMachine.Instance.Stop();
 
             // 联机：断开连接，弹出房间面板恢复 UIHome 为栈顶
-            if (NetworkSystem.HasInstance && NetworkSystem.Instance.IsConnected)
+            if (RoomSession.HasInstance && RoomSession.Instance.IsConnected)
             {
-                if (GameServerClient.HasInstance)
-                    GameServerClient.Instance.Disconnect();
+                GameConnection.Instance.Disconnect();
                 UIManager.Instance.PopTo<UIHomeCtrl>();
             }
 

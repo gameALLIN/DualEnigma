@@ -206,10 +206,26 @@ namespace DualEnigma.Framework.UI
             }
         }
 
-        /// <summary>回退到指定面板，中间面板全部弹出并隐藏</summary>
+        /// <summary>回退到指定面板，中间面板全部弹出并隐藏；未命中时保留栈并告警（防误清空导致黑屏无路可走）</summary>
         public void PopTo<T>() where T : UICtrlBase
         {
             string targetName = GetPanelName(typeof(T));
+
+            // 先确认目标在栈中：不存在则不动栈（原实现会弹空整个栈）
+            bool found = false;
+            foreach (PanelStackEntry entry in m_PanelStack)
+            {
+                if (GetPanelName(entry.Panel.GetType()) == targetName)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                Debug.LogWarning("[UIManager] PopTo 未在栈中找到面板 " + targetName + "，面板栈保持不变");
+                return;
+            }
 
             while (m_PanelStack.Count > 0)
             {
@@ -230,8 +246,6 @@ namespace DualEnigma.Framework.UI
                 ((IUIPanel)top.Panel).OnHide();
                 top.Panel.gameObject.SetActive(false);
             }
-
-            Debug.LogWarning("[UIManager] 栈中未找到面板: " + targetName);
         }
 
         /// <summary>获取当前栈顶面板</summary>

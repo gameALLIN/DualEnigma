@@ -204,7 +204,7 @@ namespace DualEnigma.UI
                 roomCode =>
                 {
                     // 流程 B：直连进房（playerId=1），停留主界面等待房主开始（UIRoom 已停用）
-                    GameServerClient.Instance.Connect(roomCode);
+                    GameConnection.Instance.ConnectToRoom(roomCode);
                 },
                 error => Debug.LogError($"[UIInvitePopup] 接受邀请失败: {error}"));
             // 卡片移除交给下一次轮询对账（服务端列表中该邀请已消失）

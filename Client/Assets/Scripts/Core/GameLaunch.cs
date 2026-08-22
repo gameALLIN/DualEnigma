@@ -34,29 +34,6 @@ namespace DualEnigma.Core
 
         private void Awake()
         {
-            // 确保场景中只有一个 AudioListener
-            AudioListener[] listeners = FindObjectsOfType<AudioListener>();
-            if (listeners.Length > 1)
-            {
-                System.Array.Sort(listeners, (a, b) =>
-                {
-                    bool aOnCamera = a != null && a.GetComponent<Camera>() != null;
-                    bool bOnCamera = b != null && b.GetComponent<Camera>() != null;
-                    return bOnCamera.CompareTo(aOnCamera);
-                });
-
-                for (int i = 1; i < listeners.Length; i++)
-                {
-                    DestroyImmediate(listeners[i]);
-                }
-                Debug.Log($"[GameLaunch] 清理了 {listeners.Length - 1} 个多余的 AudioListener");
-            }
-            else if (listeners.Length == 0)
-            {
-                gameObject.AddComponent<AudioListener>();
-                Debug.Log("[GameLaunch] 自动添加了 AudioListener");
-            }
-
             // 初始化资源管理器
             _ = ResMgr.Instance;
             ResMgr.Instance.Init();
@@ -87,8 +64,11 @@ namespace DualEnigma.Core
             // 加载地图（背景、天空、地面、墙壁、安全区、网格）
             MapLoader.Load();
 
-            // 确保场景中有正交相机
+            // 确保场景中有正交相机（不再给相机挂 AudioListener，统一在下方收口去重）
             EnsureCamera();
+
+            // AudioListener 统一收口：相机创建完成后再检查，确保全场景有且只有一个
+            EnsureSingleAudioListener();
 
             // 初始化业务系统（触发 Singleton 创建 + ServiceLocator 注册）
             _ = CharacterSystem.Instance;
@@ -100,15 +80,50 @@ namespace DualEnigma.Core
             _ = DisasterSystem.Instance;
             _ = SkillSystem.Instance;
             _ = TalentSystem.Instance;
-            _ = NetworkSystem.Instance;
+            _ = RoomSession.Instance;      // 会话唯一事实来源（R3：替代 NetworkSystem）
+            _ = GameConnection.Instance;   // 游戏连接（R3：替代 GameServerClient）
             _ = AuthService.Instance;
+
+            // 对局流程编排器（阶段驱动：蓝图/灾害/胜负/进度）
+            _ = GameplayDriver.Instance;
 
             // 局内常驻 UI（HUD/设置弹窗/结算面板，仿 UIInvitePopup 常驻模式，默认隐藏）
             UIGameHudCtrl.Ensure();
             UISettingsCtrl.Ensure();
             UIGameOverCtrl.Ensure();
 
-            Debug.Log("[GameLaunch] 全系统初始化完成（Core + 9个业务系统 + UI）");
+            Debug.Log("[GameLaunch] 全系统初始化完成（Core + 9个业务系统 + 流程编排 + UI）");
+        }
+
+        /// <summary>
+        /// 确保场景中有且只有一个 AudioListener（挂在 GameLaunch 自身，不随相机动）。
+        /// </summary>
+        private void EnsureSingleAudioListener()
+        {
+            AudioListener[] listeners = FindObjectsOfType<AudioListener>();
+
+            if (listeners.Length > 1)
+            {
+                // 保留第一个（优先挂在相机上的），销毁其余
+                System.Array.Sort(listeners, (a, b) =>
+                {
+                    bool aOnCamera = a != null && a.GetComponent<Camera>() != null;
+                    bool bOnCamera = b != null && b.GetComponent<Camera>() != null;
+                    return bOnCamera.CompareTo(aOnCamera);
+                });
+
+                for (int i = 1; i < listeners.Length; i++)
+                {
+                    if (listeners[i] != null)
+                        Destroy(listeners[i]);
+                }
+                Debug.Log($"[GameLaunch] 清理了 {listeners.Length - 1} 个多余的 AudioListener");
+            }
+            else if (listeners.Length == 0)
+            {
+                gameObject.AddComponent<AudioListener>();
+                Debug.Log("[GameLaunch] 自动添加了 AudioListener");
+            }
         }
 
         /// <summary>
@@ -124,7 +139,6 @@ namespace DualEnigma.Core
                 GameObject camObj = new GameObject("MainCamera");
                 mainCam = camObj.AddComponent<Camera>();
                 camObj.tag = "MainCamera";
-                camObj.AddComponent<AudioListener>();
                 Debug.Log("[GameLaunch] 自动创建 MainCamera");
             }
 

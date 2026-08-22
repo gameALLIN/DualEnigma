@@ -1,7 +1,7 @@
 /// ============================================================
 /// 文件名: FriendItem.cs
 /// 创建时间: 2026-08-18
-/// 最后更新: 2026-08-21
+/// 最后更新: 2026-08-22
 /// 作者: DualEnigma
 /// 描述: 好友条目通用组件（水平列表容器驱动）。行内子控件由
 ///       HorizontalLayoutGroup + LayoutElement 排布：昵称列弹性占满、
@@ -183,6 +183,7 @@ namespace DualEnigma.UI
 
         /// <summary>
         /// 紧凑布局（窄容器如邀请抽屉）：行宽收窄 + 压缩首选宽度/字号 + 间距收紧。
+        /// childControl=false 下布局按实际 rect 排布，因此 rect 与 LayoutElement 需同步收缩。
         /// ID 列由 SetMode 依据 _compact 自动隐藏回流。
         /// </summary>
         public void SetCompactLayout(float width)
@@ -201,11 +202,14 @@ namespace DualEnigma.UI
 
             if (m_NameText != null) m_NameText.fontSize = 13;
             if (m_NameLE != null) m_NameLE.preferredWidth = 90f;
+            SetRectWidth(m_NameText, 90f);
 
             if (m_StatusText != null) m_StatusText.fontSize = 11;
             if (m_StatusLE != null) m_StatusLE.preferredWidth = 64f;
+            SetRectWidth(m_StatusText, 64f);
 
             if (m_PrimaryLE != null) m_PrimaryLE.preferredWidth = 48f;
+            SetRectWidth(m_PrimaryBtn, 48f);
             if (m_PrimaryBtn != null)
             {
                 Text label = m_PrimaryBtn.GetComponentInChildren<Text>();
@@ -213,6 +217,15 @@ namespace DualEnigma.UI
             }
 
             if (m_SecondaryLE != null) m_SecondaryLE.preferredWidth = 44f;
+            SetRectWidth(m_SecondaryBtn, 44f);
+        }
+
+        /// <summary>设置子控件 rect 宽度（保持高度不变），紧凑形态回流用</summary>
+        private static void SetRectWidth(Component c, float width)
+        {
+            if (c == null) return;
+            RectTransform rt = c.transform as RectTransform;
+            if (rt != null) rt.sizeDelta = new Vector2(width, rt.sizeDelta.y);
         }
 
         // ============================================================
@@ -350,6 +363,9 @@ namespace DualEnigma.UI
         {
             GameObject go = new GameObject(name, typeof(RectTransform));
             go.transform.SetParent(transform, false);
+            // childControl=false 布局按实际 rect 排布（LayoutElement 仅声明首选值），
+            // 必须写入 sizeDelta，否则子控件停留默认 100×100
+            go.GetComponent<RectTransform>().sizeDelta = size;
             Text text = go.AddComponent<Text>();
             text.text = content;
             text.font = _builtinFont;
@@ -370,6 +386,7 @@ namespace DualEnigma.UI
         {
             GameObject btnObj = new GameObject(name, typeof(RectTransform));
             btnObj.transform.SetParent(transform, false);
+            btnObj.GetComponent<RectTransform>().sizeDelta = size;
             Image btnImage = btnObj.AddComponent<Image>();
             btnImage.color = bgColor;
             Button button = btnObj.AddComponent<Button>();

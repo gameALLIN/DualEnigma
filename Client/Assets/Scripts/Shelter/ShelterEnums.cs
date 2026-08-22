@@ -8,7 +8,7 @@
 namespace DualEnigma.Shelter
 {
     /// <summary>
-    /// 5种庇护环境。
+    /// 庇护环境（5种灾害环境 + 普通）。
     /// 引用：双生庇护系统设计.md §三 五种庇护机制
     /// </summary>
     public enum ShelterEnvironment
@@ -23,5 +23,7 @@ namespace DualEnigma.Shelter
         Earthquake,
         /// <summary>陨石 — 双方受影响(被砸概率50%)</summary>
         Meteorite,
+        /// <summary>普通 — 非灾害期间（无环境伤害；合成表回落默认配方）</summary>
+        Normal,
     }
 }

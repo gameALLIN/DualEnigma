@@ -123,7 +123,7 @@ namespace DualEnigma.UI
             if (gameObject.activeSelf) return;
 
             _model.IsVictory = e.isVictory;
-            _model.IsNetworked = NetworkSystem.HasInstance && NetworkSystem.Instance.IsConnected;
+            _model.IsNetworked = RoomSession.HasInstance && RoomSession.Instance.IsConnected;
 
             RefreshDisplay();
             gameObject.SetActive(true);
