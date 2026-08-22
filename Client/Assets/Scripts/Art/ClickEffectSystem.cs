@@ -4,10 +4,10 @@
 /// 作者: DualEnigma
 /// 描述: 点击反馈系统（常驻单例）：全局点击捕获 + 特效/音效统一入口。
 ///       自动层：游戏画面点击 → RingPulse（z=0 世界平面）；
-///               UI 点击 → StarTwinkle（sortingOrder 拉高渲染在 UI 之上）。
+///               UI 点击 → StarTwinkle（Effect 层覆盖相机渲染在 UI 之上）。
 ///       显式层：关键按钮 onClick 调 Play(type, transform) 播强化反馈
 ///               （开始对局=Shockwave，邀请=ElementMix）。
-///       预制体来源：ArtResources/Prefabs/Effects/ClickEffect_{type}
+///       预制体来源：ArtResources/Prefabs/Effects/Click/ClickEffect_{type}
 ///       （由菜单 DualEnigma/生成点击特效预制体 生成，播完自动销毁）。
 ///       音效：ClickSfxGenerator 按类型程序化合成，PlayOneShot 播放。
 /// 引用：ClickEffectEnums.cs, ClickSfxGenerator.cs, GameLaunch.cs
@@ -29,11 +29,15 @@ namespace DualEnigma.Art
         /// <summary>世界层特效渲染序（高于建筑 2，低于 UI）</summary>
         private const int WORLD_SORTING_ORDER = 5;
 
+        /// <summary>Effect 层（TagManager index 8，UI 之上特效专用渲染层）</summary>
+        private const int EFFECT_LAYER = 8;
+
         private readonly Dictionary<ClickEffectType, GameObject> _prefabs = new Dictionary<ClickEffectType, GameObject>();
         private readonly Dictionary<ClickEffectType, AudioClip> _clips = new Dictionary<ClickEffectType, AudioClip>();
 
         private AudioSource _audio;
         private Camera _camera;
+        private Camera _overlayCamera;
         private bool _prefabWarned;
 
         protected override void OnSingletonInitialized()
@@ -93,12 +97,23 @@ namespace DualEnigma.Art
             GameObject prefab = GetPrefab(type);
             if (prefab != null)
             {
-                Vector3 world = cam.ScreenToWorldPoint(new Vector3(
-                    screenPoint.x, screenPoint.y, -cam.transform.position.z));
+                // UI 之上渲染：UI 画布由独立 UI Camera（depth 0）后画，世界粒子
+                // 的 sortingOrder 跨相机无效，必须换 Effect 层 + 更高 depth 的覆盖相机
+                Camera renderCam = cam;
+                if (aboveUI)
+                {
+                    renderCam = GetOverlayCamera(cam) ?? cam;
+                }
+
+                Vector3 world = renderCam.ScreenToWorldPoint(new Vector3(
+                    screenPoint.x, screenPoint.y, -renderCam.transform.position.z));
 
                 GameObject instance = Instantiate(prefab, world, Quaternion.identity);
 
-                // 渲染层级：UI 反馈拉高到 UI 之上；世界反馈高于建筑
+                if (aboveUI)
+                    SetLayerRecursive(instance.transform, EFFECT_LAYER);
+
+                // 渲染层级：UI 反馈由覆盖相机画在 UI 之上；世界反馈高于建筑
                 int order = aboveUI ? UI_SORTING_ORDER : WORLD_SORTING_ORDER;
                 foreach (ParticleSystem ps in instance.GetComponentsInChildren<ParticleSystem>(true))
                 {
@@ -108,10 +123,7 @@ namespace DualEnigma.Art
 
                     var renderer = ps.GetComponent<ParticleSystemRenderer>();
                     if (renderer != null)
-                    {
                         renderer.sortingOrder = order;
-                        // UI 之上渲染时粒子可能在相机后方裁剪问题：保持默认层，仅调 order
-                    }
                 }
             }
 
@@ -125,6 +137,40 @@ namespace DualEnigma.Art
         }
 
         // ============================================================
+        //  UI 覆盖相机（Effect 层专用，depth 高于 UI Camera）
+        // ============================================================
+
+        /// <summary>
+        /// 懒创建 UI 覆盖相机：与主相机同变换/同正交尺寸（屏幕↔世界映射、粒子
+        /// 缩放与世界特效一致），Depth 清屏，只渲染 Effect 层，最后绘制（depth=1）。
+        /// </summary>
+        private Camera GetOverlayCamera(Camera mainCam)
+        {
+            if (_overlayCamera != null)
+                return _overlayCamera;
+
+            GameObject go = new GameObject("ClickEffectOverlayCamera");
+            go.transform.SetParent(transform, false);
+            _overlayCamera = go.AddComponent<Camera>();
+            _overlayCamera.orthographic = true;
+            _overlayCamera.orthographicSize = mainCam.orthographicSize;
+            go.transform.position = mainCam.transform.position;
+            _overlayCamera.clearFlags = CameraClearFlags.Depth;
+            _overlayCamera.cullingMask = 1 << EFFECT_LAYER;
+            _overlayCamera.depth = 1; // 高于 UI Camera(0)，特效渲染在全部 UI 之上
+
+            return _overlayCamera;
+        }
+
+        /// <summary>递归设置层级（粒子子系统一并切换到 Effect 层）</summary>
+        private static void SetLayerRecursive(Transform t, int layer)
+        {
+            t.gameObject.layer = layer;
+            for (int i = 0; i < t.childCount; i++)
+                SetLayerRecursive(t.GetChild(i), layer);
+        }
+
+        // ============================================================
         //  资源加载（懒加载缓存）
         // ============================================================
 
@@ -135,10 +181,10 @@ namespace DualEnigma.Art
 
 #if UNITY_EDITOR
             prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
-                $"Assets/ArtResources/Prefabs/Effects/ClickEffect_{type}.prefab");
+                $"Assets/ArtResources/Prefabs/Effects/Click/ClickEffect_{type}.prefab");
 #else
-            // TODO(AB 接入): ArtResources/Prefabs/Effects 纳入 effect bundle 后改走 ResMgr
-            prefab = Framework.Core.ResMgr.Instance.LoadPrefab($"Prefabs/Effects/ClickEffect_{type}");
+            // TODO(AB 接入): ArtResources/Prefabs/Effects/Click 纳入 effect bundle 后改走 ResMgr
+            prefab = Framework.Core.ResMgr.Instance.LoadPrefab($"Prefabs/Effects/Click/ClickEffect_{type}");
 #endif
             if (prefab == null)
             {
