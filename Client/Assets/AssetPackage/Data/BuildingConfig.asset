@@ -11,31 +11,20 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c1483572ead5ce74f95d7954f38bb6ae, type: 3}
   m_Name: BuildingConfig
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   _buildingHP:
   - 50
-  - 40
+  - 50
   - 60
   - 40
-  - 40
-  _hasFacing:
-  - 1
-  - 1
-  - 0
-  - 0
-  - 1
+  - 35
+  _hasFacing: 0101000001
   _gridWidth: 15
   _gridHeight: 8
   _placeTime: 0.5
   _repairTime: 1
   _demolishTime: 1
-  _minBlocks:
-  - 3
-  - 5
-  - 7
-  _maxBlocks:
-  - 4
-  - 6
-  - 8
+  _minBlocks: 030000000500000007000000
+  _maxBlocks: 040000000600000008000000
   _defaultSafeZoneCenter: {x: 7, y: 4}
   _defaultSafeZoneRadius: 5

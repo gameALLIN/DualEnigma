@@ -11,8 +11,369 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 967dd13b7b598184eac857ff958b766c, type: 3}
   m_Name: DisasterConfig
-  m_EditorClassIdentifier:
-  _disasters: []
+  m_EditorClassIdentifier: 
+  _disasters:
+  - Id: 2
+    Name: E1
+    Category: 0
+    Environment: 0
+    BaseDPS: 5
+    Range: 5
+    Duration: 20
+    RandomSeed: 1
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 3
+    Name: E2
+    Category: 0
+    Environment: 0
+    BaseDPS: 5
+    Range: 5
+    Duration: 20
+    RandomSeed: 2
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 4
+    Name: E3
+    Category: 0
+    Environment: 0
+    BaseDPS: 5
+    Range: 5
+    Duration: 20
+    RandomSeed: 3
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 5
+    Name: E4
+    Category: 0
+    Environment: 0
+    BaseDPS: 5
+    Range: 5
+    Duration: 20
+    RandomSeed: 4
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 6
+    Name: E5
+    Category: 0
+    Environment: 0
+    BaseDPS: 5
+    Range: 5
+    Duration: 20
+    RandomSeed: 5
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 7
+    Name: E6
+    Category: 0
+    Environment: 0
+    BaseDPS: 5
+    Range: 5
+    Duration: 20
+    RandomSeed: 6
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 8
+    Name: E7
+    Category: 0
+    Environment: 0
+    BaseDPS: 5
+    Range: 5
+    Duration: 20
+    RandomSeed: 7
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 9
+    Name: E8
+    Category: 0
+    Environment: 0
+    BaseDPS: 5
+    Range: 5
+    Duration: 20
+    RandomSeed: 8
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: V1
+    Category: 1
+    Environment: 1
+    BaseDPS: 5
+    Range: 5
+    Duration: 20
+    RandomSeed: 9
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: V2
+    Category: 1
+    Environment: 1
+    BaseDPS: 5
+    Range: 5
+    Duration: 20
+    RandomSeed: 10
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: V3
+    Category: 1
+    Environment: 1
+    BaseDPS: 5
+    Range: 5
+    Duration: 20
+    RandomSeed: 11
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: V4
+    Category: 1
+    Environment: 1
+    BaseDPS: 5
+    Range: 5
+    Duration: 20
+    RandomSeed: 12
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: V5
+    Category: 1
+    Environment: 1
+    BaseDPS: 5
+    Range: 5
+    Duration: 20
+    RandomSeed: 13
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: V6
+    Category: 1
+    Environment: 1
+    BaseDPS: 5
+    Range: 5
+    Duration: 20
+    RandomSeed: 14
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: T1
+    Category: 2
+    Environment: 2
+    BaseDPS: 3
+    Range: 5
+    Duration: 20
+    RandomSeed: 15
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: T2
+    Category: 2
+    Environment: 2
+    BaseDPS: 3
+    Range: 5
+    Duration: 20
+    RandomSeed: 16
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: T3
+    Category: 2
+    Environment: 2
+    BaseDPS: 3
+    Range: 5
+    Duration: 20
+    RandomSeed: 17
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: T4
+    Category: 2
+    Environment: 2
+    BaseDPS: 3
+    Range: 5
+    Duration: 20
+    RandomSeed: 18
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: T5
+    Category: 2
+    Environment: 2
+    BaseDPS: 3
+    Range: 5
+    Duration: 20
+    RandomSeed: 19
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: S1
+    Category: 3
+    Environment: 3
+    BaseDPS: 3
+    Range: 5
+    Duration: 20
+    RandomSeed: 20
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: S2
+    Category: 3
+    Environment: 3
+    BaseDPS: 3
+    Range: 5
+    Duration: 20
+    RandomSeed: 21
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: S3
+    Category: 3
+    Environment: 3
+    BaseDPS: 3
+    Range: 5
+    Duration: 20
+    RandomSeed: 22
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: S4
+    Category: 3
+    Environment: 3
+    BaseDPS: 3
+    Range: 5
+    Duration: 20
+    RandomSeed: 23
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: S5
+    Category: 3
+    Environment: 3
+    BaseDPS: 3
+    Range: 5
+    Duration: 20
+    RandomSeed: 24
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: P1
+    Category: 4
+    Environment: 4
+    BaseDPS: 8
+    Range: 5
+    Duration: 20
+    RandomSeed: 25
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: P2
+    Category: 4
+    Environment: 4
+    BaseDPS: 8
+    Range: 5
+    Duration: 20
+    RandomSeed: 26
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: P3
+    Category: 4
+    Environment: 4
+    BaseDPS: 8
+    Range: 5
+    Duration: 20
+    RandomSeed: 27
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: P4
+    Category: 4
+    Environment: 4
+    BaseDPS: 8
+    Range: 5
+    Duration: 20
+    RandomSeed: 28
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: P5
+    Category: 4
+    Environment: 4
+    BaseDPS: 8
+    Range: 5
+    Duration: 20
+    RandomSeed: 29
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: M1
+    Category: 5
+    Environment: 0
+    BaseDPS: 4
+    Range: 5
+    Duration: 20
+    RandomSeed: 30
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: M2
+    Category: 5
+    Environment: 0
+    BaseDPS: 4
+    Range: 5
+    Duration: 20
+    RandomSeed: 31
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: M3
+    Category: 5
+    Environment: 0
+    BaseDPS: 4
+    Range: 5
+    Duration: 20
+    RandomSeed: 32
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: M4
+    Category: 5
+    Environment: 0
+    BaseDPS: 4
+    Range: 5
+    Duration: 20
+    RandomSeed: 33
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: M5
+    Category: 5
+    Environment: 0
+    BaseDPS: 4
+    Range: 5
+    Duration: 20
+    RandomSeed: 34
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  - Id: 0
+    Name: M6
+    Category: 5
+    Environment: 0
+    BaseDPS: 4
+    Range: 5
+    Duration: 20
+    RandomSeed: 35
+    DifficultyMultiplier: 1
+    Position: {x: 0, y: 0}
+  _e3Enhanced:
+    Id: 0
+    Name: 
+    Category: 0
+    Environment: 0
+    BaseDPS: 0
+    Range: 0
+    Duration: 20
+    RandomSeed: 0
+    DifficultyMultiplier: 0
+    Position: {x: 0, y: 0}
   _intensityCurve:
   - 0.3
   - 0.6

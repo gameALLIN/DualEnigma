@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6c5867ff12dbffb46a0e73e16a7037b4, type: 3}
   m_Name: FragmentConfig
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   _densityFactors:
   - 1
   - 0.85
@@ -22,8 +22,8 @@ MonoBehaviour:
   - 2.5
   _previewCount: 5
   _collectPhaseCount: 25
-  _dropRangeMin: 8
-  _dropRangeMax: 18
+  _dropRangeMin: -10
+  _dropRangeMax: 10
   _warmBrickWindow: 0.1
   _passiveTriggerRadius: 3
   _typeProbabilities:

@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1dd6f4b91e82509498252a25edd70b06, type: 3}
   m_Name: CharacterConfig
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   AquaStats:
     Type: 0
     MaxHP: 100
@@ -20,7 +20,7 @@ MonoBehaviour:
     JumpHeight: 2
     CanDoubleJump: 0
     CarryLimit: 3
-    CarriedFragmentIds: []
+    CarriedFragmentIds: 
   IgnisStats:
     Type: 1
     MaxHP: 100
@@ -29,6 +29,6 @@ MonoBehaviour:
     JumpHeight: 2
     CanDoubleJump: 1
     CarryLimit: 3
-    CarriedFragmentIds: []
+    CarriedFragmentIds: 
   _aquaSpawnPosition: {x: -2, y: 0}
   _ignisSpawnPosition: {x: 2, y: 0}

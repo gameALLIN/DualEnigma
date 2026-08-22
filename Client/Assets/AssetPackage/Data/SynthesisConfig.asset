@@ -11,77 +11,69 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 30e13a5b2d65ad44e94e3627930be35e, type: 3}
   m_Name: SynthesisConfig
-  m_EditorClassIdentifier:
+  m_EditorClassIdentifier: 
   _volcanoRecipes:
+  - InputType: 1
+    OutputType: 2
+    RequiredCount: 1
+    SynthesisTime: 2
+  - InputType: 1
+    OutputType: 2
+    RequiredCount: 2
+    SynthesisTime: 4
+  - InputType: 1
+    OutputType: 2
+    RequiredCount: 3
+    SynthesisTime: 6
+  _floodRecipes:
+  - InputType: 0
+    OutputType: 0
+    RequiredCount: 1
+    SynthesisTime: 2
   - InputType: 0
     OutputType: 0
     RequiredCount: 2
-    SynthesisTime: 1
+    SynthesisTime: 4
   - InputType: 0
-    OutputType: 1
+    OutputType: 0
     RequiredCount: 3
-    SynthesisTime: 1.5
-  - InputType: 2
-    OutputType: 4
-    RequiredCount: 2
-    SynthesisTime: 2
-  - InputType: 1
-    OutputType: 1
-    RequiredCount: 3
-    SynthesisTime: 1.5
-  _floodRecipes:
-  - InputType: 0
-    OutputType: 4
-    RequiredCount: 2
-    SynthesisTime: 2
-  - InputType: 1
-    OutputType: 2
-    RequiredCount: 2
-    SynthesisTime: 1
-  - InputType: 1
-    OutputType: 3
-    RequiredCount: 3
-    SynthesisTime: 1.5
-  - InputType: 2
-    OutputType: 3
-    RequiredCount: 3
-    SynthesisTime: 1.5
+    SynthesisTime: 6
   _blizzardRecipes:
   - InputType: 0
     OutputType: 1
-    RequiredCount: 3
-    SynthesisTime: 1.5
-  - InputType: 1
-    OutputType: 2
+    RequiredCount: 1
+    SynthesisTime: 2
+  - InputType: 0
+    OutputType: 1
     RequiredCount: 2
-    SynthesisTime: 1
+    SynthesisTime: 4
+  - InputType: 0
+    OutputType: 1
+    RequiredCount: 3
+    SynthesisTime: 6
+  _earthquakeRecipes:
+  - InputType: 2
+    OutputType: 4
+    RequiredCount: 1
+    SynthesisTime: 2
+  - InputType: 2
+    OutputType: 4
+    RequiredCount: 2
+    SynthesisTime: 4
+  - InputType: 2
+    OutputType: 4
+    RequiredCount: 3
+    SynthesisTime: 6
+  _meteoriteRecipes:
+  - InputType: 2
+    OutputType: 3
+    RequiredCount: 1
+    SynthesisTime: 2
+  - InputType: 2
+    OutputType: 3
+    RequiredCount: 2
+    SynthesisTime: 4
   - InputType: 2
     OutputType: 3
     RequiredCount: 3
-    SynthesisTime: 1.5
-  _earthquakeRecipes:
-  - InputType: 0
-    OutputType: 4
-    RequiredCount: 2
-    SynthesisTime: 2
-  - InputType: 1
-    OutputType: 4
-    RequiredCount: 2
-    SynthesisTime: 2
-  - InputType: 2
-    OutputType: 4
-    RequiredCount: 2
-    SynthesisTime: 2
-  _meteoriteRecipes:
-  - InputType: 0
-    OutputType: 4
-    RequiredCount: 2
-    SynthesisTime: 2
-  - InputType: 1
-    OutputType: 4
-    RequiredCount: 2
-    SynthesisTime: 2
-  - InputType: 2
-    OutputType: 4
-    RequiredCount: 2
-    SynthesisTime: 2
+    SynthesisTime: 6
