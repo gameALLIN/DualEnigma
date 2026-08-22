@@ -1,7 +1,11 @@
 ﻿{
     "name": "DualEnigma.Framework.Network.Tests",
     "rootNamespace": "DualEnigma.Framework.Network.Tests",
-    "references": ["DualEnigma.Framework"],
+    "references": [
+        "DualEnigma.Framework",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
     "includePlatforms": [
         "Editor"
     ],
@@ -9,11 +13,8 @@
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
-    "autoReferenced": false,
+    "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],
-    "noEngineReferences": false,
-    "optionalUnityReferences": [
-        "TestAssemblies"
-    ]
+    "noEngineReferences": false
 }
