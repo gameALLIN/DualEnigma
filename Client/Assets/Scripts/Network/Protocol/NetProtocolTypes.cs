@@ -1,36 +1,24 @@
 /// ============================================================
 /// 文件名: NetProtocolTypes.cs
 /// 创建时间: 2026-08-22
+/// 最后更新: 2026-08-22（PC-2：JSON 协议退役，NetProto 常量类删除；
+///           字符串常量仅保留作 RequestTracker 的 source 标识，不再进线协议）
 /// 作者: DualEnigma
-/// 描述: 协议 type 字符串常量（与 Server/network Message 子类 @Type 一一对应，
-///       禁止改动——协议字节不变铁律）。NetworkRole 枚举自 NetworkEnums.cs 迁入。
-/// 引用：C2SMessages.cs, S2CMessages.cs
+/// 描述: 网络协议辅助类型：请求来源标识（RequestTracker source / NetworkErrorEvent source）
+///       + 业务错误码枚举 + NetworkRole。线上协议见 Protocol/proto/game.proto（Protobuf）。
+/// 引用：RequestTracker.cs, GameConnection.cs, UIHomeCtrl.cs
 /// ============================================================
 
 namespace DualEnigma.Network
 {
-    /// <summary>协议 type 字符串常量（唯一路由键，双端契约）</summary>
+    /// <summary>请求来源标识（仅本地日志/事件 source 用，非线上协议）</summary>
     public static class NetProto
     {
-        // ── C2S 上行 ──
         public const string Connect = "C2S_Connect";
         public const string Heartbeat = "C2S_Heartbeat";
         public const string StartGame = "C2S_StartGame";
         public const string HighFreqState = "C2S_HighFreqState";
         public const string FragmentCaught = "C2S_FragmentCaught";
-
-        // ── S2C 下行 ──
-        public const string ConnectAck = "S2C_ConnectAck";
-        public const string GameStart = "S2C_GameStart";
-        public const string PlayerJoined = "S2C_PlayerJoined";
-        public const string PhaseChange = "S2C_PhaseChange";
-        public const string HighFreqStateS2C = "S2C_HighFreqState";
-        public const string MidFreqState = "S2C_MidFreqState";
-        public const string OpponentDisconnect = "S2C_OpponentDisconnect";
-        public const string FragmentDropPlan = "S2C_FragmentDropPlan";
-        public const string FragmentResult = "S2C_FragmentResult";
-        public const string HeartbeatAck = "S2C_HeartbeatAck";
-        public const string Resp = "S2C_Resp";
     }
 
     /// <summary>

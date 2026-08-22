@@ -2,11 +2,10 @@
 /// 文件名: WebSocketConnection.cs
 /// 创建时间: 2026-08-22
 /// 作者: DualEnigma
-/// 描述: WebSocket 传输层（框架化，零业务知识）：连接/字节收发/分片拼包/
+/// 描述: WebSocket 传输层（框架化，零业务知识）：连接/二进制帧收发/分片拼包/
 ///       心跳定时/RTT/主线程分发泵/主动与异常断开区分。
-///       从 GameServerClient 逐行搬运泛化：不发送任何业务 JSON（进房等
-///       由上层在 OnOpen 后自行发送）；心跳包内容由 payloadFactory 注入，
-///       Ack 识别由上层注册表调用 NotifyHeartbeatAck()。
+///       PC-1 起协议为 Protobuf 二进制帧（上层 GameConnection 组装 Envelope）；
+///       传输层不感知协议内容，文本帧视为协议错误丢弃。
 ///       使用方式：由上层（如 GameConnection）动态 AddComponent，非自身单例。
 /// ============================================================
 

@@ -194,6 +194,7 @@ GameObject 树
 > **兼容性**：扩展字段全部可选，旧规格零改动即可被解释。viewer.js 未识别的字段自然忽略，预览不受影响（flexibleWidth 列预览按首选宽近似渲染）。
 >
 > **ref 依赖顺序**：引用页（如 UIHome）生成前，被引用页（如 Common）的预制体必须已存在——批量生成时先勾选 Common。
+> **Common 变更后必须重新生成引用页**：每次重新生成会重建 FriendItem.prefab 全部内部 fileID，引用页（UIHome）里嵌套实例的覆盖（改名/隐藏/摆位）按 fileID 匹配，Common 单独重新生成会使这些覆盖静默失效（模板恢复原名/激活态）——生成顺序固定为 Common → 引用页。运行时 UIHomeCtrl.RenderFriends 已做兜底（强制模板隐藏），但干净覆盖仍需按序重新生成。
 >
 > **ref 与反向导出**：gen_ui_html.py 反向导出时嵌套实例按 Unity YAML 属 stripped 对象，导出结果中该节点缺失（diff 对账时忽略 ref 节点即可）。
 
