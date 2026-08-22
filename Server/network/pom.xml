@@ -23,10 +23,11 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
-        <!-- JSON 序列化 (Jackson via Spring Boot) -->
+        <!-- Protobuf 运行时（与客户端 Google.Protobuf 大版本锁定 3.25.x） -->
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.25.5</version>
         </dependency>
 
         <!-- 测试 -->
@@ -36,4 +37,34 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <extensions>
+            <!-- OS 探测（protobuf-maven-plugin 的 protocArtifact 分类器依赖） -->
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.7.1</version>
+            </extension>
+        </extensions>
+        <plugins>
+            <!-- .proto → Java（唯一事实来源：仓库根 Protocol/proto） -->
+            <plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>0.6.1</version>
+                <configuration>
+                    <protoSourceRoot>${project.basedir}/../../Protocol/proto</protoSourceRoot>
+                    <protocArtifact>com.google.protobuf:protoc:3.25.5:exe:${os.detected.classifier}</protocArtifact>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -3,14 +3,17 @@ package com.dualenigma.server.game;
 import com.dualenigma.network.model.GameSnapshot;
 import com.dualenigma.network.model.PlayerState;
 import com.dualenigma.network.protocol.GamePhase;
-import com.dualenigma.network.protocol.c2s.C2S_HighFreqState;
-import com.dualenigma.network.protocol.s2c.S2C_FragmentDropPlan;
-import com.dualenigma.network.protocol.s2c.S2C_FragmentResult;
-import com.dualenigma.network.protocol.s2c.S2C_MidFreqState;
+import com.dualenigma.network.protocol.NetErrorCode;
 import com.dualenigma.server.logic.ConflictResolver;
 import com.dualenigma.server.logic.FragmentPlanner;
-import com.dualenigma.network.model.FragmentDropPlan;
 import com.dualenigma.server.util.Constants;
+import com.dualenigma.v1.C2S_HighFreqState;
+import com.dualenigma.v1.Envelope;
+import com.dualenigma.v1.S2C_FragmentDropPlan;
+import com.dualenigma.v1.S2C_FragmentResult;
+import com.dualenigma.v1.S2C_MidFreqState;
+import com.dualenigma.v1.Vec2;
+import com.dualenigma.network.model.FragmentDropPlan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +26,7 @@ import java.util.Set;
 
 /**
  * 单局游戏管理（权威状态机驱动）.
- * 每个房间持有一个实例，管理一局完整游戏的生命周期.
+ * 每个房间持有一个实例，管理一局完整游戏的生命周期；广播走 proto Envelope 二进制帧.
  */
 public class GameManager {
 
@@ -130,24 +133,23 @@ public class GameManager {
             roundFragmentTypes.put(p.getFragmentId(), p.getType());
         }
 
-        S2C_FragmentDropPlan msg = new S2C_FragmentDropPlan();
-        msg.setTimestamp(System.currentTimeMillis());
-        List<S2C_FragmentDropPlan.FragmentDropItem> items = new ArrayList<>();
+        S2C_FragmentDropPlan.Builder body = S2C_FragmentDropPlan.newBuilder();
         for (FragmentDropPlan p : plan) {
-            S2C_FragmentDropPlan.FragmentDropItem item = new S2C_FragmentDropPlan.FragmentDropItem();
-            item.setFragmentId(p.getFragmentId());
-            item.setType(p.getType());
-            S2C_FragmentDropPlan.Vec2 pos = new S2C_FragmentDropPlan.Vec2();
-            pos.setX(p.getPosX());
-            pos.setY(p.getPosY());
-            item.setPosition(pos);
-            item.setDropTime(p.getDropTime());
-            item.setSeed(p.getSeed());
-            items.add(item);
+            body.addPlan(S2C_FragmentDropPlan.PlanItem.newBuilder()
+                    .setFragmentId(p.getFragmentId())
+                    .setType(p.getType())
+                    .setPosition(Vec2.newBuilder().setX(p.getPosX()).setY(p.getPosY()))
+                    .setDropTime(p.getDropTime())
+                    .setSeed(p.getSeed()));
         }
-        msg.getData().setPlan(items);
-        room.broadcastToAll(msg);
-        log.info("Fragment plan broadcast: {} items (round {}-{}-{})", items.size(), chapter, section, round);
+
+        Envelope env = Envelope.newBuilder()
+                .setPlayerId(-1)
+                .setTimestamp(System.currentTimeMillis())
+                .setFragmentDropPlan(body)
+                .build();
+        room.broadcastToAll(env);
+        log.info("Fragment plan broadcast: {} items (round {}-{}-{})", plan.size(), chapter, section, round);
     }
 
     /**
@@ -172,13 +174,18 @@ public class GameManager {
      * 玩家上报接住碎片 → 几何仲裁（即时判定，无等待窗口）.
      * 以碎片位置与双方玩家位置的权威快照判定单独/同时接住，
      * 与上报到达时序无关，免疫延迟与抖动.
-     * 非本轮碎片或已判定的重复上报直接忽略.
+     *
+     * @return NetErrorCode 码：0 成功（含过期/重复上报幂等回 0）/
+     *         4002 上报者不在判定半径或 playerId 越界（防呆）
      */
-    public void onFragmentCaught(int playerId, int fragmentId, float fragX, float fragY) {
-        if (playerId < 0 || playerId > 1) return;
+    public int onFragmentCaught(int playerId, int fragmentId, float fragX, float fragY) {
+        if (playerId < 0 || playerId > 1) {
+            return NetErrorCode.FRAGMENT_REJECTED;
+        }
         if (!roundFragmentTypes.containsKey(fragmentId) || resolvedFragments.contains(fragmentId)) {
+            // 过期/重复上报：预期竞态，回执层面幂等成功（不广播 FragmentResult 的静默语义保留）
             log.debug("Ignored stale/duplicate catch: player {} fragment {}", playerId, fragmentId);
-            return;
+            return NetErrorCode.OK;
         }
 
         PlayerState reporter = players[playerId];
@@ -192,9 +199,10 @@ public class GameManager {
         if (result == null) {
             log.warn("Rejected catch (reporter not in radius): player {} fragment {} at ({},{}), player at ({},{})",
                     playerId, fragmentId, fragX, fragY, reporter.getPosX(), reporter.getPosY());
-            return;
+            return NetErrorCode.FRAGMENT_REJECTED;
         }
         resolveCatch(result);
+        return NetErrorCode.OK;
     }
 
     /**
@@ -216,13 +224,16 @@ public class GameManager {
                     result.fragmentId(), result.winnerPlayerId(), room.getRoomCode(), type);
         }
 
-        S2C_FragmentResult msg = new S2C_FragmentResult();
-        msg.setTimestamp(System.currentTimeMillis());
-        msg.getData().setFragmentId(result.fragmentId());
-        msg.getData().setPlayerId(result.winnerPlayerId());
-        msg.getData().setMultiplier(result.multiplier());
-        msg.getData().setSimultaneous(result.isSimultaneous());
-        room.broadcastToAll(msg);
+        Envelope env = Envelope.newBuilder()
+                .setPlayerId(-1)
+                .setTimestamp(System.currentTimeMillis())
+                .setFragmentResult(S2C_FragmentResult.newBuilder()
+                        .setFragmentId(result.fragmentId())
+                        .setPlayerId(result.winnerPlayerId())
+                        .setMultiplier(result.multiplier())
+                        .setIsSimultaneous(result.isSimultaneous()))
+                .build();
+        room.broadcastToAll(env);
     }
 
     /**
@@ -243,37 +254,44 @@ public class GameManager {
     public void updatePlayerHighFreq(int playerId, C2S_HighFreqState state) {
         if (playerId < 0 || playerId > 1) return;
         PlayerState p = players[playerId];
-        if (state.getData().getPosition() != null) {
-            p.setPosX(state.getData().getPosition().getX());
-            p.setPosY(state.getData().getPosition().getY());
+        if (state.hasPosition()) {
+            p.setPosX(state.getPosition().getX());
+            p.setPosY(state.getPosition().getY());
         }
-        if (state.getData().getVelocity() != null) {
-            p.setVelocityX(state.getData().getVelocity().getX());
-            p.setVelocityY(state.getData().getVelocity().getY());
+        if (state.hasVelocity()) {
+            p.setVelocityX(state.getVelocity().getX());
+            p.setVelocityY(state.getVelocity().getY());
         }
-        p.setAnimState(state.getData().getAnimState());
-        p.setFacing(state.getData().isFacing());
-        p.setHp(state.getData().getHp());
-        p.setShelterEnergy(state.getData().getShelterEnergy());
+        p.setAnimState(state.getAnimState());
+        p.setFacing(state.getFacing());
+        p.setHp(state.getHp());
+        p.setShelterEnergy(state.getShelterEnergy());
     }
 
     /**
      * 10Hz 广播双方 HP/能量/携带碎片快照.
      */
     private void broadcastMidFreqState() {
-        S2C_MidFreqState msg = new S2C_MidFreqState();
-        msg.setTimestamp(System.currentTimeMillis());
-        List<S2C_MidFreqState.PlayerMidFreq> list = new ArrayList<>();
+        S2C_MidFreqState.Builder body = S2C_MidFreqState.newBuilder();
         for (PlayerState p : players) {
-            S2C_MidFreqState.PlayerMidFreq m = new S2C_MidFreqState.PlayerMidFreq();
-            m.setPlayerId(p.getPlayerId());
-            m.setHp(p.getHp());
-            m.setShelterEnergy(Math.round(p.getShelterEnergy()));
-            m.setCarriedFragments(p.getCarriedFragments() != null ? p.getCarriedFragments() : new int[0]);
-            list.add(m);
+            S2C_MidFreqState.PlayerMidFreq.Builder m = S2C_MidFreqState.PlayerMidFreq.newBuilder()
+                    .setPlayerId(p.getPlayerId())
+                    .setHp(p.getHp())
+                    .setShelterEnergy(p.getShelterEnergy());   // proto 直接 float（JSON 时代 Math.round 成 int）
+            if (p.getCarriedFragments() != null) {
+                for (int type : p.getCarriedFragments()) {
+                    m.addCarriedFragments(type);
+                }
+            }
+            body.addPlayers(m);
         }
-        msg.getData().setPlayers(list);
-        room.broadcastToAll(msg);
+
+        Envelope env = Envelope.newBuilder()
+                .setPlayerId(-1)
+                .setTimestamp(System.currentTimeMillis())
+                .setMidFreqState(body)
+                .build();
+        room.broadcastToAll(env);
     }
 
     /**

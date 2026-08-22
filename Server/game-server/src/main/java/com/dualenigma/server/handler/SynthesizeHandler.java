@@ -3,18 +3,16 @@ package com.dualenigma.server.handler;
 import com.dualenigma.network.ClientSession;
 import com.dualenigma.network.MessageHandler;
 import com.dualenigma.network.MessageRouter;
-import com.dualenigma.network.protocol.Message;
-import com.dualenigma.network.protocol.MessageType;
-import com.dualenigma.network.protocol.c2s.C2S_Synthesize;
 import com.dualenigma.server.game.GameRoom;
 import com.dualenigma.server.game.RoomManager;
+import com.dualenigma.v1.Envelope;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
 
 /**
- * 材料合成处理器.
- * C2S_Synthesize → SynthesisValidator.validate()
+ * 材料合成处理器（预留：SynthesisValidator 未实现，schema 占位接线）.
+ * C2S_Synthesize → room.onSynthesize（TODO）
  */
 @Component
 public class SynthesizeHandler implements MessageHandler {
@@ -29,15 +27,15 @@ public class SynthesizeHandler implements MessageHandler {
 
     @PostConstruct
     public void init() {
-        messageRouter.register(MessageType.C2S_SYNTHESIZE, this);
+        messageRouter.register(Envelope.BodyCase.SYNTHESIZE, this);
     }
 
     @Override
-    public void handle(ClientSession session, Message msg) {
-        C2S_Synthesize synthesize = (C2S_Synthesize) msg;
+    public void handle(ClientSession session, Envelope env) {
         GameRoom room = roomManager.getRoom(session.getRoomCode());
         if (room != null) {
-            room.onSynthesize(session.getPlayerId(), synthesize.getData().getFragmentIds());
+            room.onSynthesize(session.getPlayerId(),
+                    env.getSynthesize().getFragmentIdsList().stream().mapToInt(Integer::intValue).toArray());
         }
     }
 }

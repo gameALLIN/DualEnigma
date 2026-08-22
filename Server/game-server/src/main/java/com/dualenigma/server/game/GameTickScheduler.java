@@ -25,7 +25,12 @@ public class GameTickScheduler {
 
     private static final long TICK_INTERVAL_MS = 50;  // 20Hz
 
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    /** daemon 线程：不阻塞 JVM 退出（测试/停服），避免每局游戏泄漏常驻线程 */
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+        Thread t = new Thread(r, "game-tick");
+        t.setDaemon(true);
+        return t;
+    });
     private ScheduledFuture<?> tickTask;
 
     /**

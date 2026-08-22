@@ -42,6 +42,12 @@
             <artifactId>mariadb-java-client</artifactId>
         </dependency>
 
+        <!-- JSON 解析（AccountValidator 解析 account-server REST 响应；WebSocket 路径已迁移 Protobuf） -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
         <!-- 测试 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

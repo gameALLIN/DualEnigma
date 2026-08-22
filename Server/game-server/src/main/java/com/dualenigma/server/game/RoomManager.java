@@ -2,13 +2,15 @@ package com.dualenigma.server.game;
 
 import com.dualenigma.network.ClientSession;
 import com.dualenigma.network.HeartbeatManager;
-import com.dualenigma.network.MessageCodec;
+import com.dualenigma.network.RespSender;
+import com.dualenigma.network.protocol.NetErrorCode;
 import com.dualenigma.server.logic.ConflictResolver;
 import com.dualenigma.server.logic.FragmentPlanner;
 import com.dualenigma.server.util.IdGenerator;
-import com.dualenigma.network.protocol.s2c.S2C_ConnectAck;
-import com.dualenigma.network.protocol.s2c.S2C_GameStart;
-import com.dualenigma.network.protocol.s2c.S2C_PlayerJoined;
+import com.dualenigma.v1.Envelope;
+import com.dualenigma.v1.S2C_ConnectAck;
+import com.dualenigma.v1.S2C_GameStart;
+import com.dualenigma.v1.S2C_PlayerJoined;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,20 +35,20 @@ public class RoomManager implements HeartbeatManager.DisconnectListener {
 
     private final ConcurrentMap<String, GameRoom> rooms = new ConcurrentHashMap<>();
     private final Queue<GameRoom> waitingQueue = new ConcurrentLinkedQueue<>();
-    private final MessageCodec messageCodec;
     private final FragmentPlanner fragmentPlanner;
     private final ConflictResolver conflictResolver;
     private final OnlineRegistry onlineRegistry;
     private final HeartbeatManager heartbeatManager;
+    private final RespSender respSender;
 
-    public RoomManager(MessageCodec messageCodec, FragmentPlanner fragmentPlanner,
+    public RoomManager(FragmentPlanner fragmentPlanner,
                        ConflictResolver conflictResolver, OnlineRegistry onlineRegistry,
-                       HeartbeatManager heartbeatManager) {
-        this.messageCodec = messageCodec;
+                       HeartbeatManager heartbeatManager, RespSender respSender) {
         this.fragmentPlanner = fragmentPlanner;
         this.conflictResolver = conflictResolver;
         this.onlineRegistry = onlineRegistry;
         this.heartbeatManager = heartbeatManager;
+        this.respSender = respSender;
     }
 
     @PostConstruct
@@ -80,140 +82,147 @@ public class RoomManager implements HeartbeatManager.DisconnectListener {
     /**
      * 玩家连接 → 匹配房间.
      * 指定 roomCode（好友联机）加入失败时不回退自动匹配，避免被邀请人掉进陌生人房间.
+     *
+     * @return NetErrorCode 码：0 成功（成功回执已随 ConnectAck 前发出）；
+     *         2001 房间不存在 / 2002 已满 / 2003 已开局
      */
-    public void onPlayerConnect(ClientSession session, String roomCode) {
+    public int onPlayerConnect(ClientSession session, String roomCode, int reqId) {
         if (roomCode != null && !roomCode.isEmpty()) {
             // 指定 roomCode — 好友联机
             GameRoom room = rooms.get(roomCode);
-            if (room != null && room.getPlayerCount() < 2 && !room.isGameStarted()) {
-                // 好友房从自动匹配队列移除，防止陌生人在好友加入前插队
-                waitingQueue.remove(room);
-                addPlayerToRoom(room, session);
-            } else {
-                // 房间不存在/已满/已开局：不回退匹配，客户端等待超时后可重新邀请
-                log.warn("Join room by code failed, roomCode={}, exists={}, count={}, started={}",
-                        roomCode, room != null,
-                        room != null ? room.getPlayerCount() : -1,
-                        room != null && room.isGameStarted());
+            if (room == null) {
+                log.warn("Join room by code failed, roomCode={} not found", roomCode);
+                return NetErrorCode.ROOM_NOT_FOUND;
             }
-            return;
+            if (room.getPlayerCount() >= 2) {
+                log.warn("Join room by code failed, roomCode={} is full", roomCode);
+                return NetErrorCode.ROOM_FULL;
+            }
+            if (room.isGameStarted()) {
+                log.warn("Join room by code failed, roomCode={} already started", roomCode);
+                return NetErrorCode.GAME_STARTED;
+            }
+
+            // 好友房从自动匹配队列移除，防止陌生人在好友加入前插队
+            waitingQueue.remove(room);
+            return addPlayerToRoom(room, session, reqId);
         }
 
         // 自动匹配 — 从等待队列取
         GameRoom waitingRoom = waitingQueue.poll();
         if (waitingRoom != null) {
-            addPlayerToRoom(waitingRoom, session);
-        } else {
-            // 创建新房间（随机码，撞码重试）
-            String newCode = IdGenerator.nextRoomCode();
-            while (rooms.containsKey(newCode)) {
-                newCode = IdGenerator.nextRoomCode();
-            }
-            GameRoom newRoom = new GameRoom(newCode, messageCodec, fragmentPlanner, conflictResolver);
-            rooms.put(newCode, newRoom);
-            addPlayerToRoom(newRoom, session);
-            waitingQueue.add(newRoom);
+            return addPlayerToRoom(waitingRoom, session, reqId);
         }
+
+        // 创建新房间（随机码，撞码重试）
+        String newCode = IdGenerator.nextRoomCode();
+        while (rooms.containsKey(newCode)) {
+            newCode = IdGenerator.nextRoomCode();
+        }
+        GameRoom newRoom = new GameRoom(newCode, fragmentPlanner, conflictResolver);
+        rooms.put(newCode, newRoom);
+        int code = addPlayerToRoom(newRoom, session, reqId);
+        waitingQueue.add(newRoom);
+        return code;
     }
 
-    private void addPlayerToRoom(GameRoom room, ClientSession session) {
+    /**
+     * 加入房间（成功时先 resp(0) 再 ConnectAck，保证回执先于领域消息到达）.
+     *
+     * @return NetErrorCode 码：0 成功 / 2002 并发满员
+     */
+    private int addPlayerToRoom(GameRoom room, ClientSession session, int reqId) {
         if (!room.addPlayer(session)) {
             log.warn("Room {} is full, reject session {}", room.getRoomCode(), session.getSessionId());
-            return;
+            return NetErrorCode.ROOM_FULL;
         }
 
         // 已识别身份的玩家注册在线状态（组队中；匿名会话内部忽略）
         onlineRegistry.register(session);
 
         log.info("Player joined room {} (count={})", room.getRoomCode(), room.getPlayerCount());
+
+        // 成功回执紧邻 ConnectAck 之前（Handler 层不再对成功路径回执）
+        respSender.reply(session, reqId, NetErrorCode.OK);
         sendConnectAck(session, session.getPlayerId(), room.getRoomCode());
 
         // 通知房间内全体玩家：有人进房（房主据此点亮"开始对局"按钮）
         broadcastPlayerJoined(room, session.getPlayerId());
+        return NetErrorCode.OK;
     }
 
     /**
      * 广播玩家进房通知到房间内全部玩家.
      */
     private void broadcastPlayerJoined(GameRoom room, int joinedPlayerId) {
-        try {
-            S2C_PlayerJoined msg = new S2C_PlayerJoined();
-            msg.getData().setPlayerId(joinedPlayerId);
-            msg.getData().setPlayerCount(room.getPlayerCount());
-            String json = messageCodec.encode(msg);
-            for (ClientSession player : room.getPlayers()) {
-                if (player != null) {
-                    player.send(json);
-                }
-            }
-        } catch (Exception e) {
-            log.error("Failed to broadcast PlayerJoined in room {}: {}",
-                    room.getRoomCode(), e.getMessage());
-        }
+        Envelope env = Envelope.newBuilder()
+                .setPlayerId(-1)
+                .setTimestamp(System.currentTimeMillis())
+                .setPlayerJoined(S2C_PlayerJoined.newBuilder()
+                        .setPlayerId(joinedPlayerId)
+                        .setPlayerCount(room.getPlayerCount()))
+                .build();
+        room.broadcastToAll(env);
     }
 
     /**
      * 房主请求开始对局：校验房主身份 + 满员，通过后启动并广播 GameStart.
+     *
+     * @return NetErrorCode 码：0 成功 / 2001 房间不存在 / 3001 非房主 / 3002 未满员 / 3003 已开局
      */
-    public void requestStart(ClientSession session) {
+    public int requestStart(ClientSession session) {
         GameRoom room = rooms.get(session.getRoomCode());
         if (room == null) {
             log.warn("Start request rejected: session {} room not found", session.getSessionId());
-            return;
+            return NetErrorCode.ROOM_NOT_FOUND;
         }
         if (session.getPlayerId() != 0) {
             log.warn("Start request in room {} rejected: player {} is not host",
                     room.getRoomCode(), session.getPlayerId());
-            return;
+            return NetErrorCode.NOT_HOST;
         }
         if (room.getPlayerCount() < 2) {
             log.warn("Start request in room {} rejected: room not full", room.getRoomCode());
-            return;
+            return NetErrorCode.NOT_FULL;
         }
         if (room.isGameStarted()) {
-            return;
+            return NetErrorCode.ALREADY_STARTED;
         }
 
         room.startGame();
         onlineRegistry.markInGame(OnlineRegistry.collectAccountIds(room.getPlayers()));
         broadcastGameStart(room);
+        return NetErrorCode.OK;
     }
 
     /**
      * 广播开局消息到房间内全部玩家（第 1-1-1 轮起）.
      */
     private void broadcastGameStart(GameRoom room) {
-        try {
-            S2C_GameStart msg = new S2C_GameStart();
-            msg.getData().setChapter(1);
-            msg.getData().setSection(1);
-            msg.getData().setRound(1);
-            String json = messageCodec.encode(msg);
-            for (ClientSession player : room.getPlayers()) {
-                if (player != null) {
-                    player.send(json);
-                }
-            }
-            log.info("Room {} full → GameStart broadcast to both players", room.getRoomCode());
-        } catch (Exception e) {
-            log.error("Failed to broadcast GameStart in room {}: {}",
-                    room.getRoomCode(), e.getMessage());
-        }
+        Envelope env = Envelope.newBuilder()
+                .setPlayerId(-1)
+                .setTimestamp(System.currentTimeMillis())
+                .setGameStart(S2C_GameStart.newBuilder()
+                        .setChapter(1)
+                        .setSection(1)
+                        .setRound(1))
+                .build();
+        room.broadcastToAll(env);
+        log.info("Room {} full → GameStart broadcast to both players", room.getRoomCode());
     }
 
     /**
      * 发送连接确认（playerId + roomCode），客户端凭 roomCode 邀请好友或展示房间码.
      */
     private void sendConnectAck(ClientSession session, int playerId, String roomCode) {
-        try {
-            S2C_ConnectAck ack = new S2C_ConnectAck();
-            ack.getData().setPlayerId(playerId);
-            ack.getData().setRoomCode(roomCode);
-            session.send(messageCodec.encode(ack));
-        } catch (Exception e) {
-            log.error("Failed to send ConnectAck to session {}: {}",
-                    session.getSessionId(), e.getMessage());
-        }
+        Envelope env = Envelope.newBuilder()
+                .setPlayerId(-1)
+                .setTimestamp(System.currentTimeMillis())
+                .setConnectAck(S2C_ConnectAck.newBuilder()
+                        .setPlayerId(playerId)
+                        .setRoomCode(roomCode))
+                .build();
+        session.send(env.toByteArray());
     }
 
     /**

@@ -1,19 +1,19 @@
 package com.dualenigma.server.game;
 
 import com.dualenigma.network.ClientSession;
-import com.dualenigma.network.MessageCodec;
-import com.dualenigma.network.protocol.Message;
-import com.dualenigma.network.protocol.c2s.C2S_HighFreqState;
-import com.dualenigma.network.protocol.s2c.S2C_HighFreqState;
-import com.dualenigma.network.protocol.s2c.S2C_OpponentDisconnect;
 import com.dualenigma.server.logic.ConflictResolver;
 import com.dualenigma.server.logic.FragmentPlanner;
+import com.dualenigma.v1.C2S_HighFreqState;
+import com.dualenigma.v1.Envelope;
+import com.dualenigma.v1.S2C_HighFreqState;
+import com.dualenigma.v1.S2C_OpponentDisconnect;
+import com.dualenigma.v1.Vec2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * 房间管理（2 人匹配 + 会话持有）.
- * 每个房间持有一局游戏的完整状态.
+ * 每个房间持有一局游戏的完整状态；广播走 proto Envelope 二进制帧.
  */
 public class GameRoom {
 
@@ -22,7 +22,6 @@ public class GameRoom {
     private final String roomCode;
     private final ClientSession[] players = new ClientSession[2];
     private final GameManager gameManager;
-    private final MessageCodec messageCodec;
     private final long createdAt = System.currentTimeMillis();
     private int playerCount = 0;
     private boolean gameStarted = false;
@@ -30,27 +29,19 @@ public class GameRoom {
     /** 未开局房间的最大存活时间（毫秒），超时由 RoomManager 回收 */
     private static final long LOBBY_TIMEOUT_MS = 10 * 60 * 1000L;
 
-    public GameRoom(String roomCode, MessageCodec messageCodec, FragmentPlanner fragmentPlanner,
-                    ConflictResolver conflictResolver) {
+    public GameRoom(String roomCode, FragmentPlanner fragmentPlanner, ConflictResolver conflictResolver) {
         this.roomCode = roomCode;
-        this.messageCodec = messageCodec;
         this.gameManager = new GameManager(this, fragmentPlanner, conflictResolver);
     }
 
     /**
-     * 向房间内全部在线玩家广播消息.
+     * 向房间内全部在线玩家广播 proto Envelope.
      */
-    public void broadcastToAll(Message msg) {
-        String json;
-        try {
-            json = messageCodec.encode(msg);
-        } catch (Exception e) {
-            log.error("Failed to encode broadcast message in room {}: {}", roomCode, e.getMessage());
-            return;
-        }
+    public void broadcastToAll(Envelope env) {
+        byte[] payload = env.toByteArray();
         for (ClientSession player : players) {
             if (player != null) {
-                player.send(json);
+                player.send(payload);
             }
         }
     }
@@ -89,12 +80,14 @@ public class GameRoom {
             playerCount--;
         }
 
-        S2C_OpponentDisconnect msg = new S2C_OpponentDisconnect();
-        msg.setPlayerId(playerId);
-        msg.setTimestamp(System.currentTimeMillis());
         // lobby=大厅离开（重置开始按钮）；waiting=对局中断线（等待重连/AI 接管）
-        msg.getData().setState(gameStarted ? "waiting" : "lobby");
-        broadcastToAll(msg);
+        Envelope env = Envelope.newBuilder()
+                .setPlayerId(playerId)          // 离开者走信封 player_id
+                .setTimestamp(System.currentTimeMillis())
+                .setOpponentDisconnect(S2C_OpponentDisconnect.newBuilder()
+                        .setState(gameStarted ? "waiting" : "lobby"))
+                .build();
+        broadcastToAll(env);
     }
 
     /** 房间内两名玩家的会话（元素可能为 null，供满员广播使用） */
@@ -137,32 +130,34 @@ public class GameRoom {
         // 入库权威快照（供 10Hz 中频广播与重连快照使用）
         gameManager.updatePlayerHighFreq(playerId, state);
 
-        try {
-            S2C_HighFreqState fwd = new S2C_HighFreqState();
-            fwd.setTimestamp(System.currentTimeMillis());
-            fwd.getData().setPlayerId(playerId);
-            // C2S 与 S2C 的 Vec2 是不同类型，逐字段转换
-            S2C_HighFreqState.Vec2 pos = new S2C_HighFreqState.Vec2();
-            pos.setX(state.getData().getPosition().getX());
-            pos.setY(state.getData().getPosition().getY());
-            S2C_HighFreqState.Vec2 vel = new S2C_HighFreqState.Vec2();
-            vel.setX(state.getData().getVelocity().getX());
-            vel.setY(state.getData().getVelocity().getY());
-            fwd.getData().setPosition(pos);
-            fwd.getData().setVelocity(vel);
-            fwd.getData().setAnimState(state.getData().getAnimState());
-            fwd.getData().setFacing(state.getData().isFacing());
-            fwd.getData().setHp(state.getData().getHp());
-            fwd.getData().setShelterEnergy(state.getData().getShelterEnergy());
-            target.send(messageCodec.encode(fwd));
-        } catch (Exception e) {
-            log.warn("Failed to forward high-freq state in room {}: {}", roomCode, e.getMessage());
-        }
+        // C2S 与 S2C 高频是两个 proto 消息类型，逐字段拷贝转发
+        S2C_HighFreqState fwd = S2C_HighFreqState.newBuilder()
+                .setPlayerId(playerId)
+                .setPosition(Vec2.newBuilder()
+                        .setX(state.getPosition().getX())
+                        .setY(state.getPosition().getY()))
+                .setVelocity(Vec2.newBuilder()
+                        .setX(state.getVelocity().getX())
+                        .setY(state.getVelocity().getY()))
+                .setAnimState(state.getAnimState())
+                .setFacing(state.getFacing())
+                .setHp(state.getHp())
+                .setShelterEnergy(state.getShelterEnergy())
+                .build();
+
+        Envelope env = Envelope.newBuilder()
+                .setPlayerId(playerId)
+                .setTimestamp(System.currentTimeMillis())
+                .setHighFreqStateS2C(fwd)
+                .build();
+        target.send(env.toByteArray());
     }
 
-    public void onFragmentCaught(int playerId, int fragmentId, float fragX, float fragY) {
-        // 几何仲裁 + 记账在 GameManager（同接翻倍/防重/结果广播）
-        gameManager.onFragmentCaught(playerId, fragmentId, fragX, fragY);
+    /**
+     * 碎片接住上报 → 几何仲裁 + 记账（GameManager），返回 NetErrorCode 码供 Handler 层回执.
+     */
+    public int onFragmentCaught(int playerId, int fragmentId, float fragX, float fragY) {
+        return gameManager.onFragmentCaught(playerId, fragmentId, fragX, fragY);
     }
 
     public void onBuildingPlace(int playerId, int buildingType, int material, int gridX, int gridY) {
@@ -188,16 +183,20 @@ public class GameRoom {
     /**
      * 向指定玩家发送消息.
      */
-    public void sendToPlayer(int playerId, Message msg) {
-        // TODO: 序列化并发送
+    public void sendToPlayer(int playerId, Envelope env) {
+        if (playerId < 0 || playerId > 1) return;
+        ClientSession target = players[playerId];
+        if (target != null) {
+            target.send(env.toByteArray());
+        }
     }
 
     /**
      * 向双方广播.
      */
-    public void broadcast(Message msg) {
-        sendToPlayer(0, msg);
-        sendToPlayer(1, msg);
+    public void broadcast(Envelope env) {
+        sendToPlayer(0, env);
+        sendToPlayer(1, env);
     }
 
     /**

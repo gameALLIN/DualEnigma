@@ -1,8 +1,10 @@
 package com.dualenigma.server.game;
 
 import com.dualenigma.network.protocol.GamePhase;
-import com.dualenigma.network.protocol.s2c.S2C_PhaseChange;
 import com.dualenigma.server.util.Constants;
+import com.dualenigma.v1.Envelope;
+import com.dualenigma.v1.GamePhasePb;
+import com.dualenigma.v1.S2C_PhaseChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,25 +63,40 @@ public class GameStateMachine {
     }
 
     /**
-     * 设置当前阶段并广播.
+     * 设置当前阶段并广播（proto 二进制帧；信封 timestamp 必填，PhaseChange 时钟差值法依赖）.
      */
     private void setPhase(GamePhase phase) {
         currentPhase = phase;
-        phaseEndTime = System.currentTimeMillis() + Constants.getPhaseDurationMs(phase);
+        long now = System.currentTimeMillis();
+        phaseEndTime = now + Constants.getPhaseDurationMs(phase);
 
-        // 构建广播消息
-        S2C_PhaseChange change = new S2C_PhaseChange();
-        change.setPlayerId(-1);
-        change.setTimestamp(System.currentTimeMillis());
-        change.getData().setPhase(phase);
-        change.getData().setDurationMs((int) Constants.getPhaseDurationMs(phase));
-        change.getData().setPhaseEndTime(phaseEndTime);
-        room.broadcastToAll(change);
+        Envelope env = Envelope.newBuilder()
+                .setPlayerId(-1)
+                .setTimestamp(now)
+                .setPhaseChange(S2C_PhaseChange.newBuilder()
+                        .setPhase(toProto(phase))
+                        .setDurationMs((int) Constants.getPhaseDurationMs(phase))
+                        .setPhaseEndTime(phaseEndTime))
+                .build();
+        room.broadcastToAll(env);
 
         // 阶段进入钩子（在 PhaseChange 广播之后，保证客户端先知道阶段再收阶段内容）
         room.getGameManager().onPhaseEnter(phase);
 
         log.info("Phase changed to: {} (duration={}ms)", phase, Constants.getPhaseDurationMs(phase));
+    }
+
+    /** 服务器内部枚举 → proto 枚举（UNSPECIFIED 仅占位，状态机不会产出）. */
+    private GamePhasePb toProto(GamePhase phase) {
+        return switch (phase) {
+            case Preview -> GamePhasePb.PREVIEW;
+            case FragmentCollect -> GamePhasePb.FRAGMENT_COLLECT;
+            case DisasterPreview -> GamePhasePb.DISASTER_PREVIEW;
+            case Build -> GamePhasePb.BUILD;
+            case DisasterImpact -> GamePhasePb.DISASTER_IMPACT;
+            case Rest -> GamePhasePb.REST;
+            case Upgrade -> GamePhasePb.UPGRADE;
+        };
     }
 
     public GamePhase getCurrentPhase() { return currentPhase; }

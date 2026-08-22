@@ -2,7 +2,8 @@ package com.dualenigma.server.logic;
 
 import com.dualenigma.server.game.GameRoom;
 import com.dualenigma.network.model.PlayerState;
-import com.dualenigma.network.protocol.s2c.S2C_HighFreqState;
+import com.dualenigma.v1.Envelope;
+import com.dualenigma.v1.S2C_HighFreqState;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,11 +35,16 @@ public class AIController {
 
         // AI 不捡碎片、不建造、不放技能（保守行为）
 
-        // 广播 AI 玩家状态
-        S2C_HighFreqState state = new S2C_HighFreqState();
-        state.setPlayerId(aiPlayer.getPlayerId());
-        state.setTimestamp(System.currentTimeMillis());
-        // TODO: 填充 position, velocity, animState, facing
-        room.broadcast(state);
+        // 广播 AI 玩家状态（proto Envelope 二进制帧）
+        S2C_HighFreqState state = S2C_HighFreqState.newBuilder()
+                .setPlayerId(aiPlayer.getPlayerId())
+                // TODO: 填充 position, velocity, animState, facing
+                .build();
+        Envelope env = Envelope.newBuilder()
+                .setPlayerId(aiPlayer.getPlayerId())
+                .setTimestamp(System.currentTimeMillis())
+                .setHighFreqStateS2C(state)
+                .build();
+        room.broadcast(env);
     }
 }

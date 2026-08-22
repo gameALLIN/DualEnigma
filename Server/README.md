@@ -6,7 +6,7 @@
 
 | 模块 | 类型 | 端口 | 职责 |
 |------|------|------|------|
-| **network** | 库 (library) | — | WebSocket 传输层 + 消息协议 (9 C2S + 16 S2C) + 内存模型 + GamePhase 枚举 |
+| **network** | 库 (library) | — | WebSocket 传输层 + 消息协议 (10 C2S + 18 S2C，含心跳对与 S2C_Resp 统一回执) + 内存模型 + GamePhase 枚举 |
 | **game-server** | 可执行 (boot) | 8080 (WebSocket) | 游戏逻辑服务器：房间管理、权威状态机、碎片/灾难/建筑/庇护、20Hz 逻辑帧 |
 | **account-server** | 可执行 (boot) | 8081 (REST API) | 账号服务器：注册、登录、JWT Token 签发与验证 |
 

@@ -3,19 +3,16 @@ package com.dualenigma.server.handler;
 import com.dualenigma.network.ClientSession;
 import com.dualenigma.network.MessageHandler;
 import com.dualenigma.network.MessageRouter;
-import com.dualenigma.network.protocol.Message;
-import com.dualenigma.network.protocol.MessageType;
-import com.dualenigma.network.protocol.c2s.C2S_BuildingPlace;
-import com.dualenigma.network.protocol.c2s.C2S_BuildingRemove;
 import com.dualenigma.server.game.GameRoom;
 import com.dualenigma.server.game.RoomManager;
+import com.dualenigma.v1.Envelope;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
 
 /**
- * 建筑操作处理器.
- * C2S_BuildingPlace / C2S_BuildingRemove → BuildingManager
+ * 建筑操作处理器（预留：BuildingManager 未实现，schema 占位接线）.
+ * C2S_BuildingPlace / C2S_BuildingRemove → room.onXxx（TODO）
  */
 @Component
 public class BuildingHandler implements MessageHandler {
@@ -30,23 +27,25 @@ public class BuildingHandler implements MessageHandler {
 
     @PostConstruct
     public void init() {
-        messageRouter.register(MessageType.C2S_BUILDING_PLACE, this);
-        messageRouter.register(MessageType.C2S_BUILDING_REMOVE, this);
+        messageRouter.register(Envelope.BodyCase.BUILDING_PLACE, this);
+        messageRouter.register(Envelope.BodyCase.BUILDING_REMOVE, this);
     }
 
     @Override
-    public void handle(ClientSession session, Message msg) {
+    public void handle(ClientSession session, Envelope env) {
         GameRoom room = roomManager.getRoom(session.getRoomCode());
         if (room == null) return;
 
         int playerId = session.getPlayerId();
-        if (msg.getType() == MessageType.C2S_BUILDING_PLACE) {
-            C2S_BuildingPlace place = (C2S_BuildingPlace) msg;
-            room.onBuildingPlace(playerId, place.getData().getBuildingType(),
-                    place.getData().getMaterial(), place.getData().getGridX(), place.getData().getGridY());
-        } else if (msg.getType() == MessageType.C2S_BUILDING_REMOVE) {
-            C2S_BuildingRemove remove = (C2S_BuildingRemove) msg;
-            room.onBuildingRemove(playerId, remove.getData().getBuildingId());
+        switch (env.getBodyCase()) {
+            case BUILDING_PLACE -> room.onBuildingPlace(playerId,
+                    env.getBuildingPlace().getBuildingType(),
+                    env.getBuildingPlace().getMaterial(),
+                    env.getBuildingPlace().getGridX(),
+                    env.getBuildingPlace().getGridY());
+            case BUILDING_REMOVE -> room.onBuildingRemove(playerId,
+                    env.getBuildingRemove().getBuildingId());
+            default -> { }
         }
     }
 }

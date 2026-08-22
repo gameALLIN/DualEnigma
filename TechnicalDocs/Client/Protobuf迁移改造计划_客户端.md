@@ -42,6 +42,7 @@ GameConnection 按 env.BodyCase switch 分发（编译期枚举路由，注册�
 Client/
 ├── Assets/Plugins/Google.Protobuf/
 │   ├── Google.Protobuf.dll               # 运行时（netstandard2.0）+ .meta
+│   ├── System.Runtime.CompilerServices.Unsafe.dll  # Protobuf 依赖（4.5.3/netstandard2.0）+ .meta
 │   └── linker.xml                        # IL2CPP stripping 保留配置
 ├── tools/
 │   ├── gen-proto.ps1                     # C# 代码生成脚本
@@ -67,15 +68,18 @@ Client/
 
 **Files:**
 - New: `Client/Assets/Plugins/Google.Protobuf/Google.Protobuf.dll`（+ .meta）
+- New: `Client/Assets/Plugins/Google.Protobuf/System.Runtime.CompilerServices.Unsafe.dll`（+ .meta）
 - New: `Client/Assets/Plugins/Google.Protobuf/linker.xml`
 
 1. 从 NuGet 包 `Google.Protobuf 3.25.5` 提取 `lib/netstandard2.0/Google.Protobuf.dll`；
+1a. 从 NuGet 包 `System.Runtime.CompilerServices.Unsafe 4.5.3` 提取 `lib/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll`（程序集版本 4.0.4.1，与 Protobuf 引用令牌精确匹配；netstandard2.1 profile 不含此程序集，缺它 Unity 报 `Unable to resolve reference` 拒载 Protobuf）；
 2. **版本锁**：与服务器 pom 的 protobuf-java 大版本一致（3.25.x），写入 `Protocol/README.md`；
 3. IL2CPP：生成代码为纯 C# 无动态编译，AOT 友好；stripping 开启时 linker.xml 保留：
 
 ```xml
 <linker>
   <assembly fullname="Google.Protobuf" preserve="all"/>
+  <assembly fullname="System.Runtime.CompilerServices.Unsafe" preserve="all"/>
 </linker>
 ```
 
@@ -254,3 +258,4 @@ public static class ProtoMapping
 - 2026-08-22 PC-0：✅ 分支 `refactor/proto-r1`；Google.Protobuf 3.25.5（netstandard2.0 DLL 462KB + linker.xml）入库；`Protocol/proto/game.proto` 按服务器篇 S0.1 草案逐字落盘 + `Protocol/README.md`（演进规则/版本锁定/排障）；`gen-proto.ps1` 修正 base_namespace 计划笔误（原计划 `DualEnigma.Network.Proto` 与 proto package `dualenigma.v1` 不兼容，实为不传 base_namespace → 产物命名空间 `Dualenigma.V1` 平铺无子目录）；`Game.cs`（273KB）生成入库含禁改头。Unity 编译验证待所有者执行。
 - 2026-08-22 PC-1：✅ `WebSocketConnection` 二进制化（`SendAsync(byte[])`/`OnMessageReceived(byte[])`/MemoryStream 分片拼包/文本帧 warn 丢弃/心跳 payloadFactory 二进制化，超时锁泵语义零改动）；`GameConnection` 切 Envelope oneof（5 发送 API 构造 Envelope、`ParseFrom` 坏帧 try/catch 丢弃、`BodyCase` switch 11 handler 逐行搬运；生成代码 case 名实测为 `HighFreqStateS2C` 大写 C 已对齐）；`ProtoMapping`（GamePhasePb/AnimState/Vec2 映射收口）；MidFreq `ShelterEnergy` float 精度直通；`ProtoRoundTripTests` 16 用例（信封字段/oneof 互斥/16 消息 round-trip/坏帧抛出断言/高频帧 <100B 体积断言）。EditMode 全绿与双开联调待所有者执行。
 - 2026-08-22 PC-2：✅ 删除 `C2SMessages/S2CMessages/NetEnvelope/NetJson/NetMessageRegistry/INetMessage`（+ Registry Tests，共 7 组文件）；`NetProtocolTypes` 的 NetProto 常量类瘦身为"RequestTracker source 标识"（C2S 5 条，S2C 常量删除）；全库 grep `NetJson|NetEnvelope|NetMessageRegistry|INetMessage|NetVec2` 零残留（Generated 除外）。**联调验收 §五 6 项待所有者双开执行后回填**。
+- 2026-08-22 / **独立质检（客户端侧全量复核，提交 95c90a1..75d15b5）** / ✅ **合格**。① PC-0：DLL 3.25.5 + **System.Runtime.CompilerServices.Unsafe.dll 依赖补入库**（好于计划）+ linker.xml preserve + protoc gitignore + Game.cs 禁改头齐全，命名空间 `DualEnigma.V1` 全局一致（Pb 别名引用）；双端版本锁核实（pom protobuf-java/protoc 3.25.5 = DLL 3.25.5，README 留档）。② PC-1：WebSocketConnection 二进制化仅动传输边界（byte[] 队列/Binary 帧/文本帧丢弃/心跳 factory 二进制，超时锁泵语义不变）；GameConnection 11 个 BodyCase handler 与 JSON 版逐行对齐——PhaseChange 时钟差值法（env.Timestamp 信封 + PhaseEndTime）、ConnectAck 取消看门狗、FragmentResult 本地玩家过滤、DropPlan seed long→uint 截断保留、MidFreq float 直通，全部语义正确；发送侧 5 API 签名不变，reqId 登记/回执派发/看门狗/DisconnectWithReason 与 R5 版零差异。③ **零改动承诺核实**：RequestTracker/RoomSession/NetConnError/Rest/ 自 946cad8 起 diff 为空（git 验证）；REST JsonUtility ×14 处保留。④ PC-2：JSON 协议层删除后全库 grep 零残留；NetErrorCode/NetworkRole 枚举按计划保留。⑤ ProtoRoundTripTests 16 用例含 `Assert.Less(bytes.Length, 100)` 高频帧体积断言。⑥ **编译验证**：ScriptAssemblies 四程序集（DualEnigma/DualEnigma.Framework/DualEnigma.Tests/DualEnigma.Network.Tests）15:13-15:20 重编译成功；asmdef 三连修（预编译引用/独立测试程序集/移除 optionalUnityReferences）过程曲折但终态结构正确。**遗留**：🟡 联调 §五 6 项中 #1/#2/#6 可由服务器侧集成测试部分背书，#3（M1-M4 双开）/ #4（10 分钟长连 RTT）/ #5（MidFreq 小数位观察）/ 带宽对比留档仍需所有者在 Unity 双开环境执行后回填；🔴 依赖服务器侧工作区改动尽快提交（详见服务器篇质检记录） / 主智能体（QA）
