@@ -1,0 +1,172 @@
+syntax = "proto3";
+
+package dualenigma.v1;   // 版本化包名：将来不兼容演进时升 v2，双端同步切
+
+// Java 生成选项（服务器 Maven 管线；com.dualenigma.* 符合工程包名规范）
+option java_package = "com.dualenigma.v1";
+option java_multiple_files = true;
+
+// ============================================================
+// DualEnigma 对局 WebSocket 协议（唯一事实来源）
+// 演进规则见 Protocol/README.md；字段语义与 JSON 版一一对应
+// （R5 reqId/S2C_Resp 回执闭环、心跳、1002 兜底逐行保留）
+// ============================================================
+
+// 信封：每 WebSocket 二进制帧 = 一个 Envelope
+// oneof case 即路由键（取代 JSON 字符串 type 字段）
+message Envelope {
+  int64 timestamp = 1;   // 发送方毫秒时钟。S2C 必填（PhaseChange 时钟差值法依赖）；
+                         // C2S 可不填（proto3 零值省略）
+  int32 player_id = 2;   // S2C 广播方 ID（-1=系统广播；OpponentDisconnect=离开者）；
+                         // C2S 不填（服务器从会话取）
+  int32 req_id = 3;      // C2S 请求关联号（S2C_Resp 回显）。
+                         // 豁免：心跳 / 高频流（恒 0，对应 R5 豁免决策）
+
+  oneof body {
+    // ── C2S（10：5 在用 + 5 预留，编号段 10-19）──
+    C2S_Connect         connect          = 10;
+    C2S_Heartbeat       heartbeat        = 11;
+    C2S_StartGame       start_game       = 12;
+    C2S_HighFreqState   high_freq_state  = 13;
+    C2S_FragmentCaught  fragment_caught  = 14;
+    C2S_BuildingPlace   building_place   = 15;   // 预留：服务器 Handler 为 TODO
+    C2S_BuildingRemove  building_remove  = 16;   // 预留
+    C2S_Synthesize      synthesize       = 17;   // 预留
+    C2S_SkillActivate   skill_activate   = 18;   // 预留
+    C2S_TalentSelect    talent_select    = 19;   // 预留
+    // ── S2C（11，编号段 30-40）──
+    S2C_Resp               resp                 = 30;
+    S2C_ConnectAck         connect_ack          = 31;
+    S2C_GameStart          game_start           = 32;
+    S2C_PlayerJoined       player_joined        = 33;
+    S2C_PhaseChange        phase_change         = 34;
+    S2C_HighFreqState      high_freq_state_s2c  = 35;
+    S2C_MidFreqState       mid_freq_state       = 36;
+    S2C_OpponentDisconnect opponent_disconnect  = 37;
+    S2C_FragmentDropPlan   fragment_drop_plan   = 38;
+    S2C_FragmentResult     fragment_result      = 39;
+    S2C_HeartbeatAck       heartbeat_ack        = 40;
+    // 预留编号段 41-59：未来 S2C 新消息
+  }
+}
+
+// ============================================================
+// 通用类型
+// ============================================================
+message Vec2 {
+  float x = 1;
+  float y = 2;
+}
+
+// 阶段枚举（proto3 首值必须为 0=未指定，实际值从 1 起；
+// 服务器 GameStateMachine 枚举 → GamePhasePb 一一映射）
+enum GamePhasePb {
+  GAME_PHASE_UNSPECIFIED = 0;
+  PREVIEW = 1;
+  FRAGMENT_COLLECT = 2;
+  DISASTER_PREVIEW = 3;
+  BUILD = 4;
+  DISASTER_IMPACT = 5;
+  REST = 6;
+  UPGRADE = 7;
+}
+
+// ============================================================
+// C2S 消息体（字段语义与 JSON 版一一对应）
+// ============================================================
+message C2S_Connect {
+  string room_code = 1;   // 空 = 自动匹配建房；非空 = 加入指定好友房
+  string token = 2;       // account-server JWT；空/无效 = 匿名（现行为）
+}
+message C2S_Heartbeat {}  // 空——RTT 语义在信封层（发送时刻 → Ack 到达）
+message C2S_StartGame {}
+message C2S_HighFreqState {
+  Vec2  position = 1;
+  Vec2  velocity = 2;
+  string anim_state = 3;  // 过渡期保持 string；枚举化列入后续清理
+  bool  facing = 4;
+  int32 hp = 5;
+  float shelter_energy = 6;
+}
+message C2S_FragmentCaught {
+  int32 fragment_id = 1;
+  float pos_x = 2;        // 碰撞瞬间碎片世界坐标（同接几何判定依据）
+  float pos_y = 3;
+}
+// ── 预留（字段按 TODO Handler 预期入参草拟，接线时如需微调走 .proto 变更流程）──
+message C2S_BuildingPlace {
+  int32 building_type = 1;
+  int32 material = 2;
+  int32 grid_x = 3;
+  int32 grid_y = 4;
+  int32 facing = 5;
+}
+message C2S_BuildingRemove { int32 building_id = 1; }
+message C2S_Synthesize {
+  repeated int32 fragment_ids = 1;
+  int32 desired_output = 2;
+}
+message C2S_SkillActivate {
+  int32 skill_id = 1;
+  float target_x = 2;
+  float target_y = 3;
+}
+message C2S_TalentSelect { int32 talent_id = 1; }
+
+// ============================================================
+// S2C 消息体
+// ============================================================
+message S2C_Resp {
+  int32 req_id = 1;       // 回显请求关联号
+  int32 code = 2;         // NetErrorCode（码值表不变：0 成功 / 非0 失败）
+  string message = 3;     // 服务器默认文案（客户端有本地兜底）
+}
+message S2C_ConnectAck {
+  int32 player_id = 1;    // 0=房主(Aqua) / 1=加入方(Ignis)
+  string room_code = 2;
+}
+message S2C_GameStart { int32 chapter = 1; int32 section = 2; int32 round = 3; }
+message S2C_PlayerJoined { int32 player_id = 1; int32 player_count = 2; }
+message S2C_PhaseChange {
+  GamePhasePb phase = 1;
+  int32 duration_ms = 2;
+  int64 phase_end_time = 3;   // 服务器时钟。剩余 = phase_end_time - 信封 timestamp
+}
+message S2C_HighFreqState {
+  int32 player_id = 1;
+  Vec2 position = 2;
+  Vec2 velocity = 3;
+  string anim_state = 4;
+  bool facing = 5;
+  int32 hp = 6;
+  float shelter_energy = 7;
+}
+message S2C_MidFreqState {
+  message PlayerMidFreq {
+    int32 player_id = 1;
+    int32 hp = 2;
+    float shelter_energy = 3;        // JSON 时代 Math.round 成 int——proto 直接 float
+    repeated int32 carried_fragments = 4;
+  }
+  repeated PlayerMidFreq players = 1;
+}
+message S2C_OpponentDisconnect {
+  string state = 1;                  // "lobby" / "waiting"；离开者 = 信封 player_id
+}
+message S2C_FragmentDropPlan {
+  message PlanItem {
+    int32 fragment_id = 1;
+    int32 type = 2;                  // 0=冰晶 1=熔岩 2=岩石
+    Vec2 position = 3;
+    float drop_time = 4;
+    int64 seed = 5;
+  }
+  repeated PlanItem plan = 1;
+}
+message S2C_FragmentResult {
+  int32 fragment_id = 1;
+  int32 player_id = 2;               // 胜出上报者
+  int32 multiplier = 3;
+  bool is_simultaneous = 4;
+}
+message S2C_HeartbeatAck { int64 server_timestamp = 1; }
